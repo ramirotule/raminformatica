@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { Metadata } from 'next'
 import { supabase } from '@/lib/supabase'
 import { dict } from '@/lib/dict'
@@ -13,7 +14,7 @@ export const revalidate = 60
 
 async function getData() {
     const [productsRes, categoriesRes, brandsRes] = await Promise.all([
-        supabase
+        (supabase as any)
             .from('products')
             .select(`
         *,
@@ -29,8 +30,8 @@ async function getData() {
             .eq('active', true)
             .order('created_at', { ascending: false })
             .limit(200),
-        supabase.from('categories').select('*').order('name'),
-        supabase.from('brands').select('*').order('name'),
+        (supabase as any).from('categories').select('*').order('name'),
+        (supabase as any).from('brands').select('*').order('name'),
     ])
 
     return {
@@ -54,11 +55,13 @@ export default async function ProductosPage() {
                         {dict.productos.resultados(products.length)} disponibles
                     </p>
                 </div>
-                <ProductosClient
-                    products={products}
-                    categories={categories as Category[]}
-                    brands={brands as Brand[]}
-                />
+                <Suspense fallback={<div>Cargando productos...</div>}>
+                    <ProductosClient
+                        products={products}
+                        categories={categories as Category[]}
+                        brands={brands as Brand[]}
+                    />
+                </Suspense>
             </div>
         </div>
     )

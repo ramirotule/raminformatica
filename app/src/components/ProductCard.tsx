@@ -32,9 +32,9 @@ export default function ProductCard({ product }: ProductCardProps) {
     const variant = product.product_variants?.[0]
     const priceUSD = variant ? getPriceUSD(variant.prices) : null
     const priceARS = priceUSD && dolar ? getPriceARS(priceUSD, dolar.venta) : null
-    const stock = variant?.inventory?.qty_available ?? null
+    const stock = (variant?.inventory as any)?.[0]?.qty_available ?? null
     const image = product.product_images?.[0]
-    const emoji = CATEGORY_EMOJI[product.categories?.slug] ?? '📦'
+    const emoji = CATEGORY_EMOJI[(product.categories as any)?.slug] ?? '📦'
 
     const conditionClass: Record<string, string> = {
         new: 'badge-new',
@@ -60,15 +60,15 @@ export default function ProductCard({ product }: ProductCardProps) {
                     />
                 ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                        {product.categories?.icon_url && product.categories.icon_url.startsWith('http') ? (
+                        {(product as any).categories?.icon_url && (product as any).categories.icon_url.startsWith('http') ? (
                             <img
-                                src={product.categories.icon_url}
-                                alt={product.categories.name}
+                                src={(product as any).categories.icon_url}
+                                alt={(product as any).categories.name}
                                 style={{ width: 64, height: 64, objectFit: 'contain', padding: 0 }}
                             />
                         ) : (
-                            <span className="product-emoji" role="img" aria-label={product.name}>
-                                {product.categories?.icon_url || emoji}
+                            <span className="product-emoji" role="img" aria-label={(product as any).name}>
+                                {(product as any).categories?.icon_url || emoji}
                             </span>
                         )}
                         <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -79,8 +79,8 @@ export default function ProductCard({ product }: ProductCardProps) {
 
                 {/* Badge condición */}
                 <div style={{ position: 'absolute', top: 10, left: 10 }}>
-                    <span className={`badge ${conditionClass[product.condition] ?? 'badge-new'}`}>
-                        {conditionLabel(product.condition)}
+                    <span className={`badge ${conditionClass[(product as any).condition || 'new'] ?? 'badge-new'}`}>
+                        {conditionLabel((product as any).condition || 'new')}
                     </span>
                 </div>
 
@@ -89,8 +89,8 @@ export default function ProductCard({ product }: ProductCardProps) {
 
             {/* Info */}
             <div className="product-info">
-                <p className="product-brand">{product.brands?.name ?? 'Marca'}</p>
-                <h3 className="product-name">{product.name}</h3>
+                <p className="product-brand">{(product as any).brands?.name ?? 'Marca'}</p>
+                <h3 className="product-name">{(product as any).name}</h3>
 
                 {variant?.storage && (
                     <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>

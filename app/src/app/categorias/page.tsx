@@ -4,7 +4,7 @@ import CategoriasClient from './CategoriasClient'
 export const dynamic = 'force-dynamic'
 
 export default async function CategoriasPage() {
-    const { data: categories } = await supabase
+    const { data: categories } = await (supabase as any)
         .from('categories')
         .select('*')
         .order('name')

@@ -26,6 +26,8 @@ import {
     ExternalLink,
     Image,
     Home,
+    TrendingUp,
+    Star,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { dict } from '@/lib/dict'
@@ -111,10 +113,10 @@ function Dashboard() {
     useEffect(() => {
         async function load() {
             const [p, c, b, inv, mfa] = await Promise.all([
-                supabase.from('products').select('id', { count: 'exact', head: true }),
-                supabase.from('categories').select('id', { count: 'exact', head: true }),
-                supabase.from('brands').select('id', { count: 'exact', head: true }),
-                supabase.from('inventory').select('id', { count: 'exact', head: true }).eq('qty_available', 0),
+                (supabase as any).from('products').select('id', { count: 'exact', head: true }),
+                (supabase as any).from('categories').select('id', { count: 'exact', head: true }),
+                (supabase as any).from('brands').select('id', { count: 'exact', head: true }),
+                (supabase as any).from('inventory').select('id', { count: 'exact', head: true }).eq('qty_available', 0),
                 supabase.auth.mfa.listFactors()
             ])
             setStats({
@@ -217,6 +219,7 @@ function AdminProductos() {
     const [form, setForm] = useState({
         name: '', slug: '', category_id: '', brand_id: '',
         condition: 'new', short_description: '', active: true,
+        is_featured: false,
         priceUSD: '', sku: '', color: '', storage: '', connectivity: '',
     })
     const [images, setImages] = useState<{ id: string, file?: File, url: string, isExisting: boolean, storagePath?: string }[]>([])
@@ -259,12 +262,12 @@ function AdminProductos() {
                 .select('*, categories(*), brands(*), product_variants(*, prices(*), inventory(*)), product_images(*)')
                 .order('created_at', { ascending: false })
                 .limit(1000),
-            supabase.from('categories').select('*').order('name'),
-            supabase.from('brands').select('*').order('name'),
+            (supabase as any).from('categories').select('*').order('name'),
+            (supabase as any).from('brands').select('*').order('name'),
         ])
-        setProducts((pRes.data as unknown as ProductWithDetails[]) ?? [])
-        setCategories(cRes.data ?? [])
-        setBrands(bRes.data ?? [])
+        setProducts((pRes.data as any) ?? [])
+        setCategories((cRes.data as any) ?? [])
+        setBrands((bRes.data as any) ?? [])
         setLoading(false)
     }, [])
 
@@ -325,7 +328,7 @@ function AdminProductos() {
 
     async function bulkStatus(active: boolean) {
         if (!selectedIds.size) return
-        await supabase.from('products').update({ active } as any).in('id', Array.from(selectedIds))
+        await ((supabase as any).from('products') as any).update({ active }).in('id', Array.from(selectedIds))
         showAlert('success', `Productos ${active ? 'activados' : 'pausados'} masivamente.`)
         setSelectedIds(new Set())
         load()
@@ -334,7 +337,7 @@ function AdminProductos() {
     async function bulkDelete() {
         if (!selectedIds.size) return
         if (!confirm(`¿Eliminar masivamente ${selectedIds.size} producto(s)? Esta acción no se puede deshacer.`)) return
-        await supabase.from('products').delete().in('id', Array.from(selectedIds))
+        await (supabase as any).from('products').delete().in('id', Array.from(selectedIds))
         showAlert('success', 'Productos eliminados masivamente.')
         setSelectedIds(new Set())
         load()
@@ -342,7 +345,7 @@ function AdminProductos() {
 
     async function performBulkCategory() {
         if (!selectedIds.size || !bulkCategoryForm) return
-        await supabase.from('products').update({ category_id: bulkCategoryForm } as any).in('id', Array.from(selectedIds))
+        await ((supabase as any).from('products') as any).update({ category_id: bulkCategoryForm }).in('id', Array.from(selectedIds))
         showAlert('success', 'Categoría actualizada para los productos seleccionados.')
         setBulkCategoryOpen(false)
         setSelectedIds(new Set())
@@ -351,7 +354,7 @@ function AdminProductos() {
 
     async function performBulkBrand() {
         if (!selectedIds.size || !bulkBrandForm) return
-        await supabase.from('products').update({ brand_id: bulkBrandForm } as any).in('id', Array.from(selectedIds))
+        await ((supabase as any).from('products') as any).update({ brand_id: bulkBrandForm }).in('id', Array.from(selectedIds))
         showAlert('success', 'Marca actualizada para los productos seleccionados.')
         setBulkBrandOpen(false)
         setSelectedIds(new Set())
@@ -360,7 +363,12 @@ function AdminProductos() {
 
     function openNew() {
         setEditProduct(null)
-        setForm({ name: '', slug: '', category_id: '', brand_id: '', condition: 'new', short_description: '', active: true, priceUSD: '', sku: '', color: '', storage: '', connectivity: '' })
+        setForm({
+            name: '', slug: '', category_id: '', brand_id: '',
+            condition: 'new', short_description: '', active: true,
+            is_featured: false,
+            priceUSD: '', sku: '', color: '', storage: '', connectivity: ''
+        })
         setImages([])
         setModalOpen(true)
     }
@@ -371,7 +379,8 @@ function AdminProductos() {
         setEditProduct(p)
         setForm({
             name: p.name, slug: p.slug, category_id: p.category_id || '', brand_id: p.brand_id || '',
-            condition: p.condition || 'new', short_description: p.short_description ?? '', active: p.active,
+            condition: p.condition || 'new', short_description: p.short_description ?? '',
+            active: p.active, is_featured: p.is_featured,
             priceUSD: price ? String(price.amount) : '',
             sku: variant?.sku ?? '', color: variant?.color ?? '',
             storage: variant?.storage ?? '', connectivity: variant?.connectivity ?? '',
@@ -402,7 +411,7 @@ function AdminProductos() {
                     .order('sort_order', { ascending: false })
                     .limit(1)
 
-                let nextSortOrder = (currentImages?.[0]?.sort_order ?? -1) + 1
+                let nextSortOrder = ((currentImages as any)?.[0]?.sort_order ?? -1) + 1
 
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i]
@@ -414,7 +423,7 @@ function AdminProductos() {
 
                     if (!uploadError || (uploadError as any).status === 409 || uploadError.message?.includes('already exists')) {
                         const { data: { publicUrl } } = supabase.storage.from('Images').getPublicUrl(fileName)
-                        await supabase.from('product_images').insert({
+                        await (supabase as any).from('product_images').insert({
                             product_id: productId,
                             storage_path: fileName,
                             public_url: publicUrl,
@@ -449,12 +458,12 @@ function AdminProductos() {
             if (editProduct) {
                 currentProductId = editProduct.id
                 // UPDATE producto
-                const { error: pErr } = await supabase
+                const { error: pErr } = await (supabase as any)
                     .from('products')
                     .update({
                         name: form.name, slug, category_id: form.category_id, brand_id: form.brand_id,
                         condition: form.condition as 'new', short_description: form.short_description || null,
-                        active: form.active,
+                        active: form.active, is_featured: form.is_featured,
                     })
                     .eq('id', editProduct.id)
 
@@ -463,25 +472,25 @@ function AdminProductos() {
                 // UPDATE variant
                 const variant = editProduct.product_variants?.[0]
                 if (variant) {
-                    await supabase.from('product_variants').update({
+                    await ((supabase as any).from('product_variants') as any).update({
                         sku: form.sku || `${slug}-v1`, color: form.color || null,
                         storage: form.storage || null, connectivity: form.connectivity || null,
-                    } as any).eq('id', variant.id)
+                    }).eq('id', variant.id)
 
                     if (form.priceUSD) {
-                        await supabase.from('prices').upsert({
+                        await (supabase as any).from('prices').upsert({
                             variant_id: variant.id, currency: 'USD', amount: parseFloat(form.priceUSD),
                         }, { onConflict: 'variant_id,currency' })
                     }
                 }
             } else {
                 // INSERT producto
-                const { data: prod, error: pErr } = await supabase
+                const { data: prod, error: pErr } = await (supabase as any)
                     .from('products')
                     .insert({
                         name: form.name, slug, category_id: form.category_id, brand_id: form.brand_id,
                         condition: form.condition as 'new', short_description: form.short_description || null,
-                        active: form.active,
+                        active: form.active, is_featured: form.is_featured,
                     })
                     .select()
                     .single()
@@ -490,7 +499,7 @@ function AdminProductos() {
                 currentProductId = prod.id
 
                 // INSERT variant
-                const { data: varData } = await supabase
+                const { data: varData } = await (supabase as any)
                     .from('product_variants')
                     .insert({
                         product_id: prod.id, sku: form.sku || `${slug}-v1`,
@@ -502,11 +511,11 @@ function AdminProductos() {
 
                 // INSERT price
                 if (varData && form.priceUSD) {
-                    await supabase.from('prices').insert({
+                    await (supabase as any).from('prices').insert({
                         variant_id: varData.id, currency: 'USD', amount: parseFloat(form.priceUSD),
                     })
                     // INSERT inventory
-                    await supabase.from('inventory').insert({
+                    await (supabase as any).from('inventory').insert({
                         variant_id: varData.id, qty_available: 0, qty_reserved: 0,
                     })
                 }
@@ -518,7 +527,7 @@ function AdminProductos() {
                 const removedImages = (editProduct?.product_images || []).filter((img: any) => !currentExistingIds.has(img.id))
 
                 for (const rmImg of removedImages) {
-                    await supabase.from('product_images').delete().eq('id', rmImg.id)
+                    await (supabase as any).from('product_images').delete().eq('id', rmImg.id)
                     if (rmImg.storage_path && rmImg.storage_path.startsWith(currentProductId)) {
                         await supabase.storage.from('Images').remove([rmImg.storage_path])
                     }
@@ -534,14 +543,14 @@ function AdminProductos() {
 
                         if (!uploadError || (uploadError as any).status === 409 || uploadError.message?.includes('already exists')) {
                             const { data: { publicUrl } } = supabase.storage.from('Images').getPublicUrl(fileName)
-                            await supabase.from('product_images').insert({ product_id: currentProductId, storage_path: fileName, public_url: publicUrl, alt: `${form.name} ${i + 1}`, sort_order: i })
+                            await (supabase as any).from('product_images').insert({ product_id: currentProductId, storage_path: fileName, public_url: publicUrl, alt: `${form.name} ${i + 1}`, sort_order: i })
                         } else {
                             showAlert('error', 'Guardado. Falló la subida de imagen. (Asegúrate de tener un bucket "Images" público)')
                         }
                     } else if (!img.isExisting && !img.file && img.url) {
-                        await supabase.from('product_images').insert({ product_id: currentProductId, storage_path: img.url, public_url: img.url, alt: `${form.name} ${i + 1}`, sort_order: i })
+                        await (supabase as any).from('product_images').insert({ product_id: currentProductId, storage_path: img.url, public_url: img.url, alt: `${form.name} ${i + 1}`, sort_order: i })
                     } else if (img.isExisting) {
-                        await supabase.from('product_images').update({ sort_order: i }).eq('id', img.id)
+                        await (supabase as any).from('product_images').update({ sort_order: i }).eq('id', img.id)
                     }
                 }
             }
@@ -558,13 +567,18 @@ function AdminProductos() {
 
     async function handleDelete(id: string, name: string) {
         if (!confirm(`¿Eliminar "${name}"? Esta acción no se puede deshacer.`)) return
-        const { error } = await supabase.from('products').delete().eq('id', id)
+        const { error } = await (supabase as any).from('products').delete().eq('id', id)
         if (error) showAlert('error', error.message)
         else { showAlert('success', 'Producto eliminado.'); load() }
     }
 
     async function toggleActive(p: ProductWithDetails) {
-        await supabase.from('products').update({ active: !p.active } as any).eq('id', p.id)
+        await ((supabase as any).from('products') as any).update({ active: !p.active }).eq('id', p.id)
+        load()
+    }
+
+    async function toggleFeatured(p: ProductWithDetails) {
+        await ((supabase as any).from('products') as any).update({ is_featured: !p.is_featured }).eq('id', p.id)
         load()
     }
 
@@ -658,6 +672,7 @@ function AdminProductos() {
                                         Estado {sortField === 'active' && (sortOrder === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
                                     </div>
                                 </th>
+                                <th>Más Vendido</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -718,6 +733,28 @@ function AdminProductos() {
                                                 }}
                                             >
                                                 {p.active ? 'Activo' : 'Inactivo'}
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <button
+                                                onClick={() => toggleFeatured(p)}
+                                                title={p.is_featured ? 'Quitar de más vendidos' : 'Marcar como más vendido'}
+                                                style={{
+                                                    background: p.is_featured ? 'rgba(255,159,10,0.15)' : 'rgba(255,255,255,0.05)',
+                                                    border: `1px solid ${p.is_featured ? 'rgba(255,159,10,0.3)' : 'rgba(255,255,255,0.1)'}`,
+                                                    color: p.is_featured ? 'var(--orange)' : 'var(--text-muted)',
+                                                    borderRadius: 100,
+                                                    padding: '3px 10px',
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: 700,
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 4
+                                                }}
+                                            >
+                                                <TrendingUp size={12} />
+                                                {p.is_featured ? 'Sí' : 'No'}
                                             </button>
                                         </td>
                                         <td>
@@ -828,6 +865,20 @@ function AdminProductos() {
                                 <label className="form-label" htmlFor="form-storage">{dict.admin.almacenamiento}</label>
                                 <input id="form-storage" className="form-input" value={form.storage}
                                     onChange={(e) => setForm((f) => ({ ...f, storage: e.target.value }))} placeholder="128GB, 256GB..." />
+                            </div>
+
+                            <div className="form-group" style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(255,159,10,0.05)', padding: '12px 16px', borderRadius: 12, border: '1px solid rgba(255,159,10,0.1)', marginTop: 8 }}>
+                                <input
+                                    type="checkbox"
+                                    id="form-featured"
+                                    checked={form.is_featured}
+                                    onChange={(e) => setForm(f => ({ ...f, is_featured: e.target.checked }))}
+                                    style={{ width: 18, height: 18, cursor: 'pointer', accentColor: 'var(--orange)' }}
+                                />
+                                <label htmlFor="form-featured" style={{ cursor: 'pointer', fontWeight: 600, color: 'var(--orange)', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                    <TrendingUp size={16} />
+                                    Marcar como "Producto Más Vendido" (Aparecerá destacado en la Home)
+                                </label>
                             </div>
 
                             <div className="form-group">
@@ -1174,7 +1225,7 @@ function AdminCategorias() {
 
     const load = useCallback(async () => {
         setLoading(true)
-        const { data } = await supabase.from('categories').select('*').order('name')
+        const { data } = await (supabase as any).from('categories').select('*').order('name')
         setItems(data ?? [])
         setLoading(false)
     }, [])
@@ -1216,9 +1267,9 @@ function AdminCategorias() {
 
             let error
             if (editId) {
-                ; ({ error } = await supabase.from('categories').update(data as any).eq('id', editId))
+                ; ({ error } = await ((supabase as any).from('categories') as any).update(data).eq('id', editId))
             } else {
-                ; ({ error } = await supabase.from('categories').insert(data))
+                ; ({ error } = await (supabase as any).from('categories').insert(data))
             }
             if (error) throw error
             showAlert('success', editId ? 'Categoría actualizada.' : 'Categoría creada.')
@@ -1233,7 +1284,7 @@ function AdminCategorias() {
     }
 
     async function handleDelete(id: string, name: string) {
-        const { count, error: countError } = await supabase
+        const { count, error: countError } = await (supabase as any)
             .from('products')
             .select('*', { count: 'exact', head: true })
             .eq('category_id', id)
@@ -1251,7 +1302,7 @@ function AdminCategorias() {
         const { id, count } = deleteConfirm
 
         if (count > 0) {
-            const { error: productsError } = await supabase.from('products').delete().eq('category_id', id)
+            const { error: productsError } = await (supabase as any).from('products').delete().eq('category_id', id)
             if (productsError) {
                 showAlert('error', productsError.message)
                 setDeleteConfirm(null)
@@ -1259,7 +1310,7 @@ function AdminCategorias() {
             }
         }
 
-        const { error } = await supabase.from('categories').delete().eq('id', id)
+        const { error } = await (supabase as any).from('categories').delete().eq('id', id)
         if (error) showAlert('error', error.message)
         else { showAlert('success', 'Categoría eliminada.'); load() }
         setDeleteConfirm(null)
@@ -1459,7 +1510,7 @@ function AdminMarcas() {
 
     const load = useCallback(async () => {
         setLoading(true)
-        const { data } = await supabase.from('brands').select('*').order('name')
+        const { data } = await (supabase as any).from('brands').select('*').order('name')
         setItems(data ?? [])
         setLoading(false)
     }, [])
@@ -1472,9 +1523,9 @@ function AdminMarcas() {
             const data = { name: form.name, slug: form.slug || slugify(form.name) }
             let error
             if (editId) {
-                ; ({ error } = await supabase.from('brands').update(data as any).eq('id', editId))
+                ; ({ error } = await ((supabase as any).from('brands') as any).update(data).eq('id', editId))
             } else {
-                ; ({ error } = await supabase.from('brands').insert(data))
+                ; ({ error } = await (supabase as any).from('brands').insert(data))
             }
             if (error) throw error
             showAlert('success', editId ? 'Marca actualizada.' : 'Marca creada.')
@@ -1488,7 +1539,7 @@ function AdminMarcas() {
     }
 
     async function handleDelete(id: string, name: string) {
-        const { count, error: countError } = await supabase
+        const { count, error: countError } = await (supabase as any)
             .from('products')
             .select('*', { count: 'exact', head: true })
             .eq('brand_id', id)
@@ -1506,7 +1557,7 @@ function AdminMarcas() {
         const { id, count } = deleteConfirm
 
         if (count > 0) {
-            const { error: productsError } = await supabase.from('products').delete().eq('brand_id', id)
+            const { error: productsError } = await (supabase as any).from('products').delete().eq('brand_id', id)
             if (productsError) {
                 showAlert('error', productsError.message)
                 setDeleteConfirm(null)
@@ -1514,7 +1565,7 @@ function AdminMarcas() {
             }
         }
 
-        const { error } = await supabase.from('brands').delete().eq('id', id)
+        const { error } = await (supabase as any).from('brands').delete().eq('id', id)
         if (error) showAlert('error', error.message)
         else { showAlert('success', 'Marca eliminada.'); load() }
         setDeleteConfirm(null)
@@ -1700,7 +1751,7 @@ function AdminInventario() {
 
     const load = useCallback(async () => {
         setLoading(true)
-        const { data } = await supabase
+        const { data, error } = await (supabase as any)
             .from('inventory')
             .select('*, product_variants(*, products(name, slug))')
             .order('updated_at', { ascending: false })
@@ -1712,7 +1763,7 @@ function AdminInventario() {
     useEffect(() => { load() }, [load])
 
     async function saveQty(id: string) {
-        const { error } = await supabase.from('inventory').update({ qty_available: parseInt(qty), updated_at: new Date().toISOString() } as any).eq('id', id)
+        const { error } = await ((supabase as any).from('inventory') as any).update({ qty_available: parseInt(qty), updated_at: new Date().toISOString() }).eq('id', id)
         if (error) showAlert('error', error.message)
         else { showAlert('success', 'Stock actualizado.'); setEditItem(null); load() }
     }
@@ -1846,9 +1897,9 @@ function AdminHome() {
     async function loadAll() {
         setLoading(true)
         const [sRes, lRes, pRes] = await Promise.all([
-            supabase.from('home_slides').select('*, products(id, name, slug)').order('sort_order'),
-            supabase.from('brand_logos').select('*').order('sort_order'),
-            supabase.from('products').select('id, name, slug').eq('active', true).order('name'),
+            (supabase as any).from('home_slides').select('*, products(id, name, slug)').order('sort_order'),
+            (supabase as any).from('brand_logos').select('*').order('sort_order'),
+            (supabase as any).from('products').select('id, name, slug').eq('active', true).order('name'),
         ])
         setSlides((sRes.data as unknown as HomeSlide[]) ?? [])
         setLogos((lRes.data as BrandLogo[]) ?? [])
@@ -1913,9 +1964,9 @@ function AdminHome() {
             }
 
             if (editItem) {
-                await supabase.from('home_slides').update(payload as any).eq('id', editItem.id)
+                await ((supabase as any).from('home_slides') as any).update(payload).eq('id', editItem.id)
             } else {
-                await supabase.from('home_slides').insert(payload)
+                await (supabase as any).from('home_slides').insert(payload)
             }
 
             showAlert('success', 'Slide guardado correctamente.')
@@ -1930,7 +1981,7 @@ function AdminHome() {
 
     async function deleteSlide(id: string) {
         if (!confirm('¿Eliminar este slide?')) return
-        await supabase.from('home_slides').delete().eq('id', id)
+        await (supabase as any).from('home_slides').delete().eq('id', id)
         showAlert('success', 'Slide eliminado.')
         loadAll()
     }
@@ -1983,9 +2034,9 @@ function AdminHome() {
             }
 
             if (editItem) {
-                await supabase.from('brand_logos').update(payload as any).eq('id', editItem.id)
+                await ((supabase as any).from('brand_logos') as any).update(payload).eq('id', editItem.id)
             } else {
-                await supabase.from('brand_logos').insert(payload)
+                await (supabase as any).from('brand_logos').insert(payload)
             }
 
             showAlert('success', 'Logo guardado correctamente.')
@@ -2000,7 +2051,7 @@ function AdminHome() {
 
     async function deleteLogo(id: string) {
         if (!confirm('¿Eliminar este logo?')) return
-        await supabase.from('brand_logos').delete().eq('id', id)
+        await (supabase as any).from('brand_logos').delete().eq('id', id)
         showAlert('success', 'Logo eliminado.')
         loadAll()
     }

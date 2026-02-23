@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export const revalidate = 10 // ISR cada 10s
 
 async function getFeaturedProducts(): Promise<ProductWithDetails[]> {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('products')
     .select(`
       *,
@@ -38,7 +38,7 @@ async function getFeaturedProducts(): Promise<ProductWithDetails[]> {
 }
 
 async function getHomeSlides(): Promise<HomeSlide[]> {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('home_slides')
     .select('*, products(id, name, slug)')
     .eq('active', true)
@@ -53,7 +53,7 @@ async function getHomeSlides(): Promise<HomeSlide[]> {
 }
 
 async function getBrandLogos(): Promise<BrandLogo[]> {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('brand_logos')
     .select('*')
     .eq('active', true)

@@ -9,7 +9,7 @@ interface ProductPageProps {
 
 export async function generateMetadata({ params }: ProductPageProps) {
     const { slug } = await params
-    const { data: product } = await supabase
+    const { data: product } = await (supabase as any)
         .from('products')
         .select('name, short_description')
         .eq('slug', slug)
@@ -18,15 +18,15 @@ export async function generateMetadata({ params }: ProductPageProps) {
     if (!product) return { title: 'Producto no encontrado' }
 
     return {
-        title: product.name,
-        description: product.short_description,
+        title: (product as any).name,
+        description: (product as any).short_description,
     }
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
     const { slug } = await params
 
-    const { data: product } = await supabase
+    const { data: product } = await (supabase as any)
         .from('products')
         .select(`
       *,

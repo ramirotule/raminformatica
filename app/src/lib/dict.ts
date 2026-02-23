@@ -17,7 +17,7 @@ export const dict = {
     },
     hero: {
         titulo: 'Tecnología premium',
-        subtitulo: 'al mejor precio de Argentina',
+        subtitulo: 'a un precios muy competitivo',
         descripcion: 'iPhone, Samsung, Motorola, JBL, PlayStation y mucho más. Precios en dólares y pesos actualizados a diario.',
         cta: 'Ver productos',
         ctaSecundario: 'Ver categorías',

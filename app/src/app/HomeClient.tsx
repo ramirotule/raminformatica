@@ -178,7 +178,7 @@ function ProductRow({
     if (products.length === 0) return null
 
     return (
-        <section className="section">
+        <section className="section" style={{ paddingBlock: 0 }}>
             <div className="container">
                 <div className="product-row-header">
                     <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -215,20 +215,20 @@ function ProductRow({
 }
 
 export default function HomeClient({ products, slides, brandLogos }: HomeClientProps) {
-    // "Más vendidos" – primeros 10
-    const masVendidos = products.slice(0, 10)
+    // "Más vendidos" – filtrados por is_featured
+    const masVendidos = products.filter(p => p.is_featured).slice(0, 10)
 
     return (
         <>
             {/* ─── HERO CAROUSEL ───────────────────────────── */}
-            <HeroCarousel slides={slides} products={products} />
+            {/* <HeroCarousel slides={slides} products={products} /> */}
 
             {/* ─── HERO TEXT ──────────────────────────────────── */}
-            <section className="hero" style={{ minHeight: 'auto', padding: '64px 0' }}>
+            <section className="hero" style={{ minHeight: 'auto', padding: '64px 0', paddingTop: '200px' }}>
                 <div className="container hero-content">
                     <div className="hero-eyebrow">
                         <Zap size={13} />
-                        <span>Tecnología al mejor precio · Argentina</span>
+                        <span>Toda la Tecnología que buscas en un solo lugar</span>
                     </div>
 
                     <h1 className="hero-title">

@@ -47,8 +47,7 @@ export async function updatePricesFromJson(jsonText: string) {
             const variantId = (product.product_variants[0] as any).id;
 
             // Actualizar el precio (solo aseguramos USD por ahora)
-            const { error: updateError } = await supabaseAdmin
-                .from("prices")
+            const { error: updateError } = await ( (supabaseAdmin as any).from("prices") as any)
                 .update({ amount: item.precio, updated_at: new Date().toISOString() })
                 .eq("variant_id", variantId)
                 .eq("currency", "USD");
