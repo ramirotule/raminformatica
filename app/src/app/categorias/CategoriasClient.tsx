@@ -13,7 +13,7 @@ export default function CategoriasClient({ categories }: CategoriasClientProps) 
     return (
         <main className="page">
             <section className="hero" style={{ minHeight: '30vh' }}>
-                <div className="container hero-content">
+                <div className="container hero-content" style={{ marginTop: '160px' }}>
                     <h1 className="hero-title">
                         <span>{dict.categorias.titulo}</span>
                     </h1>

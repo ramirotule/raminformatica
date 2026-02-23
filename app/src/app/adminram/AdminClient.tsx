@@ -325,7 +325,7 @@ function AdminProductos() {
 
     async function bulkStatus(active: boolean) {
         if (!selectedIds.size) return
-        await supabase.from('products').update({ active }).in('id', Array.from(selectedIds))
+        await supabase.from('products').update({ active } as any).in('id', Array.from(selectedIds))
         showAlert('success', `Productos ${active ? 'activados' : 'pausados'} masivamente.`)
         setSelectedIds(new Set())
         load()
@@ -342,7 +342,7 @@ function AdminProductos() {
 
     async function performBulkCategory() {
         if (!selectedIds.size || !bulkCategoryForm) return
-        await supabase.from('products').update({ category_id: bulkCategoryForm }).in('id', Array.from(selectedIds))
+        await supabase.from('products').update({ category_id: bulkCategoryForm } as any).in('id', Array.from(selectedIds))
         showAlert('success', 'Categoría actualizada para los productos seleccionados.')
         setBulkCategoryOpen(false)
         setSelectedIds(new Set())
@@ -351,7 +351,7 @@ function AdminProductos() {
 
     async function performBulkBrand() {
         if (!selectedIds.size || !bulkBrandForm) return
-        await supabase.from('products').update({ brand_id: bulkBrandForm }).in('id', Array.from(selectedIds))
+        await supabase.from('products').update({ brand_id: bulkBrandForm } as any).in('id', Array.from(selectedIds))
         showAlert('success', 'Marca actualizada para los productos seleccionados.')
         setBulkBrandOpen(false)
         setSelectedIds(new Set())
@@ -466,7 +466,7 @@ function AdminProductos() {
                     await supabase.from('product_variants').update({
                         sku: form.sku || `${slug}-v1`, color: form.color || null,
                         storage: form.storage || null, connectivity: form.connectivity || null,
-                    }).eq('id', variant.id)
+                    } as any).eq('id', variant.id)
 
                     if (form.priceUSD) {
                         await supabase.from('prices').upsert({
@@ -564,7 +564,7 @@ function AdminProductos() {
     }
 
     async function toggleActive(p: ProductWithDetails) {
-        await supabase.from('products').update({ active: !p.active }).eq('id', p.id)
+        await supabase.from('products').update({ active: !p.active } as any).eq('id', p.id)
         load()
     }
 
@@ -1216,7 +1216,7 @@ function AdminCategorias() {
 
             let error
             if (editId) {
-                ; ({ error } = await supabase.from('categories').update(data).eq('id', editId))
+                ; ({ error } = await supabase.from('categories').update(data as any).eq('id', editId))
             } else {
                 ; ({ error } = await supabase.from('categories').insert(data))
             }
@@ -1472,7 +1472,7 @@ function AdminMarcas() {
             const data = { name: form.name, slug: form.slug || slugify(form.name) }
             let error
             if (editId) {
-                ; ({ error } = await supabase.from('brands').update(data).eq('id', editId))
+                ; ({ error } = await supabase.from('brands').update(data as any).eq('id', editId))
             } else {
                 ; ({ error } = await supabase.from('brands').insert(data))
             }
@@ -1712,7 +1712,7 @@ function AdminInventario() {
     useEffect(() => { load() }, [load])
 
     async function saveQty(id: string) {
-        const { error } = await supabase.from('inventory').update({ qty_available: parseInt(qty), updated_at: new Date().toISOString() }).eq('id', id)
+        const { error } = await supabase.from('inventory').update({ qty_available: parseInt(qty), updated_at: new Date().toISOString() } as any).eq('id', id)
         if (error) showAlert('error', error.message)
         else { showAlert('success', 'Stock actualizado.'); setEditItem(null); load() }
     }
@@ -1913,7 +1913,7 @@ function AdminHome() {
             }
 
             if (editItem) {
-                await supabase.from('home_slides').update(payload).eq('id', editItem.id)
+                await supabase.from('home_slides').update(payload as any).eq('id', editItem.id)
             } else {
                 await supabase.from('home_slides').insert(payload)
             }
@@ -1983,7 +1983,7 @@ function AdminHome() {
             }
 
             if (editItem) {
-                await supabase.from('brand_logos').update(payload).eq('id', editItem.id)
+                await supabase.from('brand_logos').update(payload as any).eq('id', editItem.id)
             } else {
                 await supabase.from('brand_logos').insert(payload)
             }

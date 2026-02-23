@@ -19,7 +19,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
     const isHome = pathname === '/'
 
     // Páginas que necesitan más padding por el header de 2 filas
-    const needsExtraPadding = ['/productos', '/nosotros', '/como-comprar']
+    const needsExtraPadding = ['/productos']
     const pageStyle = needsExtraPadding.includes(pathname)
         ? { paddingTop: 195 }
         : undefined
