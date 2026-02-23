@@ -5,12 +5,13 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useDolarBlue } from '@/hooks/useDolarBlue'
 import { formatARS } from '@/lib/utils'
 import { dict } from '@/lib/dict'
-import { TrendingUp, Menu, ShoppingBag, ShoppingCart, Check, SlidersHorizontal } from 'lucide-react'
+import { TrendingUp, Menu, ShoppingBag, ShoppingCart, Check, SlidersHorizontal, Sun, Moon } from 'lucide-react'
 import { useState } from 'react'
 import { useCart } from '@/context/CartContext'
 import { useSearch } from '@/context/SearchContext'
 import CartDrawer from './CartDrawer'
 import GlobalSearch from './GlobalSearch'
+import { useTheme } from '@/context/ThemeContext'
 import { SearchableSelect } from './SearchableSelect'
 
 export default function Header() {
@@ -18,6 +19,7 @@ export default function Header() {
     const { dolar, loading } = useDolarBlue()
     const { totalItems, isDrawerOpen, setDrawerOpen } = useCart()
     const { showFilters, setShowFilters, sortBy, setSortBy } = useSearch()
+    const { theme, toggleTheme } = useTheme()
     const [menuOpen, setMenuOpen] = useState(false)
     const router = useRouter()
 
@@ -38,10 +40,11 @@ export default function Header() {
                 {/* Left: Logo */}
                 <Link href="/" className="logo-container">
                     <img
-                        src="/logo_ram_transparente.png"
+                        src={theme === 'dark' ? '/logo_transparent_dark.png' : '/logo_transparent_light.png'}
                         alt={dict.marca.nombre}
                         className="brand-logo"
                     />
+                    <span className="brand-name">Desde 2008 impulsando tu mundo tecnológico</span>
                 </Link>
 
                 {/* Right Column: Menu (Top) and Search (Bottom) */}
@@ -85,9 +88,9 @@ export default function Header() {
                                 style={{
                                     position: 'relative',
                                     padding: '8px',
-                                    background: totalItems > 0 ? 'rgba(52, 199, 89, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+                                    background: totalItems > 0 ? 'rgba(52, 199, 89, 0.1)' : 'var(--bg-card)',
                                     borderRadius: '12px',
-                                    border: totalItems > 0 ? '1px solid rgba(52, 199, 89, 0.3)' : '1px solid rgba(255, 255, 255, 0.1)'
+                                    border: totalItems > 0 ? '1px solid rgba(52, 199, 89, 0.3)' : '1px solid var(--border-light)'
                                 }}
                                 onClick={() => setDrawerOpen(true)}
                             >
@@ -116,20 +119,25 @@ export default function Header() {
                                 )}
                             </button>
 
-                            {/* WhatsApp */}
-                            <a
-                                href="https://wa.me/5492954621345"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="whatsapp-btn md-show"
-                                title="Contactanos por WhatsApp"
+                            {/* Theme Toggle */}
+                            <button
+                                className="btn btn-ghost theme-toggle-btn"
+                                onClick={toggleTheme}
+                                aria-label={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+                                title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
+                                style={{
+                                    padding: '8px',
+                                    background: 'rgba(255, 255, 255, 0.05)',
+                                    borderRadius: '12px',
+                                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                                }}
                             >
-                                <img
-                                    src="/whatsapp-logo.png"
-                                    alt="WhatsApp"
-                                    className="whatsapp-icon-img"
-                                />
-                            </a>
+                                {theme === 'dark' ? (
+                                    <Sun size={20} color="var(--text-secondary)" />
+                                ) : (
+                                    <Moon size={20} color="var(--text-secondary)" />
+                                )}
+                            </button>
 
                             {/* Mobile hamburger */}
                             <button
@@ -157,9 +165,9 @@ export default function Header() {
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '10px',
-                                    background: showFilters ? 'rgba(52, 199, 89, 0.15)' : '#1a1a1a',
-                                    border: showFilters ? '1px solid var(--accent)' : '1px solid #333',
-                                    color: 'white',
+                                    background: showFilters ? 'rgba(52, 199, 89, 0.15)' : 'var(--bg-card)',
+                                    border: showFilters ? '1px solid var(--accent)' : '1px solid var(--border-light)',
+                                    color: 'var(--text-primary)',
                                     fontSize: '0.95rem',
                                     fontWeight: 500,
                                     cursor: 'pointer',
@@ -197,6 +205,21 @@ export default function Header() {
                                 />
                             </div>
                         </div>
+
+                        {/* WhatsApp - aligned right, vertically centered */}
+                        <a
+                            href="https://wa.me/5492954621345"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="whatsapp-btn md-show"
+                            title="Contactanos por WhatsApp"
+                        >
+                            <img
+                                src="/whatsapp-logo.png"
+                                alt="WhatsApp"
+                                className="whatsapp-icon-img"
+                            />
+                        </a>
                     </div>
                 </div>
             </div>

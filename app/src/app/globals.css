@@ -34,6 +34,92 @@
   --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ─── Light Theme ────────────────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --bg-primary: #f5f5f7;
+  --bg-secondary: #e8e8ed;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f0f0f5;
+  --bg-glass: rgba(255, 255, 255, 0.85);
+  --border: rgba(0, 0, 0, 0.08);
+  --border-light: rgba(0, 0, 0, 0.12);
+
+  --text-primary: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --text-muted: #86868b;
+
+  --accent: #28a745;
+  --accent-light: #2fb350;
+  --accent-glow: rgba(40, 167, 69, 0.2);
+  --green: #28a745;
+
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .search-input {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .search-input:focus {
+  background: #ffffff;
+  border-color: var(--accent);
+}
+
+[data-theme="light"] .search-dropdown {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .dropdown-item:hover {
+  background: #f5f5f7;
+}
+
+[data-theme="light"] .dropdown-item {
+  border-bottom-color: #eee;
+}
+
+[data-theme="light"] .dolar-badge {
+  background: rgba(40, 167, 69, 0.1);
+  border-color: rgba(40, 167, 69, 0.2);
+}
+
+[data-theme="light"] .nav-links a:hover,
+[data-theme="light"] .nav-links a.active {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .product-card:hover {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1), 0 0 0 1px var(--border-light);
+}
+
+[data-theme="light"] .theme-toggle-btn {
+  background: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme="light"] .brand-logo {
+  filter: drop-shadow(0 0 12px rgba(40, 167, 69, 0.3));
+}
+
+/* Theme toggle animation */
+.theme-toggle-btn {
+  transition: all 0.3s ease !important;
+}
+
+.theme-toggle-btn:hover {
+  transform: rotate(15deg) scale(1.1);
+}
+
+/* WhatsApp in search row alignment */
+.header-search-row .whatsapp-btn {
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
 /* ─── Base ───────────────────────────────────────────────────────────────────── */
 *,
 *::before,
@@ -53,6 +139,7 @@ body {
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ─── Scrollbar ─────────────────────────────────────────────────────────────── */
@@ -169,7 +256,7 @@ img {
 }
 
 .brand-logo {
-  height: 95px;
+  height: 130px;
   width: auto;
   object-fit: contain;
   object-position: left center;
@@ -1282,7 +1369,12 @@ tbody td {
 
 /* ─── Page padding top  ──────────────────────────────────────────────────────── */
 .page {
-  padding-top: 155px;
+  padding-top: 160px;
+}
+
+.page>.section:first-child,
+.page> :first-child>.section:first-child {
+  padding-top: 0;
 }
 
 /* ─── Product Detail Page ─────────────────────────────────────────────────── */

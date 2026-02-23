@@ -12,7 +12,7 @@ interface CategoriasClientProps {
 export default function CategoriasClient({ categories }: CategoriasClientProps) {
     return (
         <main className="page">
-            <section className="section" style={{ marginTop: -60 }}>
+            <section className="section">
                 <div className="container">
                     <div style={{ marginBottom: 48, textAlign: 'center' }}>
                         <h1 className="hero-title" style={{ fontSize: '3rem', marginBottom: 16 }}>
