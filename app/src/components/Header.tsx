@@ -78,7 +78,7 @@ export default function Header() {
                                 >
                                     <span className="dolar-dot" />
                                     <span style={{ opacity: 0.9 }}>Cotización del Dólar Hoy:</span>
-                                    <span style={{ fontWeight: 800, color: 'white' }}>$AR {dolar.venta.toLocaleString('es-AR')}</span>
+                                    <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>$AR {dolar.venta.toLocaleString('es-AR')}</span>
                                 </div>
                             ) : null}
 

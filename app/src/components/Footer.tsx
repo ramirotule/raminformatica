@@ -20,8 +20,8 @@ export default function Footer() {
                             className="footer-brand-logo"
                         />
                         <p className="footer-desc">
-                            Tu tienda de tecnología de confianza en Santa Rosa, La Pampa.
-                            iPhone, Samsung, Motorola, JBL, PlayStation y mucho más.
+                            Tu tienda de tecnología de confianza en Santa Rosa, La Pampa. <br />
+                            Celulares, Consolas de Videojuegos, Notebooks y mucho más.
                         </p>
                         <div className="footer-social-links">
                             <a

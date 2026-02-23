@@ -60,15 +60,15 @@ export function SearchableSelect({ options, value, onChange, placeholder = 'Sele
                     width: '100%',
                     opacity: disabled ? 0.6 : 1,
                     userSelect: 'none',
-                    background: '#1a1a1a',
-                    border: '1px solid #333',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-light)',
                     borderRadius: '12px',
                     height: '46px',
                     padding: '0 16px'
                 }}
                 onClick={() => !disabled && setIsOpen(!isOpen)}
             >
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: selectedOption ? 'white' : 'var(--text-muted)', fontSize: '0.95rem' }}>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: selectedOption ? 'var(--text-primary)' : 'var(--text-muted)', fontSize: '0.95rem' }}>
                     {selectedOption ? selectedOption.label : placeholder}
                 </span>
                 <ChevronDown size={14} style={{ color: 'var(--text-muted)' }} />
@@ -82,10 +82,10 @@ export function SearchableSelect({ options, value, onChange, placeholder = 'Sele
                         top: 'calc(100% + 8px)',
                         left: 0,
                         right: 0,
-                        background: '#1a1a1a',
-                        border: '1px solid #333',
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border-light)',
                         borderRadius: '12px',
-                        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.5)',
+                        boxShadow: 'var(--shadow-lg)',
                         zIndex: 1000,
                         overflow: 'hidden',
                         display: 'flex',
@@ -93,7 +93,7 @@ export function SearchableSelect({ options, value, onChange, placeholder = 'Sele
                         maxHeight: '300px'
                     }}
                 >
-                    <div style={{ padding: '8px', borderBottom: '1px solid #222', display: 'flex', alignItems: 'center', background: '#111' }}>
+                    <div style={{ padding: '8px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', background: 'var(--bg-secondary)' }}>
                         <Search size={14} style={{ color: 'var(--text-muted)', marginLeft: 8 }} />
                         <input
                             ref={inputRef}
@@ -124,11 +124,11 @@ export function SearchableSelect({ options, value, onChange, placeholder = 'Sele
                                         alignItems: 'center',
                                         justifyContent: 'space-between',
                                         fontSize: '0.9rem',
-                                        color: option.value === value ? 'var(--accent-light)' : 'white',
+                                        color: option.value === value ? 'var(--accent-light)' : 'var(--text-primary)',
                                         background: option.value === value ? 'rgba(52, 199, 89, 0.1)' : 'transparent',
                                         transition: 'background 0.2s ease'
                                     }}
-                                    onMouseEnter={e => e.currentTarget.style.background = option.value === value ? 'rgba(52, 199, 89, 0.1)' : '#222'}
+                                    onMouseEnter={e => e.currentTarget.style.background = option.value === value ? 'rgba(52, 199, 89, 0.1)' : 'var(--bg-card-hover)'}
                                     onMouseLeave={e => e.currentTarget.style.background = option.value === value ? 'rgba(52, 199, 89, 0.1)' : 'transparent'}
                                 >
                                     {option.label}
