@@ -35,7 +35,7 @@ export const metadata: Metadata = {
       { url: '/favicon/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
     ],
   },
-  manifest: '/favicon/site.webmanifest',
+  manifest: '/site.webmanifest',
   openGraph: {
     title: dict.marca.nombre,
     description: dict.marca.descripcion,

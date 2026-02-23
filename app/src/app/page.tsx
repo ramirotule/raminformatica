@@ -9,7 +9,8 @@ export const metadata: Metadata = {
   description: dict.marca.descripcion,
 }
 
-export const revalidate = 10 // ISR cada 10s
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 async function getFeaturedProducts(): Promise<ProductWithDetails[]> {
   const { data, error } = await (supabase as any)
@@ -26,8 +27,9 @@ async function getFeaturedProducts(): Promise<ProductWithDetails[]> {
       product_images(*)
     `)
     .eq('active', true)
+    .order('is_featured', { ascending: false })
     .order('created_at', { ascending: false })
-    .limit(50)
+    .limit(100)
 
   if (error) {
     console.error('Error fetching productos:', error)

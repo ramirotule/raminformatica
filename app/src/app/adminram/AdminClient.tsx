@@ -265,7 +265,9 @@ function AdminProductos() {
             (supabase as any).from('categories').select('*').order('name'),
             (supabase as any).from('brands').select('*').order('name'),
         ])
-        setProducts((pRes.data as any) ?? [])
+        const productsData = (pRes.data as any) ?? []
+        console.log('Products loaded:', productsData.length, 'Featured:', productsData.filter((p: any) => p.is_featured).length)
+        setProducts(productsData)
         setCategories((cRes.data as any) ?? [])
         setBrands((bRes.data as any) ?? [])
         setLoading(false)
@@ -578,8 +580,21 @@ function AdminProductos() {
     }
 
     async function toggleFeatured(p: ProductWithDetails) {
-        await ((supabase as any).from('products') as any).update({ is_featured: !p.is_featured }).eq('id', p.id)
-        load()
+        console.log('Toggling featured for product:', p.id, 'Current keys:', Object.keys(p))
+        const { error } = await (supabase as any).from('products').update({ is_featured: !p.is_featured }).eq('id', p.id)
+        if (error) {
+            console.error('Error toggling featured:', error)
+            showAlert('error', 'Error al actualizar: ' + error.message)
+            // Si falla is_featured, intentar featured por si acaso
+            if (error.message.includes('column "is_featured" does not exist')) {
+                console.log('Trying "featured" column instead...')
+                const { error: error2 } = await (supabase as any).from('products').update({ featured: !p.is_featured }).eq('id', p.id)
+                if (error2) console.error('Error with featured column too:', error2)
+                else { showAlert('success', 'Actualizado usando columna "featured"'); load() }
+            }
+        } else {
+            load()
+        }
     }
 
     return (

@@ -215,8 +215,15 @@ function ProductRow({
 }
 
 export default function HomeClient({ products, slides, brandLogos }: HomeClientProps) {
-    // "Más vendidos" – filtrados por is_featured
-    const masVendidos = products.filter(p => p.is_featured).slice(0, 10)
+    console.log('DEBUG [HomeClient] Total products:', products?.length)
+    console.log('DEBUG [HomeClient] Featured products:', products?.filter(p => !!p.is_featured).length)
+    if (products?.length > 0) {
+        console.log('DEBUG [HomeClient] Sample product keys:', Object.keys(products[0]))
+        console.log('DEBUG [HomeClient] Sample product is_featured:', products[0].is_featured)
+    }
+
+    // "Más vendidos" – filtrados por is_featured (usamos doble negación para asegurar booleano)
+    const masVendidos = (products || []).filter(p => !!p.is_featured).slice(0, 10)
 
     return (
         <>
