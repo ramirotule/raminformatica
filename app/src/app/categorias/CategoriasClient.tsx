@@ -12,16 +12,19 @@ interface CategoriasClientProps {
 export default function CategoriasClient({ categories }: CategoriasClientProps) {
     return (
         <main className="page">
+            <section className="hero" style={{ minHeight: '30vh' }}>
+                <div className="container hero-content">
+                    <h1 className="hero-title">
+                        <span>{dict.categorias.titulo}</span>
+                    </h1>
+                    <p className="hero-desc">
+                        Explorá nuestra amplia variedad de productos tecnológicos organizados por categorías.
+                    </p>
+                </div>
+            </section>
+
             <section className="section">
                 <div className="container">
-                    <div style={{ marginBottom: 48, textAlign: 'center' }}>
-                        <h1 className="hero-title" style={{ fontSize: '3rem', marginBottom: 16 }}>
-                            <span>{dict.categorias.titulo}</span>
-                        </h1>
-                        <p className="hero-desc" style={{ maxWidth: 600, marginInline: 'auto' }}>
-                            Explorá nuestra amplia variedad de productos tecnológicos organizados por categorías.
-                        </p>
-                    </div>
 
                     <div className="cat-grid">
                         {categories.map((cat) => (

@@ -46,9 +46,11 @@ export default async function ProductosPage() {
     return (
         <div className="section">
             <div className="container">
-                <div style={{ marginBottom: 32 }}>
-                    <h1 className="section-title">{dict.nav.productos}</h1>
-                    <p className="section-subtitle">
+                <div style={{ marginBottom: 48, textAlign: 'center' }}>
+                    <h1 className="hero-title" style={{ fontSize: '3rem', marginBottom: 16 }}>
+                        <span>{dict.nav.productos}</span>
+                    </h1>
+                    <p className="hero-desc" style={{ maxWidth: 600, marginInline: 'auto' }}>
                         {dict.productos.resultados(products.length)} disponibles
                     </p>
                 </div>

@@ -17,11 +17,11 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
         return <>{children}</>
     }
     const isHome = pathname === '/'
-    const isCategorias = pathname === '/categorias'
 
-    // Padding-top por ruta
-    const pageStyle = isCategorias
-        ? { paddingTop: 100 }
+    // Páginas que necesitan más padding por el header de 2 filas
+    const needsExtraPadding = ['/productos', '/nosotros', '/como-comprar']
+    const pageStyle = needsExtraPadding.includes(pathname)
+        ? { paddingTop: 195 }
         : undefined
 
     return (
