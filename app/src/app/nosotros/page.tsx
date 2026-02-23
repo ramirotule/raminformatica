@@ -9,7 +9,7 @@ export default function NosotrosPage() {
     return (
         <main>
             <section className="hero" style={{ minHeight: '30vh' }}>
-                <div className="container hero-content" style={{ marginTop: '160px' }}>
+                <div className="container hero-content">
                     <h1 className="hero-title">
                         <span>Quiénes somos</span>
                     </h1>
@@ -58,14 +58,7 @@ export default function NosotrosPage() {
                     <p style={{ lineHeight: '1.6', color: 'var(--text-secondary)', marginBottom: '16px' }}>
                         La misma calidad y confianza de siempre, ahora al alcance de un click. Continuamos ofreciendo productos de tecnología con el mismo nivel de excelencia y atención personalizada que nos caracterizó durante todos estos años.
                     </p>
-                    <div style={{ background: 'var(--bg-glass)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border)', textAlign: 'center' }}>
-                        <p style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '12px' }}>
-                            ¿Tenés alguna consulta? No dudes en contactarnos
-                        </p>
-                        <a href="/?contacto" className="btn btn-primary">
-                            Contactanos
-                        </a>
-                    </div>
+
                 </section>
             </div>
         </main>
