@@ -2,8 +2,8 @@
 export const dict = {
     marca: {
         nombre: 'RAM Informática',
-        tagline: 'Tecnología al mejor precio',
-        descripcion: 'Tu tienda de tecnología de confianza en Argentina',
+        tagline: 'iPhones y Tecnología al mejor precio',
+        descripcion: 'RAM Informática — Tu tienda de confianza para comprar iPhones, Samsung, Motorola y tecnología premium al mejor precio en Argentina. Envíos a todo el país.',
     },
     nav: {
         inicio: 'Inicio',
