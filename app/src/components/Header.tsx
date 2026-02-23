@@ -13,6 +13,8 @@ import CartDrawer from './CartDrawer'
 import GlobalSearch from './GlobalSearch'
 import { useTheme } from '@/context/ThemeContext'
 import { SearchableSelect } from './SearchableSelect'
+import { phone } from '@/const/phone'
+import { messagewsp } from '@/const/messagewsp'
 
 export default function Header() {
     const pathname = usePathname()
@@ -78,7 +80,7 @@ export default function Header() {
                                 >
                                     <span className="dolar-dot" />
                                     <span style={{ opacity: 0.9 }}>Cotización del Dólar Hoy:</span>
-                                    <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>$AR {dolar.venta.toLocaleString('es-AR')}</span>
+                                    <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>$ {dolar.venta.toLocaleString('es-AR')}</span>
                                 </div>
                             ) : null}
 
@@ -208,7 +210,7 @@ export default function Header() {
 
                         {/* WhatsApp - aligned right, vertically centered */}
                         <a
-                            href="https://wa.me/5492954621345"
+                            href={`https://wa.me/${phone}?text=${messagewsp}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="whatsapp-btn md-show"
@@ -256,7 +258,7 @@ export default function Header() {
                                 </Link>
                             ))}
                             <a
-                                href="https://wa.me/5492954621345"
+                                href={`https://wa.me/${phone}?text=${messagewsp}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 style={{

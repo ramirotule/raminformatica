@@ -5,6 +5,7 @@ import { X, Trash2, ShoppingCart, MessageCircle, Minus, Plus } from 'lucide-reac
 import { useCart } from '@/context/CartContext'
 import { useDolarBlue } from '@/hooks/useDolarBlue'
 import { formatUSD, formatARS, getPriceARS } from '@/lib/utils'
+import { phone } from '@/const/phone'
 
 interface CartDrawerProps {
     isOpen: boolean
@@ -21,7 +22,6 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     const totalARS = dolar ? getPriceARS(totalUSD, dolar.venta) : null
 
     const handleConfirmOrder = () => {
-        const phone = '5492954227622'
         let message = `Hola! Me gustaría realizar el siguiente pedido:\n\n`
 
         cart.forEach(item => {

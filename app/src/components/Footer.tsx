@@ -4,9 +4,11 @@ import Link from 'next/link'
 import { dict } from '@/lib/dict'
 import { MapPin, Clock, Phone, Instagram, Facebook } from 'lucide-react'
 import { useTheme } from '@/context/ThemeContext'
+import { phone } from '@/const/phone'
 
 export default function Footer() {
     const { theme } = useTheme()
+
 
     return (
         <footer className="site-footer">
@@ -92,7 +94,7 @@ export default function Footer() {
                             <li>
                                 <img src="/whatsapp-logo.png" alt="" style={{ width: 16, height: 16, flexShrink: 0, marginTop: 2 }} />
                                 <div>
-                                    <a href="https://wa.me/5492954621345" target="_blank" rel="noopener noreferrer">
+                                    <a href={`https://wa.me/${phone}`} target="_blank" rel="noopener noreferrer">
                                         WhatsApp (Ramiro)
                                     </a>
                                 </div>

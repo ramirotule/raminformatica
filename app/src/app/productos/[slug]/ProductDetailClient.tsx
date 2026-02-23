@@ -5,7 +5,7 @@ import { useCart } from '@/context/CartContext'
 import { useDolarBlue } from '@/hooks/useDolarBlue'
 import { formatUSD, formatARS, getPriceUSD, getPriceARS, conditionLabel } from '@/lib/utils'
 import type { ProductWithDetails, ProductImage } from '@/lib/database.types'
-import { ShoppingCart, ChevronLeft, Minus, Plus, ShieldCheck, Truck, X, ChevronRight } from 'lucide-react'
+import { ShoppingCart, ChevronLeft, Minus, Plus, ShieldCheck, Truck, X, ChevronRight, House } from 'lucide-react'
 import Link from 'next/link'
 import AddedToCartModal from '@/components/AddedToCartModal'
 
@@ -169,10 +169,17 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 {/* Mini cards info */}
                 <div className="detail-features">
                     <div className="feature-item">
+                        <House size={20} className="feature-icon" />
+                        <div>
+                            <p className="feature-title">Retiro por domicilio</p>
+                            <p className="feature-desc">Entrega dentro de las 48hs. hábiles</p>
+                        </div>
+                    </div>
+                    <div className="feature-item">
                         <Truck size={20} className="feature-icon" />
                         <div>
-                            <p className="feature-title">Retiro por local</p>
-                            <p className="feature-desc">Entrega inmediata en CABA</p>
+                            <p className="feature-title">Envíos a todo el país</p>
+                            <p className="feature-desc">Por servcio Andreani</p>
                         </div>
                     </div>
                     <div className="feature-item">
