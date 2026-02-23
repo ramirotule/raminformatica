@@ -17,7 +17,7 @@ export const dict = {
     },
     hero: {
         titulo: 'Tecnología premium',
-        subtitulo: 'a un precios muy competitivo',
+        subtitulo: 'a precios muy competitivos',
         descripcion: 'iPhone, Samsung, Motorola, JBL, PlayStation y mucho más. Precios en dólares y pesos actualizados a diario.',
         cta: 'Ver productos',
         ctaSecundario: 'Ver categorías',
