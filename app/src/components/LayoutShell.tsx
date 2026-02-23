@@ -1,6 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
+import { useEffect } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { CartProvider } from '@/context/CartContext'
@@ -10,6 +11,11 @@ import { SearchProvider } from '@/context/SearchContext'
 
 export default function LayoutShell({ children }: { children: React.ReactNode }) {
     const pathname = usePathname()
+
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [pathname])
+
     const isAdmin = pathname.startsWith('/adminram')
 
     // En rutas de admin: sin Header, sin footer, sin padding de .page
