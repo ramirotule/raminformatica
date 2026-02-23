@@ -42,15 +42,6 @@ export default function Footer() {
                             >
                                 <Facebook size={20} />
                             </a>
-                            <a
-                                href="https://wa.me/5492954621345"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="footer-social-link"
-                                title="WhatsApp"
-                            >
-                                <img src="/whatsapp-logo.png" alt="WhatsApp" />
-                            </a>
                         </div>
                     </div>
 
@@ -99,18 +90,10 @@ export default function Footer() {
                                 </div>
                             </li>
                             <li>
-                                <Phone size={16} style={{ flexShrink: 0, marginTop: 2, color: 'var(--green)' }} />
-                                <div>
-                                    <a href="tel:+542954227622">2954-227622</a>
-                                    <br />
-                                    <span style={{ fontSize: '0.8rem' }}>(Ramiro)</span>
-                                </div>
-                            </li>
-                            <li>
                                 <img src="/whatsapp-logo.png" alt="" style={{ width: 16, height: 16, flexShrink: 0, marginTop: 2 }} />
                                 <div>
                                     <a href="https://wa.me/5492954621345" target="_blank" rel="noopener noreferrer">
-                                        WhatsApp
+                                        WhatsApp (Ramiro)
                                     </a>
                                 </div>
                             </li>

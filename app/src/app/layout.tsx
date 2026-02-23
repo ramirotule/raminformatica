@@ -52,8 +52,57 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const localBusinessSchema = {
+    "@context": "https://schema.org",
+    "@type": "ElectronicsStore",
+    "name": "RAM Informática",
+    "image": "https://raminformatica.com.ar/logo.png",
+    "@id": "https://raminformatica.com.ar",
+    "url": "https://raminformatica.com.ar",
+    "telephone": "+54929542276225",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Lebenson 3980",
+      "addressLocality": "Santa Rosa",
+      "addressRegion": "La Pampa",
+      "postalCode": "6300",
+      "addressCountry": "AR"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": -36.6425277,
+      "longitude": -64.3294774
+    },
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": [
+          "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"
+        ],
+        "opens": "09:00",
+        "closes": "17:00"
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": "Saturday",
+        "opens": "10:00",
+        "closes": "13:00"
+      }
+    ],
+    "sameAs": [
+      "https://www.facebook.com/ram.informatica",
+      "https://www.instagram.com/ram.informatica"
+    ]
+  };
+
   return (
     <html lang="es" className={`${inter.variable} ${outfit.variable}`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+        />
+      </head>
       <body style={{ fontFamily: 'var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif' }}>
         <LayoutShell>
           {children}
@@ -62,3 +111,4 @@ export default function RootLayout({
     </html>
   )
 }
+
