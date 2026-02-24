@@ -16,14 +16,9 @@ export default function Footer() {
                 <div className="footer-grid">
                     {/* Columna 1: Marca */}
                     <div>
-                        <img
-                            src={theme === 'dark' ? '/logo_transparent_dark.png' : '/logo_transparent_light.png'}
-                            alt="RAM Informática"
-                            className="footer-brand-logo"
-                        />
+                        <h4 className="footer-heading">Redes Sociales</h4>
                         <p className="footer-desc">
-                            Tu tienda de tecnología de confianza en Santa Rosa, La Pampa. <br />
-                            Celulares, Consolas de Videojuegos, Notebooks y mucho más.
+                            Seguinos en nuestras redes sociales para estar al tanto de las ultimas novedades:
                         </p>
                         <div className="footer-social-links">
                             <a
