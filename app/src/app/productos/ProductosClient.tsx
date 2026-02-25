@@ -80,8 +80,8 @@ export default function ProductosClient({ products, categories, brands }: Produc
                 return a.name.localeCompare(b.name, 'es')
             }
             if (sortBy === 'precio-asc' || sortBy === 'precio-desc') {
-                const pa = getPriceUSD(a.product_variants?.[0]?.prices ?? []) ?? Infinity
-                const pb = getPriceUSD(b.product_variants?.[0]?.prices ?? []) ?? Infinity
+                const pa = getPriceUSD(a.product_variants?.[0]?.prices, a.price_usd) ?? Infinity
+                const pb = getPriceUSD(b.product_variants?.[0]?.prices, b.price_usd) ?? Infinity
                 return sortBy === 'precio-asc' ? pa - pb : pb - pa
             }
             // reciente (default: ya vienen ordenados por created_at desc)

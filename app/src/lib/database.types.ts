@@ -92,6 +92,7 @@ export interface Product {
     category_id: string | null
     provider_id: string | null
     cost_price: number | null
+    price_usd: number | null
     tags: string[] | null
     is_featured: boolean
     active: boolean

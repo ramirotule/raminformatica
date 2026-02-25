@@ -24,7 +24,9 @@ export function formatARS(amount: number): string {
     }).format(amount)
 }
 
-export function getPriceUSD(prices: Price[]): number | null {
+export function getPriceUSD(prices: Price[] | undefined, priceUSD?: number | null): number | null {
+    if (priceUSD !== undefined && priceUSD !== null) return Number(priceUSD)
+    if (!prices) return null
     const price = prices.find((p) => p.currency === 'USD')
     return price ? Number(price.amount) : null
 }

@@ -29,8 +29,9 @@ import Link from 'next/link'
 export default function ProductCard({ product }: ProductCardProps) {
     const { dolar } = useDolarBlue()
 
+    const images = [...(product.product_images || [])].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
     const variant = product.product_variants?.[0]
-    const priceUSD = variant ? getPriceUSD(variant.prices) : null
+    const priceUSD = getPriceUSD(variant?.prices, product.price_usd)
     const priceARS = priceUSD && dolar ? getPriceARS(priceUSD, dolar.venta) : null
     const stock = (variant?.inventory as any)?.[0]?.qty_available ?? null
     const image = product.product_images?.[0]

@@ -19,6 +19,7 @@ import {
     CheckSquare,
     ChevronUp,
     ChevronDown,
+    ChevronRight,
     Loader2,
     ImagePlus,
     Upload,
@@ -219,6 +220,7 @@ function AdminProductos() {
     const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
     const [modalOpen, setModalOpen] = useState(false)
     const [editProduct, setEditProduct] = useState<ProductWithDetails | null>(null)
+    const [showMoreDetails, setShowMoreDetails] = useState(false)
 
     // Formulario nuevo/editar producto
     const [form, setForm] = useState({
@@ -469,6 +471,7 @@ function AdminProductos() {
             tags: ''
         })
         setImages([])
+        setShowMoreDetails(false)
         setModalOpen(true)
     }
 
@@ -486,7 +489,7 @@ function AdminProductos() {
             short_description: p.short_description ?? '',
             active: p.active,
             is_featured: p.is_featured,
-            priceUSD: price ? String(price.amount) : '',
+            priceUSD: p.price_usd ? String(p.price_usd) : (price ? String(price.amount) : ''),
             cost_price: p.cost_price ? String(p.cost_price) : '',
             sku: variant?.sku ?? '',
             color: variant?.color ?? '',
@@ -494,6 +497,7 @@ function AdminProductos() {
             connectivity: variant?.connectivity ?? '',
             tags: p.tags ? p.tags.join(', ') : '',
         })
+        setShowMoreDetails(false)
         const sortedImages = [...(p.product_images || [])].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
         setImages(sortedImages.map(img => ({
             id: img.id,
@@ -573,6 +577,7 @@ function AdminProductos() {
                         name: form.name, slug, category_id: form.category_id, brand_id: form.brand_id,
                         provider_id: form.provider_id || null,
                         cost_price: form.cost_price ? parseFloat(form.cost_price) : null,
+                        price_usd: form.priceUSD ? parseFloat(form.priceUSD) : null,
                         condition: form.condition as 'new', short_description: form.short_description || null,
                         active: form.active, is_featured: form.is_featured,
                     })
@@ -607,6 +612,7 @@ function AdminProductos() {
                         name: form.name, slug, category_id: form.category_id, brand_id: form.brand_id,
                         provider_id: form.provider_id || null,
                         cost_price: form.cost_price ? parseFloat(form.cost_price) : null,
+                        price_usd: form.priceUSD ? parseFloat(form.priceUSD) : null,
                         condition: form.condition as 'new', short_description: form.short_description || null,
                         active: form.active, is_featured: form.is_featured,
                         tags: form.tags.split(',').map(t => t.trim()).filter(t => t !== '')
@@ -948,13 +954,32 @@ function AdminProductos() {
                             </div>
 
                             <div className="form-group">
-                                <label className="form-label" htmlFor="form-slug">Slug</label>
-                                <input id="form-slug" className="form-input" value={form.slug}
-                                    onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} />
+                                <label className="form-label" htmlFor="form-cost-price">Precio Costo (USD)</label>
+                                <input id="form-cost-price" className="form-input" type="number" min="0" step="0.01"
+                                    value={form.cost_price}
+                                    onChange={(e) => setForm((f) => ({ ...f, cost_price: e.target.value }))}
+                                    onBlur={(e) => {
+                                        const cost = e.target.value
+                                        const finalPrice = calculateSellingPrice(parseFloat(cost))
+                                        if (finalPrice > 0) {
+                                            setForm((f) => ({ ...f, priceUSD: finalPrice.toString() }))
+                                        }
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault()
+                                            const cost = (e.target as HTMLInputElement).value
+                                            const finalPrice = calculateSellingPrice(parseFloat(cost))
+                                            if (finalPrice > 0) {
+                                                setForm((f) => ({ ...f, priceUSD: finalPrice.toString() }))
+                                            }
+                                        }
+                                    }}
+                                    placeholder="0.00" />
                             </div>
 
                             <div className="form-group">
-                                <label className="form-label" htmlFor="form-price">{dict.admin.precio}</label>
+                                <label className="form-label" htmlFor="form-price">Precio Venta (USD)</label>
                                 <input id="form-price" className="form-input" type="number" min="0" step="0.01"
                                     value={form.priceUSD} onChange={(e) => setForm((f) => ({ ...f, priceUSD: e.target.value }))}
                                     placeholder="0.00" />
@@ -993,68 +1018,6 @@ function AdminProductos() {
                                 />
                             </div>
 
-                            <div className="form-group">
-                                <label className="form-label" htmlFor="form-cost-price">Precio Costo</label>
-                                <input id="form-cost-price" className="form-input" type="number" min="0" step="0.01"
-                                    value={form.cost_price}
-                                    onChange={(e) => setForm((f) => ({ ...f, cost_price: e.target.value }))}
-                                    onBlur={(e) => {
-                                        const cost = e.target.value
-                                        const finalPrice = calculateSellingPrice(parseFloat(cost))
-                                        if (finalPrice > 0) {
-                                            setForm((f) => ({ ...f, priceUSD: finalPrice.toString() }))
-                                        }
-                                    }}
-                                    placeholder="0.00" />
-                            </div>
-
-                            <div className="form-group">
-                                <label className="form-label" htmlFor="form-condition">{dict.admin.condicion}</label>
-                                <SearchableSelect
-                                    id="form-condition"
-                                    value={form.condition}
-                                    onChange={(v) => setForm((f) => ({ ...f, condition: v }))}
-                                    options={[
-                                        { value: 'new', label: 'Nuevo' },
-                                        { value: 'oem', label: 'OEM' },
-                                        { value: 'refurbished', label: 'Reacondicionado' },
-                                        { value: 'used', label: 'Usado' },
-                                    ]}
-                                    placeholder="Seleccionar..."
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label className="form-label" htmlFor="form-sku">{dict.admin.sku}</label>
-                                <input id="form-sku" className="form-input" value={form.sku}
-                                    onChange={(e) => setForm((f) => ({ ...f, sku: e.target.value }))} placeholder="SKU único" />
-                            </div>
-
-                            <div className="form-group">
-                                <label className="form-label" htmlFor="form-storage">{dict.admin.almacenamiento}</label>
-                                <input id="form-storage" className="form-input" value={form.storage}
-                                    onChange={(e) => setForm((f) => ({ ...f, storage: e.target.value }))} placeholder="128GB, 256GB..." />
-                            </div>
-
-
-                            <div className="form-group">
-                                <label className="form-label" htmlFor="form-color">{dict.admin.color}</label>
-                                <input id="form-color" className="form-input" value={form.color}
-                                    onChange={(e) => setForm((f) => ({ ...f, color: e.target.value }))} placeholder="Negro, Blanco..." />
-                            </div>
-
-                            <div className="form-group">
-                                <label className="form-label" htmlFor="form-connectivity">{dict.admin.conectividad}</label>
-                                <input id="form-connectivity" className="form-input" value={form.connectivity}
-                                    onChange={(e) => setForm((f) => ({ ...f, connectivity: e.target.value }))} placeholder="5G, WiFi, Bluetooth..." />
-                            </div>
-
-                            <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                                <label className="form-label" htmlFor="form-desc">{dict.admin.descripcion}</label>
-                                <textarea id="form-desc" className="form-textarea" rows={2} value={form.short_description}
-                                    onChange={(e) => setForm((f) => ({ ...f, short_description: e.target.value }))}
-                                    placeholder="Descripción breve del producto" />
-                            </div>
 
                             <div className="form-group" style={{ gridColumn: '1 / -1' }}>
                                 <label className="form-label" htmlFor="form-tags">Tags de Búsqueda (separados por coma)</label>
@@ -1064,6 +1027,90 @@ function AdminProductos() {
                                 <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4 }}>
                                     Palabras clave que ayudarán a encontrar el producto más fácil (ej: "PS5" por "Playstation").
                                 </p>
+                            </div>
+
+                            {/* ─── Accordion: Más Detalles ─── */}
+                            <div className="form-group" style={{ gridColumn: '1 / -1', marginTop: 8 }}>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowMoreDetails(!showMoreDetails)}
+                                    style={{
+                                        width: '100%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        padding: '12px 16px',
+                                        background: 'var(--bg-secondary)',
+                                        border: '1px solid var(--border)',
+                                        borderRadius: 12,
+                                        cursor: 'pointer',
+                                        fontWeight: 600,
+                                        color: 'var(--text-primary)',
+                                        transition: 'all 0.2s ease'
+                                    }}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <Plus size={16} style={{ transition: 'transform 0.3s ease', transform: showMoreDetails ? 'rotate(45deg)' : 'none' }} />
+                                        <span>Más detalles (Condición, Almacenamiento, etc.)</span>
+                                    </div>
+                                    <ChevronRight size={16} style={{ transition: 'transform 0.3s ease', transform: showMoreDetails ? 'rotate(90deg)' : 'none' }} />
+                                </button>
+
+                                {showMoreDetails && (
+                                    <div className="animate-fade-in-down" style={{
+                                        display: 'grid',
+                                        gridTemplateColumns: '1fr 1fr',
+                                        gap: 16,
+                                        padding: '20px',
+                                        background: 'rgba(255,255,255,0.02)',
+                                        border: '1px solid var(--border)',
+                                        borderTop: 'none',
+                                        borderBottomLeftRadius: 12,
+                                        borderBottomRightRadius: 12,
+                                        marginTop: -1
+                                    }}>
+                                        <div className="form-group">
+                                            <label className="form-label" htmlFor="form-condition">{dict.admin.condicion}</label>
+                                            <SearchableSelect
+                                                id="form-condition"
+                                                value={form.condition}
+                                                onChange={(v) => setForm((f) => ({ ...f, condition: v }))}
+                                                options={[
+                                                    { value: 'new', label: 'Nuevo' },
+                                                    { value: 'oem', label: 'OEM' },
+                                                    { value: 'refurbished', label: 'Reacondicionado' },
+                                                    { value: 'used', label: 'Usado' },
+                                                ]}
+                                                placeholder="Seleccionar..."
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label className="form-label" htmlFor="form-storage">{dict.admin.almacenamiento}</label>
+                                            <input id="form-storage" className="form-input" value={form.storage}
+                                                onChange={(e) => setForm((f) => ({ ...f, storage: e.target.value }))} placeholder="128GB, 256GB..." />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label className="form-label" htmlFor="form-color">{dict.admin.color}</label>
+                                            <input id="form-color" className="form-input" value={form.color}
+                                                onChange={(e) => setForm((f) => ({ ...f, color: e.target.value }))} placeholder="Negro, Blanco..." />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label className="form-label" htmlFor="form-connectivity">{dict.admin.conectividad}</label>
+                                            <input id="form-connectivity" className="form-input" value={form.connectivity}
+                                                onChange={(e) => setForm((f) => ({ ...f, connectivity: e.target.value }))} placeholder="5G, WiFi, Bluetooth..." />
+                                        </div>
+
+                                        <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                                            <label className="form-label" htmlFor="form-desc">{dict.admin.descripcion}</label>
+                                            <textarea id="form-desc" className="form-textarea" rows={3} value={form.short_description}
+                                                onChange={(e) => setForm((f) => ({ ...f, short_description: e.target.value }))}
+                                                placeholder="Descripción breve del producto" />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="form-group" style={{ gridColumn: '1 / -1' }}>
