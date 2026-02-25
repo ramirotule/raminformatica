@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { DollarSign, Upload, Zap, AlertCircle, CheckCircle2, FileJson, FileText, Loader2, ShieldCheck, ArrowLeft, Search, CheckSquare, PlusCircle, Database, Building2 } from 'lucide-react'
-import { parseImportData, searchMatches, processSync, type ParsedItem } from './precios/actions'
+import { parseImportData, searchMatches, processSync, getMissingProducts, type ParsedItem } from './precios/actions'
 import { SearchableSelect } from '@/components/SearchableSelect'
 import { supabase } from '@/lib/supabase'
 
@@ -53,7 +53,7 @@ export default function AdminPrecios() {
             const res = await searchMatches(itemsToMatch)
 
             if (res.success) {
-                const newItems = [...parsedItems]
+                let newItems = [...parsedItems]
                 let matchIdx = 0
                 for (let i = 0; i < newItems.length; i++) {
                     if (selectedIndices.has(i)) {
@@ -61,6 +61,22 @@ export default function AdminPrecios() {
                         matchIdx++
                     }
                 }
+
+                // NUEVO: Ver faltantes (desactivaciones)
+                if (databaseProviderId) {
+                    const matchedIds = res.items.map(it => it.matchId).filter(id => !!id) as string[]
+                    const missing = await getMissingProducts(matchedIds, databaseProviderId)
+                    if (missing.length > 0) {
+                        newItems = [...newItems, ...missing]
+                        // Seleccionamos también los de desactivar por defecto
+                        const nextIndices = new Set(selectedIndices)
+                        for (let k = parsedItems.length; k < newItems.length; k++) {
+                            nextIndices.add(k)
+                        }
+                        setSelectedIndices(nextIndices)
+                    }
+                }
+
                 setParsedItems(newItems)
             }
         } catch (err) {
@@ -71,24 +87,41 @@ export default function AdminPrecios() {
     }
 
     const handleFinalSync = async () => {
-        if (selectedIndices.size === 0) return
+        console.log('Iniciando handleFinalSync...');
+        console.log('Seleccionados:', selectedIndices.size);
+        console.log('Provider ID:', databaseProviderId);
+
+        if (selectedIndices.size === 0) {
+            alert('No hay items seleccionados');
+            return;
+        }
         if (!databaseProviderId) {
+            alert('Falta seleccionar el proveedor en el desplegable azul');
             setResult({ success: false, message: 'Debes seleccionar un proveedor de la base de datos antes de sincronizar.' })
             return
         }
+
         setIsSyncing(true)
         setResult(null)
+
         try {
             const itemsToSync = parsedItems.filter((_, i) => selectedIndices.has(i))
+            console.log('Items a enviar al servidor:', itemsToSync.length);
+
             const res = await processSync(itemsToSync, databaseProviderId)
+            console.log('Respuesta del servidor:', res);
+
             setResult(res)
             if (res.success) {
-                // Podríamos limpiar los seleccionados o volver a inicio
+                console.log('Sincronización exitosa');
             }
         } catch (err: any) {
-            setResult({ success: false, message: 'Error durante la sincronización final.' })
+            console.error('Error fatal en handleFinalSync:', err);
+            alert('Error crítico: ' + err.message);
+            setResult({ success: false, message: 'Error durante la sincronización final: ' + err.message })
         } finally {
             setIsSyncing(false)
+            window.scrollTo({ top: 0, behavior: 'smooth' })
         }
     }
 
@@ -107,37 +140,69 @@ export default function AdminPrecios() {
         setSelectedIndices(next)
     }
 
+    const getSimilarityColor = (score?: number) => {
+        if (!score) return 'var(--text-muted)'
+        if (score > 95) return 'var(--green)'
+        if (score > 80) return 'var(--blue)'
+        if (score > 60) return 'var(--orange)'
+        return 'var(--red)'
+    }
+
     if (view === 'preview') {
         return (
-            <div style={{ maxWidth: '1000px', margin: '0 auto' }} className="animate-fade-in">
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-                    <button onClick={() => setView('input')} className="btn btn-ghost btn-sm" style={{ gap: 8 }}>
-                        <ArrowLeft size={16} /> Volver a editar
-                    </button>
+            <div style={{ maxWidth: '1100px', margin: '0 auto', position: 'relative' }} className="animate-fade-in">
+                {isSyncing && (
+                    <div style={{
+                        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                        zIndex: 1000, backdropFilter: 'blur(4px)', gap: 16
+                    }}>
+                        <div className="card" style={{ padding: '32px 48px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, borderRadius: 24 }}>
+                            <Loader2 className="animate-spin" size={48} color="var(--green)" />
+                            <div style={{ textAlign: 'center' }}>
+                                <h3 style={{ fontWeight: 800, marginBottom: 4 }}>Sincronizando Productos...</h3>
+                                <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Esto puede tardar unos segundos, no cierres la ventana.</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, background: 'var(--bg-card)', padding: '16px 20px', borderRadius: 16, border: '1px solid var(--border)', flexWrap: 'wrap', gap: 16 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                        <button onClick={() => setView('input')} className="btn btn-ghost btn-sm" style={{ gap: 8 }}>
+                            <ArrowLeft size={16} /> Volver
+                        </button>
+                        <div style={{ width: 250 }}>
+                            <SearchableSelect
+                                value={databaseProviderId}
+                                onChange={(val) => setDatabaseProviderId(val)}
+                                options={providers.map(p => ({ value: p.id, label: p.name }))}
+                                placeholder="Elegir proveedor..."
+                            />
+                        </div>
+                    </div>
                     <div style={{ display: 'flex', gap: 12 }}>
                         <button
                             onClick={handleSearchMatches}
-                            disabled={isLoading || selectedIndices.size === 0}
+                            disabled={isLoading}
                             className="btn btn-ghost"
                             style={{ gap: 8, background: 'rgba(52, 199, 89, 0.05)', color: 'var(--green-dark)' }}
                         >
                             {isLoading ? <Loader2 className="animate-spin" size={16} /> : <Search size={16} />}
-                            Buscar coincidencias ({selectedIndices.size})
+                            Detección Inteligente
                         </button>
                         <button
                             onClick={handleFinalSync}
-                            disabled={isSyncing || selectedIndices.size === 0 || !databaseProviderId}
                             className="btn btn-primary"
                             style={{ gap: 8, padding: '0 24px' }}
                         >
                             {isSyncing ? <Loader2 className="animate-spin" size={16} /> : <Zap size={16} />}
-                            Sincronizar Seleccionados
+                            Sincronizar ({selectedIndices.size})
                         </button>
                     </div>
                 </div>
 
                 {result && (
-                    <div style={{
+                    <div id="result-banner" style={{
                         padding: 16, borderRadius: 12, marginBottom: 20,
                         background: result.success ? 'rgba(52, 199, 89, 0.1)' : 'rgba(255, 59, 48, 0.1)',
                         border: `1px solid ${result.success ? 'var(--green)' : 'var(--red)'}`,
@@ -147,48 +212,85 @@ export default function AdminPrecios() {
                             {result.success ? <CheckCircle2 size={18} color="var(--green)" /> : <AlertCircle size={18} color="var(--red)" />}
                             <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{result.message}</span>
                         </div>
+                        {result.errors && result.errors.length > 0 && (
+                            <ul style={{ margin: '8px 0 0 28px', fontSize: '0.8rem', color: result.success ? 'var(--text-secondary)' : 'var(--red)', opacity: 0.8 }}>
+                                {result.errors.map((err, i) => <li key={i}>{err}</li>)}
+                            </ul>
+                        )}
                     </div>
                 )}
 
-                <div className="table-wrap" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+                <div className="table-wrap" style={{ maxHeight: '70vh', overflowY: 'auto', borderRadius: 16 }}>
                     <table style={{ borderCollapse: 'separate', borderSpacing: '0 4px' }}>
                         <thead style={{ position: 'sticky', top: 0, background: 'var(--bg)', zIndex: 10 }}>
                             <tr>
                                 <th style={{ width: 40 }}><input type="checkbox" checked={selectedIndices.size === parsedItems.length} onChange={toggleSelectAll} /></th>
-                                <th>Descripción Detectada</th>
-                                <th style={{ width: 100 }}>Costo</th>
-                                <th style={{ width: 100 }}>Venta</th>
+                                <th>Producto / Coincidencia</th>
+                                <th style={{ width: 90 }}>Costo</th>
+                                <th style={{ width: 110 }}>Similitud</th>
+                                <th style={{ width: 140 }}>Precio Venta</th>
                                 <th>Estado / Acción</th>
                             </tr>
                         </thead>
                         <tbody>
                             {parsedItems.map((item, idx) => (
                                 <tr key={idx} style={{
-                                    background: selectedIndices.has(idx) ? 'rgba(52, 199, 89, 0.03)' : 'transparent',
-                                    transition: 'background 0.2s'
+                                    background: item.status === 'deactivate' ? 'rgba(255, 59, 48, 0.05)' : selectedIndices.has(idx) ? 'rgba(52, 199, 89, 0.03)' : 'transparent',
+                                    transition: 'background 0.2s',
+                                    opacity: selectedIndices.has(idx) ? 1 : 0.6
                                 }}>
                                     <td><input type="checkbox" checked={selectedIndices.has(idx)} onChange={() => toggleItem(idx)} /></td>
                                     <td>
-                                        <div style={{ fontWeight: 600 }}>{item.name}</div>
+                                        <div style={{ fontWeight: 600, color: item.status === 'deactivate' ? 'var(--red)' : 'inherit' }}>{item.name}</div>
                                         {item.matchName && (
-                                            <div style={{ fontSize: '0.75rem', color: 'var(--green-dark)', display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
-                                                <Database size={10} /> Vinculado a: {item.matchName}
+                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
+                                                <Database size={10} /> Base: {item.matchName}
                                             </div>
                                         )}
                                     </td>
-                                    <td style={{ fontFamily: 'monospace', color: 'var(--text-secondary)' }}>${item.cost}</td>
-                                    <td style={{ fontFamily: 'monospace', fontWeight: 700, color: 'var(--primary)' }}>${item.finalPrice}</td>
+                                    <td style={{ fontFamily: 'monospace', fontSize: '0.85rem', opacity: 0.8 }}>
+                                        {item.status !== 'deactivate' ? `$${item.cost}` : '—'}
+                                    </td>
+                                    <td>
+                                        {item.similarity !== undefined && (
+                                            <div style={{
+                                                fontSize: '0.75rem',
+                                                fontWeight: 800,
+                                                color: getSimilarityColor(item.similarity),
+                                                background: `${getSimilarityColor(item.similarity)}15`,
+                                                padding: '2px 8px',
+                                                borderRadius: 6,
+                                                width: 'fit-content'
+                                            }}>
+                                                {item.similarity}% conf.
+                                            </div>
+                                        )}
+                                    </td>
                                     <td>
                                         {item.status === 'matched' ? (
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.7rem', color: 'var(--green)', fontWeight: 700, background: 'rgba(52, 199, 89, 0.1)', padding: '4px 10px', borderRadius: 20, width: 'fit-content' }}>
-                                                <CheckCircle2 size={12} /> ACTUALIZAR PRECIO
+                                            <div style={{ fontSize: '0.85rem', display: 'flex', flexDirection: 'column' }}>
+                                                <span style={{ textDecoration: 'line-through', opacity: 0.5, fontSize: '0.75rem' }}>${item.currentPrice || '—'}</span>
+                                                <span style={{ fontWeight: 800, color: 'var(--green)' }}>${item.finalPrice}</span>
                                             </div>
                                         ) : item.status === 'new' ? (
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.7rem', color: 'var(--orange)', fontWeight: 700, background: 'rgba(255, 159, 10, 0.1)', padding: '4px 10px', borderRadius: 20, width: 'fit-content' }}>
-                                                <PlusCircle size={12} /> CREAR COMO NUEVO
+                                            <span style={{ fontWeight: 800 }}>${item.finalPrice}</span>
+                                        ) : '—'}
+                                    </td>
+                                    <td>
+                                        {item.status === 'matched' ? (
+                                            <div style={{ color: 'var(--green)', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 4 }}>
+                                                <CheckCircle2 size={12} /> ACTUALIZAR
+                                            </div>
+                                        ) : item.status === 'new' ? (
+                                            <div style={{ color: 'var(--orange)', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 4 }}>
+                                                <PlusCircle size={12} /> CREAR NUEVO
+                                            </div>
+                                        ) : item.status === 'deactivate' ? (
+                                            <div style={{ color: 'var(--red)', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 4 }}>
+                                                <AlertCircle size={12} /> DESACTIVAR (NO EN LISTA)
                                             </div>
                                         ) : (
-                                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Pendiente de búsqueda</span>
+                                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Analizar...</span>
                                         )}
                                     </td>
                                 </tr>
@@ -216,21 +318,6 @@ export default function AdminPrecios() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 24, alignItems: 'start' }}>
                 <div className="card" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
-
-                    <div style={{ background: 'rgba(10, 132, 255, 0.05)', padding: 16, borderRadius: 16, border: '1px solid rgba(10, 132, 255, 0.1)', marginBottom: 10 }}>
-                        <label style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--blue)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-                            <Building2 size={14} /> Seleccionar Proveedor (Base de Datos)
-                        </label>
-                        <SearchableSelect
-                            value={databaseProviderId}
-                            onChange={(val) => setDatabaseProviderId(val)}
-                            options={providers.map(p => ({ value: p.id, label: p.name }))}
-                            placeholder="Elegir proveedor..."
-                        />
-                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8 }}>
-                            Los productos actualizados o creados se vincularán a este proveedor.
-                        </p>
-                    </div>
 
                     <div style={{ display: 'flex', gap: 12 }}>
                         <button

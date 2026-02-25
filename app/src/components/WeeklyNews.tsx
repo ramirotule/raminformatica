@@ -1,51 +1,45 @@
 'use client'
 
-import { useRef } from 'react'
-import { ChevronLeft, ChevronRight, Bell, Zap, Cpu, Sparkles } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { ChevronLeft, ChevronRight, Bell, Zap, Cpu, Sparkles, Loader2, X, MessageCircle } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
+import type { WeeklyNews as NewsType } from '@/lib/database.types'
+import { phone } from '@/const/phone'
 
-const NEWS = [
-    {
-        id: 1,
-        title: "Ingreso iPhone 16 Pro",
-        desc: "Ya llegaron las primeras unidades. Retiro inmediato en Santa Rosa.",
-        icon: <Zap size={20} />,
-        color: "#34C759", // Verde RAM
-        tag: "NUEVO"
-    },
-    {
-        id: 2,
-        title: "Plan Canje Activo",
-        desc: "Tomamos tu iPhone o Samsung usado como parte de pago. Consultanos.",
-        icon: <Sparkles size={20} />,
-        color: "#5856D6", // Violeta
-        tag: "OFERTA"
-    },
-    {
-        id: 3,
-        title: "Notebooks para Estudiantes",
-        desc: "Llevate tu laptop con 12 cuotas sin interés y mochila de regalo.",
-        icon: <Cpu size={20} />,
-        color: "#007AFF", // Azul
-        tag: "PROMO"
-    },
-    {
-        id: 4,
-        title: "Servicio Técnico RAM",
-        desc: "Reparación de pantallas y cambio de batería en solo 60 minutos.",
-        icon: <Bell size={20} />,
-        color: "#FF9500", // Naranja
-        tag: "SERVICIO"
-    }
-]
+const iconMap: Record<string, React.ReactNode> = {
+    Zap: <Zap size={20} />,
+    Sparkles: <Sparkles size={20} />,
+    Cpu: <Cpu size={20} />,
+    Bell: <Bell size={20} />,
+}
 
 export default function WeeklyNews() {
+    const [news, setNews] = useState<NewsType[]>([])
+    const [loading, setLoading] = useState(true)
+    const [selectedNews, setSelectedNews] = useState<NewsType | null>(null)
     const scrollRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        async function fetchNews() {
+            setLoading(true)
+            const { data } = await supabase
+                .from('weekly_news')
+                .select('*')
+                .eq('active', true)
+                .order('sort_order', { ascending: true })
+            if (data) setNews(data)
+            setLoading(false)
+        }
+        fetchNews()
+    }, [])
 
     const scroll = (dir: 'left' | 'right') => {
         if (!scrollRef.current) return
         const amt = 300
         scrollRef.current.scrollBy({ left: dir === 'left' ? -amt : amt, behavior: 'smooth' })
     }
+
+    if (!loading && news.length === 0) return null
 
     return (
         <section style={{ padding: '40px 0', overflow: 'hidden' }}>
@@ -72,59 +66,135 @@ export default function WeeklyNews() {
                     }}
                     className="no-scrollbar"
                 >
-                    {NEWS.map((item) => (
-                        <div
-                            key={item.id}
-                            style={{
-                                minWidth: 280,
-                                background: 'var(--bg-card)',
-                                border: '1px solid var(--border)',
-                                borderRadius: 16,
-                                padding: 20,
-                                position: 'relative',
-                                transition: 'transform 0.2s',
-                                cursor: 'pointer'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
-                            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                        >
-                            <div style={{
-                                background: `${item.color}15`,
-                                color: item.color,
-                                width: 40,
-                                height: 40,
-                                borderRadius: 10,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                marginBottom: 16
-                            }}>
-                                {item.icon}
-                            </div>
-
-                            <div style={{
-                                position: 'absolute',
-                                top: 20,
-                                right: 20,
-                                fontSize: '0.65rem',
-                                fontWeight: 700,
-                                padding: '2px 8px',
-                                borderRadius: 4,
-                                background: 'var(--bg-secondary)',
-                                color: 'var(--text-muted)',
-                                border: '1px solid var(--border)'
-                            }}>
-                                {item.tag}
-                            </div>
-
-                            <h4 style={{ fontWeight: 700, fontSize: '1rem', marginBottom: 8 }}>{item.title}</h4>
-                            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                                {item.desc}
-                            </p>
+                    {loading ? (
+                        <div style={{ padding: '20px', width: '100%', display: 'flex', justifyContent: 'center' }}>
+                            <Loader2 className="animate-spin" size={24} color="var(--green)" />
                         </div>
-                    ))}
+                    ) : (
+                        news.map((item) => (
+                            <div
+                                key={item.id}
+                                style={{
+                                    minWidth: 320,
+                                    maxWidth: 320,
+                                    background: 'var(--bg-card)',
+                                    border: '1px solid var(--border)',
+                                    borderRadius: 16,
+                                    padding: 20,
+                                    position: 'relative',
+                                    transition: 'transform 0.2s',
+                                    cursor: 'pointer'
+                                }}
+                                onClick={() => setSelectedNews(item)}
+                                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
+                                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                            >
+                                {item.image_url && (
+                                    <div style={{
+                                        margin: '-20px -20px 16px -20px',
+                                        height: 160,
+                                        overflow: 'hidden',
+                                        borderRadius: '16px 16px 0 0',
+                                        borderBottom: '1px solid var(--border)',
+                                        background: 'var(--bg-secondary)'
+                                    }}>
+                                        <img src={item.image_url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    </div>
+                                )}
+
+                                {!item.image_url && (
+                                    <div style={{
+                                        background: `${item.color}15`,
+                                        color: item.color || '#34C759',
+                                        width: 40,
+                                        height: 40,
+                                        borderRadius: 10,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        marginBottom: 16
+                                    }}>
+                                        {iconMap[item.icon_name || 'Bell'] || <Bell size={20} />}
+                                    </div>
+                                )}
+
+
+
+                                <h4 style={{ fontWeight: 700, fontSize: '1rem', marginBottom: 8 }}>{item.title}</h4>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                    {item.description}
+                                </p>
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
+
+            {/* Modal de Detalle */}
+            {selectedNews && (
+                <div
+                    className="modal-overlay animate-fade-in-fast"
+                    style={{ zIndex: 1000, position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+                    onClick={() => setSelectedNews(null)}
+                >
+                    <div
+                        className="modal animate-scale-up"
+                        style={{ maxWidth: 500, width: '100%', background: 'var(--bg-card)', borderRadius: 24, overflow: 'hidden', position: 'relative', border: '1px solid var(--border)' }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button
+                            onClick={() => setSelectedNews(null)}
+                            style={{ position: 'absolute', top: 16, right: 16, background: 'rgba(0,0,0,0.5)', color: '#fff', border: 'none', borderRadius: '50%', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}
+                        >
+                            <X size={18} />
+                        </button>
+
+                        {selectedNews.image_url && (
+                            <div style={{ width: '100%', height: 320, background: 'var(--bg-secondary)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <img src={selectedNews.image_url} alt={selectedNews.title} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                            </div>
+                        )}
+
+                        <div style={{ padding: 24 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+                                {!selectedNews.image_url && (
+                                    <div style={{
+                                        background: `${selectedNews.color}15`,
+                                        color: selectedNews.color || '#34C759',
+                                        width: 48,
+                                        height: 48,
+                                        borderRadius: 12,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}>
+                                        {iconMap[selectedNews.icon_name || 'Bell'] || <Bell size={24} />}
+                                    </div>
+                                )}
+                                <div>
+                                    <h2 style={{ fontSize: '1.5rem', fontWeight: 800, lineHeight: 1.2 }}>{selectedNews.title}</h2>
+                                </div>
+                            </div>
+
+                            <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 24 }}>
+                                {selectedNews.description}
+                            </p>
+
+                            <a
+                                href={`https://wa.me/${phone}?text=${encodeURIComponent(`Hola! Vi la novedad "${selectedNews.title}" en la web y quería consultarles más información.`)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-primary"
+                                style={{ width: '100%', justifyContent: 'center', gap: 10, padding: '14px 0', fontSize: '1rem', background: '#25D366', borderColor: '#25D366' }}
+                            >
+                                <MessageCircle size={20} />
+                                Consultar por WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            )}
         </section>
     )
 }
+

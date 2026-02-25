@@ -53,3 +53,38 @@ export function slugify(text: string): string {
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '')
 }
+
+const ACRONYMS = ['SSD', 'RAM', 'USB', 'RGB', 'LED', 'GB', 'TB', 'MB', 'HD', 'FHD', 'UHD', 'QHD', '4K', 'WIFI', 'BT', 'PC', 'CPU', 'GPU', 'SATA', 'NVME', 'DDR', 'VGA', 'HDMI', 'DP', 'OLED', 'IPS', 'VA', 'HZ', 'MHZ', 'TDP', 'ARGB', 'VRAM'];
+
+export function smartCapitalize(str: string): string {
+    if (!str) return str;
+
+    const smallWords = ['de', 'con', 'para', 'y', 'a', 'en', 'o', 'la', 'el'];
+
+    return str.toLowerCase().split(' ').map((word, index) => {
+        const upper = word.toUpperCase();
+
+        // Always capitalize first word fully if it's an acronym, OR just first letter
+        if (index === 0) {
+            if (ACRONYMS.includes(upper)) return upper;
+            // Check for numbers + unit (e.g. 64GB, 1TB)
+            if (/^\d+(GB|TB|MB|SSD|RAM|HZ|MHZ|DDR|GBPS)$/i.test(word)) return upper;
+            return word.charAt(0).toUpperCase() + word.slice(1);
+        }
+
+        // Small words in lowercase (unless they are acronyms)
+        if (smallWords.includes(word) && !ACRONYMS.includes(upper)) return word;
+
+        // Known acronyms to keep in uppercase
+        if (ACRONYMS.includes(upper)) return upper;
+
+        // Handle alphanumeric units (e.g. 64gb -> 64GB, 3200mhz -> 3200MHz/3200MHZ)
+        // For simplicity, we'll uppercase the whole alphanumeric block if it ends in a known unit
+        if (/^\d+(GB|TB|MB|SSD|RAM|HZ|MHZ|DDR|GBPS)$/i.test(word)) {
+            return upper;
+        }
+
+        // Normal capitalization
+        return word.charAt(0).toUpperCase() + word.slice(1);
+    }).join(' ');
+}

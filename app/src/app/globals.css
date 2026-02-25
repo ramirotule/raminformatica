@@ -182,7 +182,7 @@ img {
 }
 
 .section {
-  padding-block: clamp(48px, 8vw, 96px);
+  padding-block: clamp(48px, 96px);
 }
 
 /* ─── Header ─────────────────────────────────────────────────────────────────── */
@@ -2347,10 +2347,16 @@ tbody td {
   max-height: 100%;
   object-fit: contain;
 }
+
 /* ─── Infinite Brand Ticker ───────────────────────────────────────── */
 @keyframes ticker-scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(calc(-100% / 3)); }
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(calc(-100% / 3));
+  }
 }
 
 .brand-ticker-track {

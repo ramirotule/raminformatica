@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@supabase/supabase-js";
-import { slugify } from "@/lib/utils";
+import { slugify, smartCapitalize } from "@/lib/utils";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey =
@@ -18,7 +18,9 @@ export interface ParsedItem {
     finalPrice: number;
     matchId?: string;
     matchName?: string;
-    status: 'pending' | 'matched' | 'new';
+    status: 'pending' | 'matched' | 'new' | 'deactivate';
+    similarity?: number;
+    currentPrice?: number;
 }
 
 function calculateFinalPrice(cost: number) {
@@ -38,7 +40,7 @@ export async function parseImportData(input: string, provider: 'gcgroup' | 'zent
             for (const p of productos) {
                 if (!p.nombre || p.precio === undefined) continue;
                 items.push({
-                    name: p.nombre,
+                    name: smartCapitalize(p.nombre),
                     cost: p.precio_costo || p.precio,
                     finalPrice: p.precio, // En JSON de GCgroup el precio ya suele ser el final o se toma tal cual
                     status: 'pending'
@@ -65,7 +67,7 @@ export async function parseImportData(input: string, provider: 'gcgroup' | 'zent
                     name = name.replace(/^[\d\.\-\)\>]+\s?/, '');
 
                     items.push({
-                        name,
+                        name: smartCapitalize(name),
                         cost,
                         finalPrice: calculateFinalPrice(cost),
                         status: 'pending'
@@ -81,60 +83,148 @@ export async function parseImportData(input: string, provider: 'gcgroup' | 'zent
 }
 
 /**
- * Busca coincidencias para una lista de nombres de productos.
+ * Algoritmo Jaro-Winkler para similitud de strings (0 a 1)
+ */
+function getSimilarity(s1: string, s2: string): number {
+    let m = 0;
+    if (s1.length === 0 || s2.length === 0) return 0;
+    if (s1 === s2) return 1;
+
+    let range = (Math.floor(Math.max(s1.length, s2.length) / 2)) - 1;
+    let s1Matches = new Array(s1.length);
+    let s2Matches = new Array(s2.length);
+
+    for (let i = 0; i < s1.length; i++) {
+        let low = Math.max(0, i - range);
+        let high = Math.min(i + range + 1, s2.length);
+        for (let j = low; j < high; j++) {
+            if (!s2Matches[j] && s1[i] === s2[j]) {
+                s1Matches[i] = true;
+                s2Matches[j] = true;
+                m++;
+                break;
+            }
+        }
+    }
+
+    if (m === 0) return 0;
+
+    let t = 0;
+    let k = 0;
+    for (let i = 0; i < s1.length; i++) {
+        if (s1Matches[i]) {
+            while (!s2Matches[k]) k++;
+            if (s1[i] !== s2[k]) t++;
+            k++;
+        }
+    }
+
+    let jaro = ((m / s1.length) + (m / s2.length) + ((m - t / 2) / m)) / 3;
+    return jaro;
+}
+
+/**
+ * Busca coincidencias para una lista de nombres de productos usando Fuzzy Matching.
  */
 export async function searchMatches(items: ParsedItem[]) {
     const results: ParsedItem[] = [];
 
+    const { data: dbProducts } = await supabaseAdmin
+        .from("products")
+        .select(`
+            id, 
+            name,
+            product_variants (
+                id,
+                prices (amount)
+            )
+        `)
+        .eq('active', true);
+
+    if (!dbProducts) return { success: false, message: "No se pudieron cargar los productos de la DB.", items };
+
     for (const item of items) {
-        // Buscamos por palabras clave (primera palabra y coincidencia parcial)
-        const firstWord = item.name.split(' ')[0].replace(/[^\w]/g, '');
+        let bestMatch: any = null;
+        let highestScore = 0;
 
-        const { data: dbProducts } = await supabaseAdmin
-            .from("products")
-            .select("id, name")
-            .ilike("name", `%${firstWord}%`)
-            .limit(5);
+        for (const dbP of dbProducts) {
+            const score = getSimilarity(item.name.toLowerCase(), dbP.name.toLowerCase());
+            if (score > highestScore) {
+                highestScore = score;
+                bestMatch = dbP;
+            }
+        }
 
-        let match: any = null;
-        if (dbProducts && dbProducts.length > 0) {
-            // Buscamos exacto o el que más se parezca
-            match = dbProducts.find(p =>
-                p.name.toLowerCase() === item.name.toLowerCase() ||
-                p.name.toLowerCase().includes(item.name.toLowerCase()) ||
-                item.name.toLowerCase().includes(p.name.toLowerCase())
-            );
+        const isMatched = highestScore > 0.70;
+        let currentPrice = undefined;
+        if (isMatched && bestMatch.product_variants?.[0]?.prices?.[0]) {
+            currentPrice = bestMatch.product_variants[0].prices[0].amount;
         }
 
         results.push({
             ...item,
-            matchId: match?.id,
-            matchName: match?.name,
-            status: match ? 'matched' : 'new'
+            matchId: isMatched ? bestMatch.id : undefined,
+            matchName: isMatched ? bestMatch.name : undefined,
+            similarity: Math.round(highestScore * 100),
+            currentPrice,
+            status: isMatched ? 'matched' : 'new'
         });
     }
 
-    return { success: true, items: results, message: "Búsqueda de coincidencias finalizada." };
+    return { success: true, items: results, message: "Búsqueda de coincidencias inteligente finalizada." };
 }
 
 /**
- * Procesa la importación final (crea o actualiza).
+ * Obtiene los productos que se VAN A DESACTIVAR porque no están en la lista
+ */
+export async function getMissingProducts(matchedIds: string[], providerId: string) {
+    if (!providerId) return [];
+
+    // Convertir el Set o Array de IDs a string para el filtro 'in'
+    const idsInList = matchedIds.filter(id => !!id);
+
+    let query = supabaseAdmin
+        .from('products')
+        .select('id, name')
+        .eq('provider_id', providerId)
+        .eq('active', true);
+
+    if (idsInList.length > 0) {
+        query = query.not('id', 'in', `(${idsInList.join(',')})`);
+    }
+
+    const { data: missing } = await query;
+
+    return missing?.map(p => ({
+        name: p.name,
+        cost: 0,
+        finalPrice: 0,
+        matchId: p.id,
+        status: 'deactivate' as const
+    })) || [];
+}
+
+/**
+ * Procesa la importación final (crea, actualiza o desactiva).
  */
 export async function processSync(items: ParsedItem[], providerId?: string) {
     let updated = 0;
     let created = 0;
+    let deactivated = 0;
     const errors: string[] = [];
+    const matchedIds = new Set<string>();
 
-    // Necesitamos una categoría y marca por defecto para nuevos productos si no existen
     const DEFAULT_CAT_NAME = "Sin Asignar";
     const DEFAULT_BRAND_NAME = "Sin Asignar";
 
+    // ASEGURAR CATEGORÍA POR DEFECTO
     let { data: defCat } = await supabaseAdmin.from('categories').select('id').eq('name', DEFAULT_CAT_NAME).maybeSingle();
     if (!defCat) {
         const { data: newCat } = await supabaseAdmin.from('categories').insert({ name: DEFAULT_CAT_NAME, slug: 'sin-asignar' }).select().single();
         defCat = newCat;
     }
 
+    // ASEGURAR MARCA POR DEFECTO
     let { data: defBrand } = await supabaseAdmin.from('brands').select('id').eq('name', DEFAULT_BRAND_NAME).maybeSingle();
     if (!defBrand) {
         const { data: newBrand } = await supabaseAdmin.from('brands').insert({ name: DEFAULT_BRAND_NAME, slug: 'sin-asignar' }).select().single();
@@ -144,7 +234,7 @@ export async function processSync(items: ParsedItem[], providerId?: string) {
     for (const item of items) {
         try {
             if (item.status === 'matched' && item.matchId) {
-                // ACTUALIZAR PRECIO
+                matchedIds.add(item.matchId);
                 const { data: variants } = await supabaseAdmin
                     .from('product_variants')
                     .select('id')
@@ -152,28 +242,36 @@ export async function processSync(items: ParsedItem[], providerId?: string) {
 
                 if (variants && variants.length > 0) {
                     for (const v of variants) {
-                        await ((supabaseAdmin as any).from('prices') as any)
+                        // Usamos RPC o Upsert directo según la versión de Supabase/PostgREST
+                        const { error: priceErr } = await supabaseAdmin
+                            .from('prices')
                             .upsert({
                                 variant_id: v.id,
                                 currency: 'USD',
                                 amount: item.finalPrice,
                                 updated_at: new Date().toISOString()
                             }, { onConflict: 'variant_id,currency' });
-                    }
 
-                    // También actualizar el proveedor en el producto si se proporcionó
+                        if (priceErr) throw priceErr;
+                    }
                     if (providerId) {
-                        await (supabaseAdmin as any).from('products').update({ provider_id: providerId }).eq('id', item.matchId);
+                        await supabaseAdmin.from('products').update({
+                            provider_id: providerId,
+                            active: true,
+                            cost_price: item.cost
+                        }).eq('id', item.matchId);
+                    } else {
+                        // Si no hay providerId, igualmente actualizamos el costo
+                        await supabaseAdmin.from('products').update({
+                            cost_price: item.cost
+                        }).eq('id', item.matchId);
                     }
-
                     updated++;
                 } else {
-                    errors.push(`Producto ${item.name} encontrado pero sin variantes.`);
+                    errors.push(`El producto ${item.name} no tiene variantes para actualizar precio.`);
                 }
             } else if (item.status === 'new') {
-                // CREAR NUEVO PRODUCTO
-                const slugCandidate = slugify(item.name);
-
+                const slugCandidate = slugify(item.name) + '-' + Math.random().toString(36).substring(2, 5);
                 const { data: newProd, error: prodErr } = await supabaseAdmin
                     .from('products')
                     .insert({
@@ -182,45 +280,63 @@ export async function processSync(items: ParsedItem[], providerId?: string) {
                         category_id: defCat?.id,
                         brand_id: defBrand?.id,
                         provider_id: providerId || null,
+                        cost_price: item.cost,
                         active: true
                     }).select().single();
 
                 if (prodErr) throw prodErr;
 
-                // Crear variante base
                 const { data: variant, error: varErr } = await supabaseAdmin
                     .from('product_variants')
-                    .insert({
-                        product_id: (newProd as any).id,
-                        active: true
-                    }).select().single();
+                    .insert({ product_id: (newProd as any).id, active: true })
+                    .select().single();
 
                 if (varErr) throw varErr;
 
-                // Crear precio
-                await ((supabaseAdmin as any).from('prices') as any).insert({
+                await supabaseAdmin.from('prices').insert({
                     variant_id: (variant as any).id,
                     currency: 'USD',
                     amount: item.finalPrice
                 });
 
-                // Crear inventario base (0)
                 await supabaseAdmin.from('inventory').insert({
                     variant_id: (variant as any).id,
                     qty_available: 0
                 });
 
                 created++;
+            } else if (item.status === 'deactivate' && item.matchId) {
+                await supabaseAdmin.from('products').update({ active: false }).eq('id', item.matchId);
+                deactivated++;
             }
         } catch (e: any) {
-            errors.push(`Error con ${item.name}: ${e.message}`);
+            console.error(`Error procesando ${item.name}:`, e);
+            errors.push(`Error con ${item.name}: ${e.message || 'Error desconocido'}`);
+        }
+    }
+
+    // Doble check de seguridad para desactivación masiva si no se hizo por status explícito
+    if (providerId && items.every(item => item.status !== 'deactivate')) {
+        const { data: providerProducts } = await supabaseAdmin
+            .from('products')
+            .select('id')
+            .eq('provider_id', providerId)
+            .eq('active', true);
+
+        if (providerProducts) {
+            for (const p of providerProducts) {
+                if (!matchedIds.has(p.id)) {
+                    await supabaseAdmin.from('products').update({ active: false }).eq('id', p.id);
+                    deactivated++;
+                }
+            }
         }
     }
 
     return {
-        success: true,
-        message: `Sincronización finalizada. Actualizados: ${updated}, Creados: ${created}.`,
-        errors
+        success: errors.length < items.length, // Si fallaron todos es fracaso total
+        message: `Sincronización finalizada. Actualizados: ${updated}, Creados: ${created}, Desactivados: ${deactivated}.`,
+        errors: errors.length > 0 ? errors : undefined
     };
 }
 

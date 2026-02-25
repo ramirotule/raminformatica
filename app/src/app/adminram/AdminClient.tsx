@@ -30,16 +30,20 @@ import {
     TrendingUp,
     Star,
     Wand2,
+    Bell,
+    Zap,
+    Cpu,
+    Sparkles,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { dict } from '@/lib/dict'
-import { conditionLabel, slugify, formatUSD, getPriceUSD } from '@/lib/utils'
-import type { Product, ProductWithDetails, Category, Brand, ProductVariant, Price, Inventory, HomeSlide, BrandLogo, Provider } from '@/lib/database.types'
+import { conditionLabel, slugify, formatUSD, getPriceUSD, smartCapitalize } from '@/lib/utils'
+import type { Product, ProductWithDetails, Category, Brand, ProductVariant, Price, Inventory, HomeSlide, BrandLogo, Provider, WeeklyNews } from '@/lib/database.types'
 import { SearchableSelect } from '@/components/SearchableSelect'
 import { calculateSellingPrice } from '@/lib/constants'
 import AdminPrecios from './AdminPrecios'
 
-type AdminSection = 'dashboard' | 'productos' | 'categorias' | 'marcas' | 'proveedores' | 'home' | 'precios'
+type AdminSection = 'dashboard' | 'productos' | 'categorias' | 'marcas' | 'proveedores' | 'home' | 'precios' | 'novedades'
 
 async function getFileHash(file: File): Promise<string> {
     const arrayBuffer = await file.arrayBuffer()
@@ -58,6 +62,7 @@ function Sidebar({ active, onChange }: { active: AdminSection; onChange: (s: Adm
         { id: 'marcas', label: dict.admin.marcas, icon: <Building2 size={16} /> },
         { id: 'proveedores', label: 'Proveedores', icon: <Warehouse size={16} /> },
         { id: 'precios', label: 'Sincronizar Precios', icon: <RefreshCw size={16} /> },
+        { id: 'novedades', label: 'Novedades', icon: <Bell size={16} /> },
     ]
     return (
         <aside className="admin-sidebar">
@@ -384,7 +389,8 @@ function AdminProductos() {
             for (const p of productsToClean) {
                 let newName = p.name;
                 if (mode === 'clean') {
-                    newName = p.name.replace(emojiRegex, '').replace(/\s+/g, ' ').trim()
+                    const noEmojis = p.name.replace(emojiRegex, '').replace(/\s+/g, ' ').trim()
+                    newName = smartCapitalize(noEmojis)
                 } else if (mode === 'replace' && bulkRenameSearch) {
                     const regex = new RegExp(bulkRenameSearch, 'gi')
                     newName = p.name.replace(regex, bulkRenameReplace).replace(/\s+/g, ' ').trim()
@@ -1543,9 +1549,9 @@ function AdminProductos() {
                             </div>
 
                             <div style={{ background: 'rgba(52,199,89,0.05)', padding: 16, borderRadius: 12, border: '1px solid rgba(52,199,89,0.1)' }}>
-                                <h4 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: 12 }}>Opción 2: Limpieza Inteligente</h4>
+                                <h4 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: 12 }}>Opción 2: Limpieza y Capitalización</h4>
                                 <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: 12 }}>
-                                    Elimina automáticamente emoticones, emojis y normaliza los espacios en blanco.
+                                    Elimina emojis, normaliza espacios y aplica formato título (Ej: "SMARTWATCH 64GB" → "Smartwatch 64GB").
                                 </p>
                                 <button
                                     className="btn btn-success btn-sm btn-full"
@@ -1553,7 +1559,7 @@ function AdminProductos() {
                                     style={{ background: 'var(--green)', color: 'white' }}
                                     disabled={isSaving}
                                 >
-                                    Limpiar Emoticones y Espacios
+                                    Ejecutar Limpieza Completa
                                 </button>
                             </div>
                         </div>
@@ -2813,6 +2819,272 @@ function AdminProveedores() {
     )
 }
 
+// ─── Novedades Admin ──────────────────────────────────────────────────────────
+function AdminNovedades() {
+    const [items, setItems] = useState<WeeklyNews[]>([])
+    const [loading, setLoading] = useState(true)
+    const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+    const [modalOpen, setModalOpen] = useState(false)
+    const [editId, setEditId] = useState<string | null>(null)
+    const [isSaving, setIsSaving] = useState(false)
+    const [newsFile, setNewsFile] = useState<File | null>(null)
+    const [newsPreview, setNewsPreview] = useState<string | null>(null)
+
+    const [form, setForm] = useState({
+        title: '',
+        description: '',
+        icon_name: 'Bell',
+        image_url: '',
+        storage_path: '',
+        color: '#34C759',
+        tag: 'NUEVO',
+        active: true,
+        sort_order: 0
+    })
+
+    const showAlert = (type: 'success' | 'error', message: string) => {
+        setAlert({ type, message })
+        setTimeout(() => setAlert(null), 4000)
+    }
+
+    const load = useCallback(async () => {
+        setLoading(true)
+        const { data, error } = await supabase.from('weekly_news').select('*').order('sort_order', { ascending: true })
+        if (error) showAlert('error', error.message)
+        else setItems(data || [])
+        setLoading(false)
+    }, [])
+
+    useEffect(() => { load() }, [load])
+
+    async function handleSave() {
+        if (!form.title) { showAlert('error', 'El título es requerido'); return }
+        setIsSaving(true)
+        try {
+            let finalImageUrl = form.image_url
+            let finalStoragePath = form.storage_path
+
+            if (newsFile) {
+                const fileExt = newsFile.name.split('.').pop()
+                const fileName = `weekly-news-${Date.now()}.${fileExt}`
+
+                const { error: uploadError } = await supabase.storage.from('Images').upload(fileName, newsFile, { upsert: true })
+                if (uploadError) throw uploadError
+
+                const { data: { publicUrl } } = supabase.storage.from('Images').getPublicUrl(fileName)
+                finalImageUrl = publicUrl
+                finalStoragePath = fileName
+            }
+
+            const payload = { ...form, image_url: finalImageUrl, storage_path: finalStoragePath }
+
+            if (editId) {
+                const { error } = await (supabase as any).from('weekly_news').update(payload).eq('id', editId)
+                if (error) throw error
+                showAlert('success', 'Novedad actualizada.')
+            } else {
+                const { error } = await (supabase as any).from('weekly_news').insert(payload)
+                if (error) throw error
+                showAlert('success', 'Novedad creada.')
+            }
+            setModalOpen(false)
+            setNewsFile(null)
+            setNewsPreview(null)
+            load()
+        } catch (error: any) {
+            showAlert('error', error.message || 'Error al guardar')
+        } finally {
+            setIsSaving(false)
+        }
+    }
+
+    async function handleDelete(id: string, name: string) {
+        if (!confirm(`¿Eliminar la novedad "${name}"?`)) return
+        const { error } = await (supabase as any).from('weekly_news').delete().eq('id', id)
+        if (error) showAlert('error', error.message)
+        else { showAlert('success', 'Novedad eliminada.'); load() }
+    }
+
+    const iconsList = ['Bell', 'Zap', 'Cpu', 'Sparkles']
+    const colorsList = ['#34C759', '#5856D6', '#007AFF', '#FF9500', '#FF3B30']
+
+    return (
+        <div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Novedades de la Semana</h1>
+                <button className="btn btn-primary btn-sm" onClick={() => {
+                    setEditId(null);
+                    setForm({ title: '', description: '', icon_name: 'Bell', image_url: '', storage_path: '', color: '#34C759', tag: 'NUEVO', active: true, sort_order: items.length });
+                    setNewsFile(null);
+                    setNewsPreview(null);
+                    setModalOpen(true)
+                }}>
+                    <Plus size={15} /> Nueva Novedad
+                </button>
+            </div>
+
+            {alert && <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
+
+            {loading ? <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 40 }}>Cargando...</div> : (
+                <div className="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style={{ width: 60 }}>Orden</th>
+                                <th>Icono</th>
+                                <th>Título / Tag</th>
+                                <th>Descripción</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {items.map((it) => (
+                                <tr key={it.id}>
+                                    <td>{it.sort_order}</td>
+                                    <td>
+                                        {it.image_url ? (
+                                            <img src={it.image_url} alt="" style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover' }} />
+                                        ) : (
+                                            <div style={{
+                                                width: 32, height: 32, borderRadius: 8, background: `${it.color}15`, color: it.color || 'var(--text-primary)',
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                            }}>
+                                                {it.icon_name === 'Zap' && <Zap size={16} />}
+                                                {it.icon_name === 'Cpu' && <Cpu size={16} />}
+                                                {it.icon_name === 'Sparkles' && <Sparkles size={16} />}
+                                                {it.icon_name === 'Bell' && <Bell size={16} />}
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td>
+                                        <div style={{ fontWeight: 600 }}>{it.title}</div>
+                                        <div style={{ fontSize: '0.7rem', opacity: 0.6 }}>{it.tag}</div>
+                                    </td>
+                                    <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', maxWidth: 300 }}>{it.description}</td>
+                                    <td>
+                                        <span className={`badge ${it.active ? 'badge-new' : 'badge-used'}`}>
+                                            {it.active ? 'Activo' : 'Pausado'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div style={{ display: 'flex', gap: 6 }}>
+                                            <button className="btn btn-ghost btn-sm" onClick={() => {
+                                                setEditId(it.id);
+                                                setForm({ title: it.title, description: it.description || '', icon_name: it.icon_name || 'Bell', image_url: it.image_url || '', storage_path: it.storage_path || '', color: it.color || '#34C759', tag: it.tag || '', active: it.active, sort_order: it.sort_order });
+                                                setNewsPreview(it.image_url);
+                                                setNewsFile(null);
+                                                setModalOpen(true)
+                                            }}><Pencil size={14} /></button>
+                                            <button className="btn btn-danger btn-sm" onClick={() => handleDelete(it.id, it.title)}><Trash2 size={14} /></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+
+            {modalOpen && (
+                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setModalOpen(false)}>
+                    <div className="modal" style={{ maxWidth: 500 }}>
+                        <div className="modal-title">
+                            <span>{editId ? 'Editar Novedad' : 'Nueva Novedad'}</span>
+                            <button onClick={() => setModalOpen(false)} className="btn btn-ghost btn-sm"><X size={16} /></button>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                            <div className="form-group">
+                                <label className="form-label">Título *</label>
+                                <input className="form-input" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Ej: Ingreso iPhone 16" />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Descripción</label>
+                                <textarea className="form-input" rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Imagen de Portada (Opcional)</label>
+                                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                                    <div style={{
+                                        width: 80, height: 60, borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)',
+                                        overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+                                    }}>
+                                        {newsPreview ? <img src={newsPreview} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Image size={24} color="var(--text-muted)" />}
+                                    </div>
+                                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                        <input type="file" accept="image/*" onChange={(e) => {
+                                            const file = e.target.files?.[0]
+                                            if (file) {
+                                                setNewsFile(file)
+                                                setNewsPreview(URL.createObjectURL(file))
+                                            }
+                                        }} style={{ fontSize: '0.8rem' }} />
+                                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>* Se subirá al bucket "Images" de Supabase.</div>
+                                    </div>
+                                    {(newsPreview || form.image_url) && (
+                                        <button className="btn btn-danger btn-sm" onClick={() => { setNewsFile(null); setNewsPreview(null); setForm({ ...form, image_url: '', storage_path: '' }) }} title="Quitar imagen">
+                                            <Trash2 size={12} />
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                                <div className="form-group">
+                                    <label className="form-label">Tag Superior</label>
+                                    <input className="form-input" value={form.tag} onChange={(e) => setForm({ ...form, tag: e.target.value })} placeholder="Ej: NUEVO" />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Orden</label>
+                                    <input type="number" className="form-input" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) })} />
+                                </div>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                                <div className="form-group">
+                                    <label className="form-label">Icono</label>
+                                    <div style={{ display: 'flex', gap: 8 }}>
+                                        {iconsList.map(ic => (
+                                            <button key={ic} onClick={() => setForm({ ...form, icon_name: ic })} style={{
+                                                padding: 8, borderRadius: 8, border: `1px solid ${form.icon_name === ic ? 'var(--green)' : 'var(--border)'}`,
+                                                background: form.icon_name === ic ? 'var(--green-light)' : 'transparent', cursor: 'pointer'
+                                            }}>
+                                                {ic === 'Zap' && <Zap size={18} />}
+                                                {ic === 'Cpu' && <Cpu size={18} />}
+                                                {ic === 'Sparkles' && <Sparkles size={18} />}
+                                                {ic === 'Bell' && <Bell size={18} />}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Color</label>
+                                    <div style={{ display: 'flex', gap: 8 }}>
+                                        {colorsList.map(c => (
+                                            <button key={c} onClick={() => setForm({ ...form, color: c })} style={{
+                                                width: 24, height: 24, borderRadius: '50%', background: c, border: `2px solid ${form.color === c ? 'var(--text-primary)' : 'transparent'}`,
+                                                cursor: 'pointer'
+                                            }} />
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} style={{ width: 18, height: 18, accentColor: 'var(--green)' }} />
+                                <span style={{ fontWeight: 600 }}>Pestaña Activa</span>
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 16 }}>
+                            <button className="btn btn-ghost" onClick={() => setModalOpen(false)}>Cancelar</button>
+                            <button className="btn btn-primary" onClick={handleSave} disabled={isSaving}>
+                                {isSaving ? <Loader2 className="animate-spin" size={15} /> : <Check size={15} />} Guardar Novedad
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    )
+}
+
 // ─── Main AdminClient ─────────────────────────────────────────────────────────
 export default function AdminClient() {
     const [section, setSection] = useState<AdminSection>('dashboard')
@@ -2825,6 +3097,7 @@ export default function AdminClient() {
         marcas: <AdminMarcas />,
         proveedores: <AdminProveedores />,
         precios: <AdminPrecios />,
+        novedades: <AdminNovedades />,
     }
 
     return (

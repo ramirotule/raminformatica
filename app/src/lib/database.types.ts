@@ -59,6 +59,11 @@ export interface Database {
                 Insert: Omit<Provider, 'id' | 'created_at'>
                 Update: Partial<Omit<Provider, 'id' | 'created_at'>>
             }
+            weekly_news: {
+                Row: WeeklyNews
+                Insert: Omit<WeeklyNews, 'id' | 'created_at'>
+                Update: Partial<Omit<WeeklyNews, 'id' | 'created_at'>>
+            }
         }
     }
 }
@@ -192,5 +197,19 @@ export interface Provider {
     email: string | null
     notes: string | null
     active: boolean
+    created_at: string
+}
+
+export interface WeeklyNews {
+    id: string
+    title: string
+    description: string | null
+    icon_name: string | null
+    image_url: string | null
+    storage_path: string | null
+    color: string | null
+    tag: string | null
+    active: boolean
+    sort_order: number
     created_at: string
 }
