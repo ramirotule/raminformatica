@@ -77,7 +77,7 @@ export default async function CategoriaSlugPage({ params }: Props) {
     return (
         <div className="section">
             <div className="container">
-                <div style={{ marginBottom: 48, textAlign: 'center' }}>
+                <div style={{ marginTop: 40, marginBottom: 48, textAlign: 'center' }}>
                     <h1 className="hero-title" style={{ fontSize: '3.5rem', marginBottom: 16 }}>
                         <span>{category.name}</span>
                     </h1>
