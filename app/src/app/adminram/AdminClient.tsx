@@ -28,14 +28,16 @@ import {
     Home,
     TrendingUp,
     Star,
+    Wand2,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { dict } from '@/lib/dict'
 import { conditionLabel, slugify, formatUSD } from '@/lib/utils'
-import type { Product, ProductWithDetails, Category, Brand, ProductVariant, Price, Inventory, HomeSlide, BrandLogo } from '@/lib/database.types'
+import type { Product, ProductWithDetails, Category, Brand, ProductVariant, Price, Inventory, HomeSlide, BrandLogo, Provider } from '@/lib/database.types'
 import { SearchableSelect } from '@/components/SearchableSelect'
+import AdminPrecios from './AdminPrecios'
 
-type AdminSection = 'dashboard' | 'productos' | 'categorias' | 'marcas' | 'inventario' | 'home'
+type AdminSection = 'dashboard' | 'productos' | 'categorias' | 'marcas' | 'proveedores' | 'home' | 'precios'
 
 async function getFileHash(file: File): Promise<string> {
     const arrayBuffer = await file.arrayBuffer()
@@ -52,7 +54,8 @@ function Sidebar({ active, onChange }: { active: AdminSection; onChange: (s: Adm
         { id: 'productos', label: dict.admin.productos, icon: <Package size={16} /> },
         { id: 'categorias', label: dict.admin.categorias, icon: <Tag size={16} /> },
         { id: 'marcas', label: dict.admin.marcas, icon: <Building2 size={16} /> },
-        { id: 'inventario', label: dict.admin.inventario, icon: <Warehouse size={16} /> },
+        { id: 'proveedores', label: 'Proveedores', icon: <Warehouse size={16} /> },
+        { id: 'precios', label: 'Sincronizar Precios', icon: <RefreshCw size={16} /> },
     ]
     return (
         <aside className="admin-sidebar">
@@ -210,6 +213,7 @@ function AdminProductos() {
     const [products, setProducts] = useState<ProductWithDetails[]>([])
     const [categories, setCategories] = useState<Category[]>([])
     const [brands, setBrands] = useState<Brand[]>([])
+    const [providers, setProviders] = useState<Provider[]>([])
     const [loading, setLoading] = useState(true)
     const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
     const [modalOpen, setModalOpen] = useState(false)
@@ -217,10 +221,10 @@ function AdminProductos() {
 
     // Formulario nuevo/editar producto
     const [form, setForm] = useState({
-        name: '', slug: '', category_id: '', brand_id: '',
+        name: '', slug: '', category_id: '', brand_id: '', provider_id: '',
         condition: 'new', short_description: '', active: true,
         is_featured: false,
-        priceUSD: '', sku: '', color: '', storage: '', connectivity: '',
+        priceUSD: '', cost_price: '', sku: '', color: '', storage: '', connectivity: '',
     })
     const [images, setImages] = useState<{ id: string, file?: File, url: string, isExisting: boolean, storagePath?: string }[]>([])
     const [draggedIdx, setDraggedIdx] = useState<number | null>(null)
@@ -230,10 +234,15 @@ function AdminProductos() {
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
     const [bulkCategoryOpen, setBulkCategoryOpen] = useState(false)
     const [bulkBrandOpen, setBulkBrandOpen] = useState(false)
+    const [bulkProviderOpen, setBulkProviderOpen] = useState(false)
     const [bulkCategoryForm, setBulkCategoryForm] = useState('')
     const [bulkBrandForm, setBulkBrandForm] = useState('')
+    const [bulkProviderForm, setBulkProviderForm] = useState('')
     const [bulkImagesOpen, setBulkImagesOpen] = useState(false)
     const [bulkImagesData, setBulkImagesData] = useState<Record<string, File[]>>({})
+    const [bulkRenameOpen, setBulkRenameOpen] = useState(false)
+    const [bulkRenameSearch, setBulkRenameSearch] = useState('')
+    const [bulkRenameReplace, setBulkRenameReplace] = useState('')
 
     type SortField = 'name' | 'categories.name' | 'brands.name' | 'priceUSD' | 'condition' | 'active'
     const [sortField, setSortField] = useState<SortField>('name')
@@ -256,7 +265,7 @@ function AdminProductos() {
 
     const load = useCallback(async () => {
         setLoading(true)
-        const [pRes, cRes, bRes] = await Promise.all([
+        const [pRes, cRes, bRes, provRes] = await Promise.all([
             supabase
                 .from('products')
                 .select('*, categories(*), brands(*), product_variants(*, prices(*), inventory(*)), product_images(*)')
@@ -264,12 +273,14 @@ function AdminProductos() {
                 .limit(1000),
             (supabase as any).from('categories').select('*').order('name'),
             (supabase as any).from('brands').select('*').order('name'),
+            (supabase as any).from('providers').select('*').order('name'),
         ])
         const productsData = (pRes.data as any) ?? []
         console.log('Products loaded:', productsData.length, 'Featured:', productsData.filter((p: any) => p.is_featured).length)
         setProducts(productsData)
         setCategories((cRes.data as any) ?? [])
         setBrands((bRes.data as any) ?? [])
+        setProviders((provRes.data as any) ?? [])
         setLoading(false)
     }, [])
 
@@ -328,6 +339,42 @@ function AdminProductos() {
         }
     }
 
+    async function performBulkRename(mode: 'clean' | 'replace') {
+        if (!selectedIds.size) return
+
+        setIsSaving(true)
+        try {
+            const productsToClean = products.filter(p => selectedIds.has(p.id))
+            // Regex más robusta para emojis sin usar secuencias problemáticas para el editor
+            const emojiRegex = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g
+
+            for (const p of productsToClean) {
+                let newName = p.name;
+                if (mode === 'clean') {
+                    newName = p.name.replace(emojiRegex, '').replace(/\s+/g, ' ').trim()
+                } else if (mode === 'replace' && bulkRenameSearch) {
+                    const regex = new RegExp(bulkRenameSearch, 'gi')
+                    newName = p.name.replace(regex, bulkRenameReplace).replace(/\s+/g, ' ').trim()
+                }
+
+                if (newName !== p.name) {
+                    await (supabase as any).from('products').update({ name: newName, slug: slugify(newName) }).eq('id', p.id)
+                }
+            }
+
+            showAlert('success', 'Nombres actualizados correctamente.')
+            setBulkRenameOpen(false)
+            setBulkRenameSearch('')
+            setBulkRenameReplace('')
+            setSelectedIds(new Set())
+            load()
+        } catch (error: any) {
+            showAlert('error', 'Error al procesar nombres: ' + error.message)
+        } finally {
+            setIsSaving(false)
+        }
+    }
+
     async function bulkStatus(active: boolean) {
         if (!selectedIds.size) return
         await ((supabase as any).from('products') as any).update({ active }).in('id', Array.from(selectedIds))
@@ -363,13 +410,33 @@ function AdminProductos() {
         load()
     }
 
+    async function performBulkProvider() {
+        if (!selectedIds.size || !bulkProviderForm) return
+        await ((supabase as any).from('products') as any).update({ provider_id: bulkProviderForm }).in('id', Array.from(selectedIds))
+        showAlert('success', 'Proveedor actualizado para los productos seleccionados.')
+        setBulkProviderOpen(false)
+        setSelectedIds(new Set())
+        load()
+    }
+
     function openNew() {
         setEditProduct(null)
         setForm({
-            name: '', slug: '', category_id: '', brand_id: '',
-            condition: 'new', short_description: '', active: true,
+            name: '',
+            slug: '',
+            category_id: '',
+            brand_id: '',
+            provider_id: '',
+            condition: 'new',
+            short_description: '',
+            active: true,
             is_featured: false,
-            priceUSD: '', sku: '', color: '', storage: '', connectivity: ''
+            priceUSD: '',
+            cost_price: '',
+            sku: '',
+            color: '',
+            storage: '',
+            connectivity: ''
         })
         setImages([])
         setModalOpen(true)
@@ -380,12 +447,21 @@ function AdminProductos() {
         const price = variant?.prices?.find((pr: any) => pr.currency === 'USD')
         setEditProduct(p)
         setForm({
-            name: p.name, slug: p.slug, category_id: p.category_id || '', brand_id: p.brand_id || '',
-            condition: p.condition || 'new', short_description: p.short_description ?? '',
-            active: p.active, is_featured: p.is_featured,
+            name: p.name,
+            slug: p.slug,
+            category_id: p.category_id || '',
+            brand_id: p.brand_id || '',
+            provider_id: (p as any).provider_id || '',
+            condition: p.condition || 'new',
+            short_description: p.short_description ?? '',
+            active: p.active,
+            is_featured: p.is_featured,
             priceUSD: price ? String(price.amount) : '',
-            sku: variant?.sku ?? '', color: variant?.color ?? '',
-            storage: variant?.storage ?? '', connectivity: variant?.connectivity ?? '',
+            cost_price: (p as any).cost_price ? String((p as any).cost_price) : '',
+            sku: variant?.sku ?? '',
+            color: variant?.color ?? '',
+            storage: variant?.storage ?? '',
+            connectivity: variant?.connectivity ?? '',
         })
         const sortedImages = [...(p.product_images || [])].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
         setImages(sortedImages.map(img => ({
@@ -464,6 +540,8 @@ function AdminProductos() {
                     .from('products')
                     .update({
                         name: form.name, slug, category_id: form.category_id, brand_id: form.brand_id,
+                        provider_id: form.provider_id || null,
+                        cost_price: form.cost_price ? parseFloat(form.cost_price) : null,
                         condition: form.condition as 'new', short_description: form.short_description || null,
                         active: form.active, is_featured: form.is_featured,
                     })
@@ -491,6 +569,8 @@ function AdminProductos() {
                     .from('products')
                     .insert({
                         name: form.name, slug, category_id: form.category_id, brand_id: form.brand_id,
+                        provider_id: form.provider_id || null,
+                        cost_price: form.cost_price ? parseFloat(form.cost_price) : null,
                         condition: form.condition as 'new', short_description: form.short_description || null,
                         active: form.active, is_featured: form.is_featured,
                     })
@@ -630,9 +710,14 @@ function AdminProductos() {
                         <button className="btn btn-sm btn-ghost" style={{ background: 'rgba(0,0,0,0.05)', border: '1px solid var(--border)' }} onClick={() => bulkStatus(false)}>Pausar</button>
                         <button className="btn btn-sm btn-ghost" style={{ background: 'rgba(0,0,0,0.05)', border: '1px solid var(--border)' }} onClick={() => { setBulkCategoryForm(''); setBulkCategoryOpen(true); }}>Categoría</button>
                         <button className="btn btn-sm btn-ghost" style={{ background: 'rgba(0,0,0,0.05)', border: '1px solid var(--border)' }} onClick={() => { setBulkBrandForm(''); setBulkBrandOpen(true); }}>Marca</button>
+                        <button className="btn btn-sm btn-ghost" style={{ background: 'rgba(0,0,0,0.05)', border: '1px solid var(--border)' }} onClick={() => { setBulkProviderForm(''); setBulkProviderOpen(true); }}>Proveedor</button>
                         <button className="btn btn-sm btn-ghost" style={{ background: 'rgba(52,199,89,0.1)', border: '1px solid var(--accent)', color: 'var(--accent-light)' }} onClick={() => { setBulkImagesData({}); setBulkImagesOpen(true); }}>
                             <ImagePlus size={14} style={{ marginRight: 4 }} />
                             Subir Imágenes
+                        </button>
+                        <button className="btn btn-sm btn-ghost" style={{ background: 'rgba(10,132,255,0.1)', border: '1px solid rgba(10,132,255,0.3)', color: 'var(--blue)' }} onClick={() => setBulkRenameOpen(true)}>
+                            <Wand2 size={14} style={{ marginRight: 4 }} />
+                            Renombrar / Limpiar
                         </button>
                         <button className="btn btn-danger btn-sm" onClick={bulkDelete}>Eliminar</button>
                     </div>
@@ -718,8 +803,8 @@ function AdminProductos() {
                                                 )}
                                             </div>
                                         </td>
-                                        <td>
-                                            <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{p.name}</div>
+                                        <td onClick={() => openEdit(p)} style={{ cursor: 'pointer' }} className="hover-opacity">
+                                            <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-primary)' }}>{p.name}</div>
                                             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{p.slug}</div>
                                         </td>
                                         <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{p.categories?.name}</td>
@@ -855,6 +940,24 @@ function AdminProductos() {
                             </div>
 
                             <div className="form-group">
+                                <label className="form-label" htmlFor="form-provider">Proveedor</label>
+                                <SearchableSelect
+                                    id="form-provider"
+                                    value={form.provider_id}
+                                    onChange={(v) => setForm((f) => ({ ...f, provider_id: v }))}
+                                    options={providers.map(p => ({ value: p.id, label: p.name }))}
+                                    placeholder="Seleccionar proveedor..."
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label" htmlFor="form-cost-price">Precio Costo</label>
+                                <input id="form-cost-price" className="form-input" type="number" min="0" step="0.01"
+                                    value={form.cost_price} onChange={(e) => setForm((f) => ({ ...f, cost_price: e.target.value }))}
+                                    placeholder="0.00" />
+                            </div>
+
+                            <div className="form-group">
                                 <label className="form-label" htmlFor="form-condition">{dict.admin.condicion}</label>
                                 <SearchableSelect
                                     id="form-condition"
@@ -882,19 +985,6 @@ function AdminProductos() {
                                     onChange={(e) => setForm((f) => ({ ...f, storage: e.target.value }))} placeholder="128GB, 256GB..." />
                             </div>
 
-                            <div className="form-group" style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(255,159,10,0.05)', padding: '12px 16px', borderRadius: 12, border: '1px solid rgba(255,159,10,0.1)', marginTop: 8 }}>
-                                <input
-                                    type="checkbox"
-                                    id="form-featured"
-                                    checked={form.is_featured}
-                                    onChange={(e) => setForm(f => ({ ...f, is_featured: e.target.checked }))}
-                                    style={{ width: 18, height: 18, cursor: 'pointer', accentColor: 'var(--orange)' }}
-                                />
-                                <label htmlFor="form-featured" style={{ cursor: 'pointer', fontWeight: 600, color: 'var(--orange)', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: 6 }}>
-                                    <TrendingUp size={16} />
-                                    Marcar como "Producto Más Vendido" (Aparecerá destacado en la Home)
-                                </label>
-                            </div>
 
                             <div className="form-group">
                                 <label className="form-label" htmlFor="form-color">{dict.admin.color}</label>
@@ -1003,12 +1093,24 @@ function AdminProductos() {
                                 )}
                             </div>
 
-                            <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                            <div className="form-group" style={{ gridColumn: '1 / -1', display: 'flex', gap: 24, padding: '12px 0', borderTop: '1px solid var(--border)', marginTop: 8 }}>
                                 <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
                                     <input type="checkbox" checked={form.active}
                                         onChange={(e) => setForm((f) => ({ ...f, active: e.target.checked }))}
-                                        style={{ width: 16, height: 16, accentColor: 'var(--accent)' }} />
-                                    <span className="form-label" style={{ margin: 0 }}>Producto activo (visible en tienda)</span>
+                                        style={{ width: 18, height: 18, accentColor: 'var(--green)' }} />
+                                    <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>Producto Activo</span>
+                                </label>
+
+                                <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={form.is_featured}
+                                        onChange={(e) => setForm(f => ({ ...f, is_featured: e.target.checked }))}
+                                        style={{ width: 18, height: 18, cursor: 'pointer', accentColor: 'var(--orange)' }}
+                                    />
+                                    <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--orange)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                        <TrendingUp size={14} /> Marcar como + VENDIDO
+                                    </span>
                                 </label>
                             </div>
                         </div>
@@ -1084,6 +1186,32 @@ function AdminProductos() {
                     </div>
                 </div>
             )}
+
+            {/* Bulk Provider Modal */}
+            {bulkProviderOpen && (
+                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setBulkProviderOpen(false)}>
+                    <div className="modal" style={{ maxWidth: 400, overflow: 'visible' }}>
+                        <div className="modal-title">
+                            <span>Asignar Proveedor Masivo</span>
+                            <button onClick={() => setBulkProviderOpen(false)} className="btn btn-ghost btn-sm"><X size={16} /></button>
+                        </div>
+                        <div className="form-group" style={{ zIndex: 10 }}>
+                            <label className="form-label">Selecciona el nuevo proveedor para los {selectedIds.size} productos:</label>
+                            <SearchableSelect
+                                value={bulkProviderForm}
+                                onChange={v => setBulkProviderForm(v)}
+                                options={providers.map(p => ({ value: p.id, label: p.name }))}
+                                placeholder="Seleccionar..."
+                            />
+                        </div>
+                        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 16 }}>
+                            <button className="btn btn-ghost" onClick={() => setBulkProviderOpen(false)}>Cancelar</button>
+                            <button className="btn btn-primary" onClick={performBulkProvider} disabled={!bulkProviderForm}>Guardar</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Bulk Image Upload Modal */}
             {bulkImagesOpen && (
                 <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setBulkImagesOpen(false)}>
@@ -1193,6 +1321,77 @@ function AdminProductos() {
                                 <Check size={16} style={{ marginRight: 6 }} />
                                 Guardar todas las imágenes
                             </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {bulkRenameOpen && (
+                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setBulkRenameOpen(false)}>
+                    <div className="modal" style={{ maxWidth: 450 }}>
+                        <div className="modal-title">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                <Wand2 size={20} color="var(--blue)" />
+                                <span>Renombrar o Limpiar Nombres</span>
+                            </div>
+                            <button onClick={() => setBulkRenameOpen(false)} className="btn btn-ghost btn-sm"><X size={16} /></button>
+                        </div>
+
+                        <div style={{ padding: '16px 0' }}>
+                            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: 20 }}>
+                                Aplicando cambios a <strong>{selectedIds.size}</strong> productos seleccionados.
+                            </p>
+
+                            <div style={{ background: 'rgba(10,132,255,0.05)', padding: 16, borderRadius: 12, border: '1px solid rgba(10,132,255,0.1)', marginBottom: 20 }}>
+                                <h4 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: 12 }}>Opción 1: Reemplazar Texto</h4>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                    <div className="form-group" style={{ marginBottom: 0 }}>
+                                        <label className="form-label" style={{ fontSize: '0.75rem' }}>Buscar palabra/frase</label>
+                                        <input
+                                            className="form-input"
+                                            placeholder="Ej: Watch"
+                                            value={bulkRenameSearch}
+                                            onChange={(e) => setBulkRenameSearch(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="form-group" style={{ marginBottom: 0 }}>
+                                        <label className="form-label" style={{ fontSize: '0.75rem' }}>Reemplazar con</label>
+                                        <input
+                                            className="form-input"
+                                            placeholder="Ej: Smartwatch"
+                                            value={bulkRenameReplace}
+                                            onChange={(e) => setBulkRenameReplace(e.target.value)}
+                                        />
+                                    </div>
+                                    <button
+                                        className="btn btn-primary btn-sm btn-full"
+                                        onClick={() => performBulkRename('replace')}
+                                        disabled={!bulkRenameSearch || isSaving}
+                                        style={{ marginTop: 8 }}
+                                    >
+                                        Ejecutar Reemplazo
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div style={{ background: 'rgba(52,199,89,0.05)', padding: 16, borderRadius: 12, border: '1px solid rgba(52,199,89,0.1)' }}>
+                                <h4 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: 12 }}>Opción 2: Limpieza Inteligente</h4>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: 12 }}>
+                                    Elimina automáticamente emoticones, emojis y normaliza los espacios en blanco.
+                                </p>
+                                <button
+                                    className="btn btn-success btn-sm btn-full"
+                                    onClick={() => performBulkRename('clean')}
+                                    style={{ background: 'var(--green)', color: 'white' }}
+                                    disabled={isSaving}
+                                >
+                                    Limpiar Emoticones y Espacios
+                                </button>
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 8 }}>
+                            <button className="btn btn-ghost" onClick={() => setBulkRenameOpen(false)}>Cerrar</button>
                         </div>
                     </div>
                 </div>
@@ -2249,6 +2448,168 @@ function AdminHome() {
     )
 }
 
+// ─── Admin Proveedores ────────────────────────────────────────────────────────
+function AdminProveedores() {
+    const [items, setItems] = useState<Provider[]>([])
+    const [loading, setLoading] = useState(true)
+    const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+    const [modalOpen, setModalOpen] = useState(false)
+    const [editId, setEditId] = useState<string | null>(null)
+    const [isSaving, setIsSaving] = useState(false)
+
+    const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', notes: '', active: true })
+
+    const [sortField, setSortField] = useState<'name' | 'email' | 'created_at'>('name')
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+
+    const showAlert = (type: 'success' | 'error', message: string) => {
+        setAlert({ type, message })
+        setTimeout(() => setAlert(null), 3500)
+    }
+
+    const load = useCallback(async () => {
+        setLoading(true)
+        const { data } = await (supabase as any).from('providers').select('*').order('name')
+        setItems(data ?? [])
+        setLoading(false)
+    }, [])
+
+    useEffect(() => { load() }, [load])
+
+    async function handleSave() {
+        if (!form.name) return showAlert('error', 'El nombre es obligatorio')
+        setIsSaving(true)
+        try {
+            const data = { ...form, updated_at: new Date().toISOString() }
+            let error
+            if (editId) {
+                ; ({ error } = await ((supabase as any).from('providers') as any).update(data).eq('id', editId))
+            } else {
+                ; ({ error } = await (supabase as any).from('providers').insert(data))
+            }
+            if (error) throw error
+            showAlert('success', editId ? 'Proveedor actualizado.' : 'Proveedor creado.')
+            setModalOpen(false)
+            load()
+        } catch (error: any) {
+            showAlert('error', error.message || 'Error al guardar')
+        } finally {
+            setIsSaving(false)
+        }
+    }
+
+    async function handleDelete(id: string, name: string) {
+        if (!confirm(`¿Eliminar al proveedor "${name}"?`)) return
+        const { error } = await (supabase as any).from('providers').delete().eq('id', id)
+        if (error) showAlert('error', error.message)
+        else { showAlert('success', 'Proveedor eliminado.'); load() }
+    }
+
+    const sortedItems = [...items].sort((a: any, b: any) => {
+        const valA = (a[sortField] || '').toLowerCase()
+        const valB = (b[sortField] || '').toLowerCase()
+        if (valA < valB) return sortOrder === 'asc' ? -1 : 1
+        if (valA > valB) return sortOrder === 'asc' ? 1 : -1
+        return 0
+    })
+
+    return (
+        <div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Gestión de Proveedores</h1>
+                <button className="btn btn-primary btn-sm" onClick={() => { setEditId(null); setForm({ name: '', email: '', phone: '', address: '', notes: '', active: true }); setModalOpen(true) }}>
+                    <Plus size={15} /> Nuevo Proveedor
+                </button>
+            </div>
+
+            {alert && <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
+
+            {loading ? <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 40 }}>Cargando...</div> : (
+                <div className="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th onClick={() => { setSortField('name'); setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc') }} style={{ cursor: 'pointer' }}>Nombre</th>
+                                <th onClick={() => { setSortField('email'); setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc') }} style={{ cursor: 'pointer' }}>Email / Contacto</th>
+                                <th>Teléfono</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {sortedItems.map((p) => (
+                                <tr key={p.id}>
+                                    <td style={{ fontWeight: 600 }}>{p.name}</td>
+                                    <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{p.email || '—'}</td>
+                                    <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{p.phone || '—'}</td>
+                                    <td>
+                                        <span className={`badge ${p.active ? 'badge-new' : 'badge-used'}`}>
+                                            {p.active ? 'Activo' : 'Inactivo'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div style={{ display: 'flex', gap: 6 }}>
+                                            <button className="btn btn-ghost btn-sm" onClick={() => {
+                                                setEditId(p.id);
+                                                setForm({ name: p.name, email: p.email || '', phone: p.phone || '', address: p.address || '', notes: p.notes || '', active: p.active });
+                                                setModalOpen(true)
+                                            }} title="Editar"><Pencil size={14} /></button>
+                                            <button className="btn btn-danger btn-sm" style={{ padding: '4px 8px' }} onClick={() => handleDelete(p.id, p.name)} title="Eliminar"><Trash2 size={14} /></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+
+            {modalOpen && (
+                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setModalOpen(false)}>
+                    <div className="modal" style={{ maxWidth: 600 }}>
+                        <div className="modal-title">
+                            <span>{editId ? 'Editar Proveedor' : 'Nuevo Proveedor'}</span>
+                            <button onClick={() => setModalOpen(false)} className="btn btn-ghost btn-sm"><X size={16} /></button>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                            <div className="form-group">
+                                <label className="form-label">Nombre *</label>
+                                <input className="form-input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Email</label>
+                                <input className="form-input" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Teléfono</label>
+                                <input className="form-input" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Dirección</label>
+                                <input className="form-input" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+                            </div>
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">Notas / Observaciones</label>
+                            <textarea className="form-input" rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+                        </div>
+                        <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} style={{ width: 18, height: 18, accentColor: 'var(--green)' }} />
+                            <span style={{ fontWeight: 600 }}>Proveedor Activo</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 16 }}>
+                            <button className="btn btn-ghost" onClick={() => setModalOpen(false)}>Cancelar</button>
+                            <button className="btn btn-primary" onClick={handleSave} disabled={isSaving}>
+                                {isSaving ? <Loader2 className="animate-spin" size={15} /> : <Check size={15} />} Guardar Proveedor
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    )
+}
+
 // ─── Main AdminClient ─────────────────────────────────────────────────────────
 export default function AdminClient() {
     const [section, setSection] = useState<AdminSection>('dashboard')
@@ -2259,7 +2620,8 @@ export default function AdminClient() {
         productos: <AdminProductos />,
         categorias: <AdminCategorias />,
         marcas: <AdminMarcas />,
-        inventario: <AdminInventario />,
+        proveedores: <AdminProveedores />,
+        precios: <AdminPrecios />,
     }
 
     return (

@@ -54,6 +54,11 @@ export interface Database {
                 Insert: Omit<BrandLogo, 'id' | 'created_at'>
                 Update: Partial<Omit<BrandLogo, 'id' | 'created_at'>>
             }
+            providers: {
+                Row: Provider
+                Insert: Omit<Provider, 'id' | 'created_at'>
+                Update: Partial<Omit<Provider, 'id' | 'created_at'>>
+            }
         }
     }
 }
@@ -171,6 +176,17 @@ export interface BrandLogo {
     logo_url: string
     storage_path: string | null
     sort_order: number
+    active: boolean
+    created_at: string
+}
+
+export interface Provider {
+    id: string
+    name: string
+    phone: string | null
+    address: string | null
+    email: string | null
+    notes: string | null
     active: boolean
     created_at: string
 }
