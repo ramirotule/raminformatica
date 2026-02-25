@@ -6,8 +6,8 @@ import type { ProductWithDetails, Category, Brand } from '@/lib/database.types'
 import ProductosClient from './ProductosClient'
 
 export const metadata: Metadata = {
-    title: 'Productos',
-    description: 'Explorá nuestro catálogo completo de tecnología al mejor precio.',
+    title: 'Productos de Tecnología en Santa Rosa, La Pampa',
+    description: 'Catálogo completo de tecnología en RAM Informática: iPhones, PlayStation, Samsung, Notebooks y más al mejor precio en Santa Rosa y envíos a toda Argentina.',
 }
 
 export const revalidate = 60

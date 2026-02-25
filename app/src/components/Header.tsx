@@ -31,6 +31,7 @@ export default function Header() {
     const navItems = [
         { href: '/', label: dict.nav.inicio },
         { href: '/categorias', label: dict.nav.categorias },
+        { href: '/servicios', label: dict.nav.servicios },
         { href: '/productos', label: dict.nav.productos },
         { href: '/nosotros', label: dict.nav.nosotros },
         { href: '/como-comprar', label: dict.nav.comoComprar },

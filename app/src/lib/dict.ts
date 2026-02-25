@@ -2,8 +2,8 @@
 export const dict = {
     marca: {
         nombre: 'RAM Informática',
-        tagline: 'iPhones y Tecnología al mejor precio',
-        descripcion: 'RAM Informática — Tu tienda de confianza para comprar iPhones, Samsung, Motorola y tecnología premium al mejor precio en Argentina. Envíos a todo el país.',
+        tagline: 'Tecnología y iPhones en Santa Rosa, La Pampa',
+        descripcion: 'RAM Informática — Tu tienda de confianza en Santa Rosa, La Pampa. Venta de iPhones, PlayStation, Samsung, Motorola y tecnología premium con los mejores precios de Argentina. Envíos a todo el país.',
     },
     nav: {
         inicio: 'Inicio',
@@ -12,6 +12,7 @@ export const dict = {
         ofertas: 'Ofertas',
         contacto: 'Contacto',
         nosotros: 'Nosotros',
+        servicios: 'Servicios',
         comoComprar: 'Cómo comprar',
         admin: 'Administración',
     },

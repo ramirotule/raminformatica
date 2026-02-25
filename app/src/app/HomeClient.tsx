@@ -268,6 +268,22 @@ export default function HomeClient({ products, slides, brandLogos }: HomeClientP
                 accentColor="var(--green)"
             />
 
+            {/* ─── SEO FOOTER CONTENT ──────────────────────── */}
+            <section className="section" style={{ paddingTop: 40, paddingBottom: 80, opacity: 0.8 }}>
+                <div className="container">
+                    <div style={{ maxWidth: '800px', marginInline: 'auto', textAlign: 'center' }}>
+                        <h2 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: 16 }}>Tu aliado tecnológico en Santa Rosa, La Pampa</h2>
+                        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.8 }}>
+                            En RAM Informática nos especializamos en acercar lo último en tecnología a la Patagonia.
+                            Si estás buscando comprar una <strong>PlayStation</strong>, un <strong>iPhone</strong> o renovar tu <strong>Notebook</strong> en Santa Rosa,
+                            ofrecemos asesoramiento personalizado y los mejores precios del mercado.
+                            Nuestra trayectoria desde 2008 avala nuestro compromiso con la innovación y la satisfacción del cliente.
+                            Realizamos envíos garantizados a todo el país.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
             {/* ─── BRAND LOGOS TICKER ──────────────────────── */}
             <BrandTicker logos={brandLogos} />
         </>

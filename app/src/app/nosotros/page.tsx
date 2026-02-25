@@ -1,8 +1,8 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-    title: 'Nosotros | RAM Informática',
-    description: 'Conocé nuestra historia, desde nuestros comienzos en Santa Rosa hasta nuestra tienda online actual.',
+    title: 'Nosotros | RAM Informática Santa Rosa',
+    description: 'Conocé la historia de RAM Informática, referentes en tecnología en Santa Rosa, La Pampa desde 2008. Tradición, compromiso y los mejores precios.',
 }
 
 export default function NosotrosPage() {

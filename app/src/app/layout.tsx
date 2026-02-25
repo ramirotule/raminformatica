@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     template: `%s | ${dict.marca.nombre}`,
   },
   description: dict.marca.descripcion,
-  keywords: ['tecnología', 'celulares', 'iPhone', 'Samsung', 'notebooks', 'gaming', 'Argentina'],
+  keywords: ['RAM Informática', 'Santa Rosa', 'La Pampa', 'tecnología', 'celulares', 'iPhone', 'PlayStation', 'PS5', 'Samsung', 'Motorola', 'notebooks', 'gaming', 'Argentina'],
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },

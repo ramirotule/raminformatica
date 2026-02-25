@@ -30,7 +30,7 @@ export default function CategoriasClient({ categories }: CategoriasClientProps) 
                         {categories.map((cat) => (
                             <Link
                                 key={cat.id}
-                                href={`/productos?categoria=${cat.slug}`}
+                                href={`/categorias/${cat.slug}`}
                                 className="cat-card"
                             >
                                 <span className="cat-emoji" role="img" aria-label={cat.name}>
