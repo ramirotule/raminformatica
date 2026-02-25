@@ -34,7 +34,9 @@ export default function ProductCard({ product }: ProductCardProps) {
     const priceUSD = getPriceUSD(variant?.prices, product.price_usd)
     const priceARS = priceUSD && dolar ? getPriceARS(priceUSD, dolar.venta) : null
     const stock = (variant?.inventory as any)?.[0]?.qty_available ?? null
-    const image = product.product_images?.[0]
+    const image = product.product_images && product.product_images.length > 0
+        ? [...product.product_images].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))[0]
+        : null
     const emoji = CATEGORY_EMOJI[(product.categories as any)?.slug] ?? '📦'
 
     const conditionClass: Record<string, string> = {

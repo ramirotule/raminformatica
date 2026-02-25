@@ -30,24 +30,30 @@ export default function GlobalSearch() {
     }, [])
 
     useEffect(() => {
-        if (!searchQuery.trim() || isProductsPage) {
+        const query = searchQuery.trim().toLowerCase()
+
+        // Si hay menos de 3 letras o estamos en la página de productos, no hacemos fetch
+        if (query.length < 3 || isProductsPage) {
             setResults([])
+            setLoading(false)
             return
         }
 
         const timer = setTimeout(async () => {
             setLoading(true)
             try {
+                // Ahora buscamos coincidencias parciales en nombre, descripción Y la nueva columna tags_index
                 const { data, error } = await supabase
                     .from('products')
                     .select('*, brands(*), categories(*), product_images(*), product_variants(*, prices(*))')
-                    .or(`name.ilike.%${searchQuery}%,short_description.ilike.%${searchQuery}%,tags.cs.{"${searchQuery}"}`)
+                    .or(`name.ilike.%${query}%,short_description.ilike.%${query}%,tags_index.ilike.%${query}%`)
                     .eq('active', true)
                     .limit(8)
 
                 if (data) setResults(data as any)
+                if (error) console.error('Search error details:', error)
             } catch (err) {
-                console.error(err)
+                console.error('Fatal search error:', err)
             } finally {
                 setLoading(false)
                 setShowDropdown(true)

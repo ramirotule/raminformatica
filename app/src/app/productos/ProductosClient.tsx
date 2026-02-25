@@ -56,7 +56,7 @@ export default function ProductosClient({ products, categories, brands }: Produc
             list = list.filter(
                 (p) =>
                     p.name.toLowerCase().includes(q) ||
-                    p.brands?.name?.toLowerCase().includes(q) ||
+                    (p.brands?.name || '').toLowerCase().includes(q) ||
                     p.short_description?.toLowerCase().includes(q) ||
                     p.tags?.some(tag => tag.toLowerCase().includes(q))
             )

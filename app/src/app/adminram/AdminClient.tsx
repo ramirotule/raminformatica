@@ -33,7 +33,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { dict } from '@/lib/dict'
-import { conditionLabel, slugify, formatUSD } from '@/lib/utils'
+import { conditionLabel, slugify, formatUSD, getPriceUSD } from '@/lib/utils'
 import type { Product, ProductWithDetails, Category, Brand, ProductVariant, Price, Inventory, HomeSlide, BrandLogo, Provider } from '@/lib/database.types'
 import { SearchableSelect } from '@/components/SearchableSelect'
 import { calculateSellingPrice } from '@/lib/constants'
@@ -596,7 +596,7 @@ function AdminProductos() {
 
                 // Update common fields (tags)
                 await (supabase as any).from('products').update({
-                    tags: form.tags.split(',').map(t => t.trim()).filter(t => t !== '')
+                    tags: form.tags.split(',').map(t => t.trim().toLowerCase()).filter(t => t !== '')
                 }).eq('id', currentProductId)
 
                 if (variant && form.priceUSD) {
@@ -615,7 +615,7 @@ function AdminProductos() {
                         price_usd: form.priceUSD ? parseFloat(form.priceUSD) : null,
                         condition: form.condition as 'new', short_description: form.short_description || null,
                         active: form.active, is_featured: form.is_featured,
-                        tags: form.tags.split(',').map(t => t.trim()).filter(t => t !== '')
+                        tags: form.tags.split(',').map(t => t.trim().toLowerCase()).filter(t => t !== '')
                     })
                     .select()
                     .single()
@@ -827,7 +827,7 @@ function AdminProductos() {
                         <tbody>
                             {sortedProducts.map((p) => {
                                 const variant = p.product_variants?.[0]
-                                const priceUSD = variant?.prices?.find((pr: any) => pr.currency === 'USD')?.amount
+                                const priceUSD = getPriceUSD(variant?.prices, p.price_usd)
                                 return (
                                     <tr key={p.id} style={{ background: selectedIds.has(p.id) ? 'var(--bg-secondary)' : 'transparent' }}>
                                         <td>
@@ -853,7 +853,25 @@ function AdminProductos() {
                                         </td>
                                         <td onClick={() => openEdit(p)} style={{ cursor: 'pointer' }} className="hover-opacity">
                                             <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-primary)' }}>{p.name}</div>
-                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{p.slug}</div>
+                                            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 4 }}>
+                                                {p.tags && p.tags.length > 0 ? (
+                                                    p.tags.map((tag, idx) => (
+                                                        <span key={idx} style={{
+                                                            fontSize: '0.65rem',
+                                                            background: 'rgba(0,0,0,0.05)',
+                                                            border: '1px solid var(--border)',
+                                                            padding: '2px 6px',
+                                                            borderRadius: 4,
+                                                            color: 'var(--text-secondary)',
+                                                            textTransform: 'lowercase'
+                                                        }}>
+                                                            {tag}
+                                                        </span>
+                                                    ))
+                                                ) : (
+                                                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>Sin tags</div>
+                                                )}
+                                            </div>
                                         </td>
                                         <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{p.categories?.name}</td>
                                         <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{p.brands?.name}</td>

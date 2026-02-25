@@ -55,6 +55,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       product_images(*)
     `)
         .eq('slug', slug)
+        .order('sort_order', { foreignTable: 'product_images', ascending: true })
         .single()
 
     if (!product) {

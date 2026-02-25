@@ -17,14 +17,14 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
     const { dolar } = useDolarBlue()
     const { addToCart, setDrawerOpen } = useCart()
     const [quantity, setQuantity] = useState(1)
-    const [mainImage, setMainImage] = useState<string>(product.product_images?.[0]?.public_url || '')
+    const images = [...(product.product_images || [])].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+    const [mainImage, setMainImage] = useState<string>(images[0]?.public_url || '')
 
     // Modals state
     const [lightboxOpen, setLightboxOpen] = useState(false)
     const [lightboxIndex, setLightboxIndex] = useState(0)
     const [addedModalOpen, setAddedModalOpen] = useState(false)
 
-    const images = [...(product.product_images || [])].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
     const variant = product.product_variants?.[0]
     const priceUSD = getPriceUSD(variant?.prices, product.price_usd)
     const priceARS = priceUSD && dolar ? getPriceARS(priceUSD, dolar.venta) : null
