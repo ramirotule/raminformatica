@@ -7,6 +7,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import type { ProductWithDetails } from '@/lib/database.types'
 import { dict } from '@/lib/dict'
+import { getPriceUSD, formatUSD } from '@/lib/utils'
 
 export default function GlobalSearch() {
     const { searchQuery, setSearchQuery } = useSearch()
@@ -109,19 +110,37 @@ export default function GlobalSearch() {
                         </div>
                     ) : results.length > 0 ? (
                         <div className="dropdown-results">
-                            {results.map((product) => (
-                                <button
-                                    key={product.id}
-                                    className="dropdown-item"
-                                    onClick={() => handleSelect(product.slug)}
-                                >
-                                    <div className="item-info">
-                                        <p className="item-name">{product.name}</p>
-                                        <p className="item-cat">{product.categories?.name} • {product.brands?.name}</p>
-                                    </div>
-                                    <div className="item-arrow">→</div>
-                                </button>
-                            ))}
+                            {results.map((product) => {
+                                const variant = product.product_variants?.[0]
+                                const priceUSD = getPriceUSD(variant?.prices, product.price_usd)
+                                const image = product.product_images?.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))[0]?.public_url
+
+                                return (
+                                    <button
+                                        key={product.id}
+                                        className="dropdown-item"
+                                        onClick={() => handleSelect(product.slug)}
+                                        style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px' }}
+                                    >
+                                        <div style={{ width: 40, height: 40, borderRadius: 6, background: 'var(--bg-secondary)', overflow: 'hidden', flexShrink: 0, border: '1px solid var(--border)' }}>
+                                            {image ? (
+                                                <img src={image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                                            ) : (
+                                                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>📦</div>
+                                            )}
+                                        </div>
+                                        <div className="item-info" style={{ flex: 1, textAlign: 'left' }}>
+                                            <p className="item-name" style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: 2 }}>{product.name}</p>
+                                            <p className="item-cat" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{product.categories?.name}</p>
+                                        </div>
+                                        <div style={{ textAlign: 'right' }}>
+                                            <p style={{ fontWeight: 700, color: 'var(--accent)', fontSize: '0.9rem' }}>
+                                                {priceUSD ? formatUSD(priceUSD) : '—'}
+                                            </p>
+                                        </div>
+                                    </button>
+                                )
+                            })}
                             <button
                                 className="dropdown-footer"
                                 onClick={() => {

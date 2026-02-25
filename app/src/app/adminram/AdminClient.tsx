@@ -247,6 +247,8 @@ function AdminProductos() {
     const [bulkRenameOpen, setBulkRenameOpen] = useState(false)
     const [bulkRenameSearch, setBulkRenameSearch] = useState('')
     const [bulkRenameReplace, setBulkRenameReplace] = useState('')
+    const [bulkTagsOpen, setBulkTagsOpen] = useState(false)
+    const [bulkTagsForm, setBulkTagsForm] = useState('')
 
     type SortField = 'name' | 'categories.name' | 'brands.name' | 'providers.name' | 'priceUSD' | 'condition' | 'active'
     const [sortField, setSortField] = useState<SortField>('name')
@@ -448,6 +450,42 @@ function AdminProductos() {
         setBulkProviderOpen(false)
         setSelectedIds(new Set())
         load()
+    }
+
+    async function performBulkTags() {
+        if (!selectedIds.size || !bulkTagsForm) return
+
+        setIsSaving(true)
+        try {
+            const newTags = bulkTagsForm.split(',').map(t => t.trim().toLowerCase()).filter(t => t !== '')
+
+            // Traemos los productos actuales para no pisar los tags que ya tienen
+            const { data: currentProducts } = await supabase
+                .from('products')
+                .select('id, tags')
+                .in('id', Array.from(selectedIds))
+
+            if (currentProducts) {
+                for (const p of currentProducts as any[]) {
+                    const existingTags = p.tags || []
+                    const updatedTags = Array.from(new Set([...existingTags, ...newTags]))
+
+                    await (supabase as any).from('products').update({
+                        tags: updatedTags
+                    }).eq('id', p.id)
+                }
+            }
+
+            showAlert('success', 'Tags actualizados masivamente.')
+            setBulkTagsOpen(false)
+            setBulkTagsForm('')
+            setSelectedIds(new Set())
+            load()
+        } catch (error: any) {
+            showAlert('error', 'Error al procesar tags: ' + error.message)
+        } finally {
+            setIsSaving(false)
+        }
     }
 
     function openNew() {
@@ -754,6 +792,10 @@ function AdminProductos() {
                         <button className="btn btn-sm btn-ghost" style={{ background: 'rgba(0,0,0,0.05)', border: '1px solid var(--border)' }} onClick={() => { setBulkCategoryForm(''); setBulkCategoryOpen(true); }}>Categoría</button>
                         <button className="btn btn-sm btn-ghost" style={{ background: 'rgba(0,0,0,0.05)', border: '1px solid var(--border)' }} onClick={() => { setBulkBrandForm(''); setBulkBrandOpen(true); }}>Marca</button>
                         <button className="btn btn-sm btn-ghost" style={{ background: 'rgba(0,0,0,0.05)', border: '1px solid var(--border)' }} onClick={() => { setBulkProviderForm(''); setBulkProviderOpen(true); }}>Proveedor</button>
+                        <button className="btn btn-sm btn-ghost" style={{ background: 'rgba(0,0,0,0.05)', border: '1px solid var(--border)' }} onClick={() => { setBulkTagsForm(''); setBulkTagsOpen(true); }}>
+                            <Tag size={14} style={{ marginRight: 4 }} />
+                            Tags
+                        </button>
                         <button className="btn btn-sm btn-ghost" style={{ background: 'rgba(52,199,89,0.1)', border: '1px solid var(--accent)', color: 'var(--accent-light)' }} onClick={() => { setBulkImagesData({}); setBulkImagesOpen(true); }}>
                             <ImagePlus size={14} style={{ marginRight: 4 }} />
                             Subir Imágenes
@@ -1518,6 +1560,41 @@ function AdminProductos() {
 
                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 8 }}>
                             <button className="btn btn-ghost" onClick={() => setBulkRenameOpen(false)}>Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {bulkTagsOpen && (
+                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setBulkTagsOpen(false)}>
+                    <div className="modal" style={{ maxWidth: 450 }}>
+                        <div className="modal-title">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                <Tag size={20} color="var(--primary)" />
+                                Etiquetado Masivo
+                            </div>
+                            <button className="btn-close" onClick={() => setBulkTagsOpen(false)}><X size={20} /></button>
+                        </div>
+                        <div className="modal-body">
+                            <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: 16 }}>
+                                Los tags ingresados se <b>agregarán</b> a los que ya tengan los productos seleccionados. Separe con comas.
+                            </p>
+                            <div className="form-group">
+                                <label className="form-label">Nuevos Tags</label>
+                                <textarea
+                                    className="form-input"
+                                    placeholder="ej: oferta, ps5, gaming"
+                                    rows={3}
+                                    value={bulkTagsForm}
+                                    onChange={(e) => setBulkTagsForm(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 20 }}>
+                            <button className="btn btn-ghost" onClick={() => setBulkTagsOpen(false)}>Cancelar</button>
+                            <button className="btn btn-primary" onClick={performBulkTags} disabled={!bulkTagsForm.trim() || isSaving}>
+                                {isSaving ? 'Guardando...' : 'Agregar Tags'}
+                            </button>
                         </div>
                     </div>
                 </div>
