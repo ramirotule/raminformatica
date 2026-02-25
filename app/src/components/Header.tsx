@@ -6,7 +6,7 @@ import { useDolarBlue } from '@/hooks/useDolarBlue'
 import { formatARS } from '@/lib/utils'
 import { dict } from '@/lib/dict'
 import { TrendingUp, Menu, ShoppingBag, ShoppingCart, Check, SlidersHorizontal, Sun, Moon } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useCart } from '@/context/CartContext'
 import { useSearch } from '@/context/SearchContext'
 import CartDrawer from './CartDrawer'
@@ -20,10 +20,18 @@ export default function Header() {
     const pathname = usePathname()
     const { dolar, loading } = useDolarBlue()
     const { totalItems, isDrawerOpen, setDrawerOpen } = useCart()
-    const { showFilters, setShowFilters, sortBy, setSortBy } = useSearch()
+    const { showFilters, setShowFilters, sortBy, setSortBy, resetSearch } = useSearch()
     const { theme, toggleTheme } = useTheme()
     const [menuOpen, setMenuOpen] = useState(false)
     const router = useRouter()
+    const prevPathname = useRef(pathname)
+
+    useEffect(() => {
+        if (prevPathname.current !== pathname) {
+            resetSearch()
+        }
+        prevPathname.current = pathname
+    }, [pathname, resetSearch])
 
     const isProductsPage = pathname === '/productos'
     const isHome = pathname === '/'

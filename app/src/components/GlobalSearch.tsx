@@ -51,7 +51,10 @@ export default function GlobalSearch() {
                     .eq('active', true)
                     .limit(8)
 
-                if (data) setResults(data as any)
+                if (data) {
+                    const sorted = (data as any).sort((a: any, b: any) => a.name.localeCompare(b.name, 'es'))
+                    setResults(sorted)
+                }
                 if (error) console.error('Search error details:', error)
             } catch (err) {
                 console.error('Fatal search error:', err)

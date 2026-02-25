@@ -2347,3 +2347,16 @@ tbody td {
   max-height: 100%;
   object-fit: contain;
 }
+/* ─── Infinite Brand Ticker ───────────────────────────────────────── */
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-100% / 3)); }
+}
+
+.brand-ticker-track {
+  animation: ticker-scroll 40s linear infinite;
+}
+
+.brand-ticker-container:hover .brand-ticker-track {
+  animation-play-state: paused;
+}

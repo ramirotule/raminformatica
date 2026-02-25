@@ -9,6 +9,7 @@ interface SearchContextType {
     setShowFilters: (show: boolean) => void
     sortBy: string
     setSortBy: (sort: any) => void
+    resetSearch: () => void
 }
 
 const SearchContext = createContext<SearchContextType | undefined>(undefined)
@@ -18,6 +19,12 @@ export function SearchProvider({ children }: { children: ReactNode }) {
     const [showFilters, setShowFilters] = useState(false)
     const [sortBy, setSortBy] = useState('reciente')
 
+    const resetSearch = () => {
+        setSearchQuery('')
+        setShowFilters(false)
+        setSortBy('reciente')
+    }
+
     return (
         <SearchContext.Provider value={{
             searchQuery,
@@ -25,7 +32,8 @@ export function SearchProvider({ children }: { children: ReactNode }) {
             showFilters,
             setShowFilters,
             sortBy,
-            setSortBy
+            setSortBy,
+            resetSearch
         }}>
             {children}
         </SearchContext.Provider>

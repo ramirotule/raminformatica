@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { ChevronRight, ChevronLeft, Zap, TrendingUp, Star } from 'lucide-react'
 import ProductCard from '@/components/ProductCard'
+import PromoModal from '@/components/PromoModal'
+import WeeklyNews from '@/components/WeeklyNews'
 import { dict } from '@/lib/dict'
 import type { ProductWithDetails, HomeSlide, BrandLogo } from '@/lib/database.types'
 
@@ -116,35 +118,85 @@ function HeroCarousel({ slides, products }: { slides: HomeSlide[]; products: Pro
     )
 }
 
-// ─── Brand Logos Ticker ─────────────────────────────────────────
+// ─── Brand Logos Section (Infinite Ticker) ───────────────────────
 function BrandTicker({ logos }: { logos: BrandLogo[] }) {
     if (logos.length === 0) return null
-
-    // Duplicamos para loop infinito
-    const doubled = [...logos, ...logos]
 
     const slugify = (text: string) =>
         text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
 
+    // Duplicamos para asegurar el loop infinito sin saltos
+    const doubledLogos = [...logos, ...logos, ...logos]
+
     return (
-        <section className="brand-ticker-section">
-            <div className="container" style={{ marginBottom: 24 }}>
-                <p style={{ textAlign: 'center', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)' }}>
-                    Marcas que trabajamos
-                </p>
+        <section style={{ padding: '60px 0', overflow: 'hidden', borderTop: '1px solid var(--border)' }}>
+            <div className="container" style={{ marginBottom: 32 }}>
+                <div>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: 4 }}>Nuestras Marcas</h3>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Socios estratégicos de RAM</p>
+                </div>
             </div>
-            <div className="brand-ticker-wrapper">
-                <div className="brand-ticker-track">
-                    {doubled.map((logo, i) => (
-                        <Link
-                            key={`${logo.id}-${i}`}
-                            href={`/productos?marca=${slugify(logo.name)}`}
-                            className="brand-ticker-item"
-                            title={logo.name}
-                        >
-                            <img src={logo.logo_url} alt={logo.name} />
-                        </Link>
-                    ))}
+
+            <div className="container">
+                <div className="brand-ticker-container" style={{ position: 'relative', width: '100%', overflow: 'hidden', padding: '40px 0' }}>
+                    <div
+                        className="brand-ticker-track"
+                        style={{
+                            display: 'flex',
+                            gap: 20,
+                            width: 'max-content',
+                            padding: '10px 0'
+                        }}
+                    >
+                        {doubledLogos.map((logo, i) => (
+                            <Link
+                                key={`${logo.id}-${i}`}
+                                href={`/productos?marca=${slugify(logo.name)}`}
+                                style={{
+                                    minWidth: 160,
+                                    height: 100,
+                                    background: 'var(--bg-card)',
+                                    border: '1px solid var(--border)',
+                                    borderRadius: 16,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    padding: 20,
+                                    transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                                    cursor: 'pointer',
+                                    textDecoration: 'none',
+                                    position: 'relative'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'scale(1.2) translateY(-8px)'
+                                    e.currentTarget.style.borderColor = 'var(--accent)'
+                                    e.currentTarget.style.zIndex = '10'
+                                    e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)'
+                                    const img = e.currentTarget.querySelector('img')
+                                    if (img) img.style.transform = 'scale(1.3)'
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'scale(1) translateY(0)'
+                                    e.currentTarget.style.borderColor = 'var(--border)'
+                                    e.currentTarget.style.zIndex = '1'
+                                    e.currentTarget.style.boxShadow = 'none'
+                                    const img = e.currentTarget.querySelector('img')
+                                    if (img) img.style.transform = 'scale(1)'
+                                }}
+                            >
+                                <img
+                                    src={logo.logo_url}
+                                    alt={logo.name}
+                                    style={{
+                                        maxWidth: '80%',
+                                        maxHeight: '60%',
+                                        objectFit: 'contain',
+                                        transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                                    }}
+                                />
+                            </Link>
+                        ))}
+                    </div>
                 </div>
             </div>
         </section>
@@ -227,6 +279,7 @@ export default function HomeClient({ products, slides, brandLogos }: HomeClientP
 
     return (
         <>
+            <PromoModal />
             {/* ─── HERO CAROUSEL ───────────────────────────── */}
             {/* <HeroCarousel slides={slides} products={products} /> */}
 
@@ -257,6 +310,9 @@ export default function HomeClient({ products, slides, brandLogos }: HomeClientP
                     </div>
                 </div>
             </section>
+
+            {/* ─── NOVEDADES SEMANALES ───────────────────── */}
+            <WeeklyNews />
 
             {/* ─── PRODUCTOS MÁS VENDIDOS ──────────────────── */}
             <ProductRow
