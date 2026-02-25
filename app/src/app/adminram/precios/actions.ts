@@ -10,6 +10,8 @@ const supabaseKey =
 
 const supabaseAdmin = createClient(supabaseUrl, supabaseKey);
 
+import { calculateSellingPrice } from "@/lib/constants";
+
 export interface ParsedItem {
     name: string;
     cost: number;
@@ -19,13 +21,8 @@ export interface ParsedItem {
     status: 'pending' | 'matched' | 'new';
 }
 
-function round5(value: number) {
-    return Math.round(value / 5) * 5;
-}
-
 function calculateFinalPrice(cost: number) {
-    const calculated = (cost / 0.9) + 25;
-    return round5(calculated);
+    return calculateSellingPrice(cost);
 }
 
 /**

@@ -41,7 +41,7 @@ export default function GlobalSearch() {
                 const { data, error } = await supabase
                     .from('products')
                     .select('*, brands(*), categories(*), product_images(*), product_variants(*, prices(*))')
-                    .or(`name.ilike.%${searchQuery}%,short_description.ilike.%${searchQuery}%`)
+                    .or(`name.ilike.%${searchQuery}%,short_description.ilike.%${searchQuery}%,tags.cs.{"${searchQuery}"}`)
                     .eq('active', true)
                     .limit(8)
 

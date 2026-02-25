@@ -90,6 +90,8 @@ export interface Product {
     condition: string | null
     brand_id: string | null
     category_id: string | null
+    provider_id: string | null
+    cost_price: number | null
     tags: string[] | null
     is_featured: boolean
     active: boolean
@@ -142,6 +144,7 @@ export interface Inventory {
 export interface ProductWithDetails extends Product {
     categories?: Category
     brands?: Brand
+    providers?: Provider
     product_images?: ProductImage[]
     product_variants?: (ProductVariant & {
         prices: Price[]

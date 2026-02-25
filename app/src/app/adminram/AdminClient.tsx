@@ -35,6 +35,7 @@ import { dict } from '@/lib/dict'
 import { conditionLabel, slugify, formatUSD } from '@/lib/utils'
 import type { Product, ProductWithDetails, Category, Brand, ProductVariant, Price, Inventory, HomeSlide, BrandLogo, Provider } from '@/lib/database.types'
 import { SearchableSelect } from '@/components/SearchableSelect'
+import { calculateSellingPrice } from '@/lib/constants'
 import AdminPrecios from './AdminPrecios'
 
 type AdminSection = 'dashboard' | 'productos' | 'categorias' | 'marcas' | 'proveedores' | 'home' | 'precios'
@@ -225,6 +226,7 @@ function AdminProductos() {
         condition: 'new', short_description: '', active: true,
         is_featured: false,
         priceUSD: '', cost_price: '', sku: '', color: '', storage: '', connectivity: '',
+        tags: '',
     })
     const [images, setImages] = useState<{ id: string, file?: File, url: string, isExisting: boolean, storagePath?: string }[]>([])
     const [draggedIdx, setDraggedIdx] = useState<number | null>(null)
@@ -244,7 +246,7 @@ function AdminProductos() {
     const [bulkRenameSearch, setBulkRenameSearch] = useState('')
     const [bulkRenameReplace, setBulkRenameReplace] = useState('')
 
-    type SortField = 'name' | 'categories.name' | 'brands.name' | 'priceUSD' | 'condition' | 'active'
+    type SortField = 'name' | 'categories.name' | 'brands.name' | 'providers.name' | 'priceUSD' | 'condition' | 'active'
     const [sortField, setSortField] = useState<SortField>('name')
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
     const [isSaving, setIsSaving] = useState(false)
@@ -265,33 +267,57 @@ function AdminProductos() {
 
     const load = useCallback(async () => {
         setLoading(true)
-        const [pRes, cRes, bRes, provRes] = await Promise.all([
-            supabase
-                .from('products')
-                .select('*, categories(*), brands(*), product_variants(*, prices(*), inventory(*)), product_images(*)')
-                .order('created_at', { ascending: false })
-                .limit(1000),
-            (supabase as any).from('categories').select('*').order('name'),
-            (supabase as any).from('brands').select('*').order('name'),
-            (supabase as any).from('providers').select('*').order('name'),
-        ])
-        const productsData = (pRes.data as any) ?? []
-        console.log('Products loaded:', productsData.length, 'Featured:', productsData.filter((p: any) => p.is_featured).length)
-        setProducts(productsData)
-        setCategories((cRes.data as any) ?? [])
-        setBrands((bRes.data as any) ?? [])
-        setProviders((provRes.data as any) ?? [])
-        setLoading(false)
+        try {
+            const [pRes, cRes, bRes, provRes] = await Promise.all([
+                supabase
+                    .from('products')
+                    .select('*, categories(*), brands(*), product_variants(*, prices(*), inventory(*)), product_images(*)')
+                    .order('created_at', { ascending: false })
+                    .limit(1000),
+                (supabase as any).from('categories').select('*').order('name'),
+                (supabase as any).from('brands').select('*').order('name'),
+                (supabase as any).from('providers').select('*').order('name'),
+            ])
+
+            if (pRes.error) {
+                console.error('Error loading products:', pRes.error)
+                showAlert('error', 'Error al cargar productos: ' + pRes.error.message)
+            }
+
+            const productsData = (pRes.data as any) ?? []
+            const providersData = (provRes.data as any) ?? []
+
+            // Cruce manual ya que no hay una relación (Foreign Key) explícita en la DB
+            const enrichedProducts = productsData.map((p: any) => ({
+                ...p,
+                providers: providersData.find((prov: any) => prov.id === p.provider_id)
+            }))
+
+            setProducts(enrichedProducts)
+            setCategories((cRes.data as any) ?? [])
+            setBrands((bRes.data as any) ?? [])
+            setProviders(providersData)
+        } catch (error: any) {
+            console.error('Unexpected error in load:', error)
+            showAlert('error', 'Error inesperado: ' + error.message)
+        } finally {
+            setLoading(false)
+        }
     }, [])
 
     useEffect(() => { load() }, [load])
 
-    const filteredProducts = products.filter(p =>
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.brands?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.categories?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.product_variants?.[0]?.sku?.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    const filteredProducts = products.filter(p => {
+        const query = searchQuery.toLowerCase()
+        return (
+            p.name.toLowerCase().includes(query) ||
+            (p.brands?.name?.toLowerCase() || '').includes(query) ||
+            (p.categories?.name?.toLowerCase() || '').includes(query) ||
+            (p.providers?.name?.toLowerCase() || '').includes(query) ||
+            p.tags?.some(t => t.toLowerCase().includes(query)) ||
+            (p.product_variants?.[0]?.sku?.toLowerCase() || '').includes(query)
+        )
+    })
 
     const sortedProducts = [...filteredProducts].sort((a, b) => {
         let valA: any = ''
@@ -306,6 +332,9 @@ function AdminProductos() {
         } else if (sortField === 'brands.name') {
             valA = a.brands?.name?.toLowerCase() || ''
             valB = b.brands?.name?.toLowerCase() || ''
+        } else if (sortField === 'providers.name') {
+            valA = a.providers?.name?.toLowerCase() || ''
+            valB = b.providers?.name?.toLowerCase() || ''
         } else if (sortField === 'priceUSD') {
             const priceA = a.product_variants?.[0]?.prices?.find((pr: any) => pr.currency === 'USD')?.amount
             const priceB = b.product_variants?.[0]?.prices?.find((pr: any) => pr.currency === 'USD')?.amount
@@ -436,7 +465,8 @@ function AdminProductos() {
             sku: '',
             color: '',
             storage: '',
-            connectivity: ''
+            connectivity: '',
+            tags: ''
         })
         setImages([])
         setModalOpen(true)
@@ -451,17 +481,18 @@ function AdminProductos() {
             slug: p.slug,
             category_id: p.category_id || '',
             brand_id: p.brand_id || '',
-            provider_id: (p as any).provider_id || '',
+            provider_id: p.provider_id || '',
             condition: p.condition || 'new',
             short_description: p.short_description ?? '',
             active: p.active,
             is_featured: p.is_featured,
             priceUSD: price ? String(price.amount) : '',
-            cost_price: (p as any).cost_price ? String((p as any).cost_price) : '',
+            cost_price: p.cost_price ? String(p.cost_price) : '',
             sku: variant?.sku ?? '',
             color: variant?.color ?? '',
             storage: variant?.storage ?? '',
             connectivity: variant?.connectivity ?? '',
+            tags: p.tags ? p.tags.join(', ') : '',
         })
         const sortedImages = [...(p.product_images || [])].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
         setImages(sortedImages.map(img => ({
@@ -556,12 +587,17 @@ function AdminProductos() {
                         sku: form.sku || `${slug}-v1`, color: form.color || null,
                         storage: form.storage || null, connectivity: form.connectivity || null,
                     }).eq('id', variant.id)
+                }
 
-                    if (form.priceUSD) {
-                        await (supabase as any).from('prices').upsert({
-                            variant_id: variant.id, currency: 'USD', amount: parseFloat(form.priceUSD),
-                        }, { onConflict: 'variant_id,currency' })
-                    }
+                // Update common fields (tags)
+                await (supabase as any).from('products').update({
+                    tags: form.tags.split(',').map(t => t.trim()).filter(t => t !== '')
+                }).eq('id', currentProductId)
+
+                if (variant && form.priceUSD) {
+                    await (supabase as any).from('prices').upsert({
+                        variant_id: variant.id, currency: 'USD', amount: parseFloat(form.priceUSD),
+                    }, { onConflict: 'variant_id,currency' })
                 }
             } else {
                 // INSERT producto
@@ -573,6 +609,7 @@ function AdminProductos() {
                         cost_price: form.cost_price ? parseFloat(form.cost_price) : null,
                         condition: form.condition as 'new', short_description: form.short_description || null,
                         active: form.active, is_featured: form.is_featured,
+                        tags: form.tags.split(',').map(t => t.trim()).filter(t => t !== '')
                     })
                     .select()
                     .single()
@@ -757,6 +794,11 @@ function AdminProductos() {
                                         Marca {sortField === 'brands.name' && (sortOrder === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
                                     </div>
                                 </th>
+                                <th onClick={() => handleSort('providers.name')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                        Proveedor {sortField === 'providers.name' && (sortOrder === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
+                                    </div>
+                                </th>
                                 <th onClick={() => handleSort('priceUSD')} style={{ cursor: 'pointer', userSelect: 'none' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                                         Precio USD {sortField === 'priceUSD' && (sortOrder === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
@@ -809,6 +851,7 @@ function AdminProductos() {
                                         </td>
                                         <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{p.categories?.name}</td>
                                         <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{p.brands?.name}</td>
+                                        <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{p.providers?.name || <span style={{ color: 'var(--text-muted)' }}>—</span>}</td>
                                         <td style={{ fontWeight: 700 }}>
                                             {priceUSD ? formatUSD(Number(priceUSD)) : <span style={{ color: 'var(--text-muted)' }}>—</span>}
                                         </td>
@@ -953,7 +996,15 @@ function AdminProductos() {
                             <div className="form-group">
                                 <label className="form-label" htmlFor="form-cost-price">Precio Costo</label>
                                 <input id="form-cost-price" className="form-input" type="number" min="0" step="0.01"
-                                    value={form.cost_price} onChange={(e) => setForm((f) => ({ ...f, cost_price: e.target.value }))}
+                                    value={form.cost_price}
+                                    onChange={(e) => setForm((f) => ({ ...f, cost_price: e.target.value }))}
+                                    onBlur={(e) => {
+                                        const cost = e.target.value
+                                        const finalPrice = calculateSellingPrice(parseFloat(cost))
+                                        if (finalPrice > 0) {
+                                            setForm((f) => ({ ...f, priceUSD: finalPrice.toString() }))
+                                        }
+                                    }}
                                     placeholder="0.00" />
                             </div>
 
@@ -1000,9 +1051,19 @@ function AdminProductos() {
 
                             <div className="form-group" style={{ gridColumn: '1 / -1' }}>
                                 <label className="form-label" htmlFor="form-desc">{dict.admin.descripcion}</label>
-                                <textarea id="form-desc" className="form-textarea" rows={3} value={form.short_description}
+                                <textarea id="form-desc" className="form-textarea" rows={2} value={form.short_description}
                                     onChange={(e) => setForm((f) => ({ ...f, short_description: e.target.value }))}
                                     placeholder="Descripción breve del producto" />
+                            </div>
+
+                            <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                                <label className="form-label" htmlFor="form-tags">Tags de Búsqueda (separados por coma)</label>
+                                <textarea id="form-tags" className="form-textarea" rows={2} value={form.tags}
+                                    onChange={(e) => setForm((f) => ({ ...f, tags: e.target.value }))}
+                                    placeholder="Playstation, Sony, Consola, Next-Gen..." />
+                                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4 }}>
+                                    Palabras clave que ayudarán a encontrar el producto más fácil (ej: "PS5" por "Playstation").
+                                </p>
                             </div>
 
                             <div className="form-group" style={{ gridColumn: '1 / -1' }}>
