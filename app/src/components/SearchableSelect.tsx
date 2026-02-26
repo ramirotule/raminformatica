@@ -20,6 +20,7 @@ interface Props {
 }
 
 export function SearchableSelect({ options, value, onChange, placeholder = 'Seleccionar...', className = '', id, disabled = false, style }: Props) {
+    const [highlightedIdx, setHighlightedIdx] = useState(-1)
     const [isOpen, setIsOpen] = useState(false)
     const [search, setSearch] = useState('')
     const ref = useRef<HTMLDivElement>(null)
@@ -35,6 +36,7 @@ export function SearchableSelect({ options, value, onChange, placeholder = 'Sele
             if (ref.current && !ref.current.contains(event.target as Node)) {
                 setIsOpen(false)
                 setSearch('') // reset search on close
+                setHighlightedIdx(-1)
             }
         }
         document.addEventListener('mousedown', handleClickOutside)
@@ -42,16 +44,25 @@ export function SearchableSelect({ options, value, onChange, placeholder = 'Sele
     }, [])
 
     useEffect(() => {
-        if (isOpen && inputRef.current) {
-            inputRef.current.focus()
+        if (isOpen) {
+            if (inputRef.current) inputRef.current.focus()
+            setHighlightedIdx(-1)
         }
     }, [isOpen])
+
+    const handleSelect = (option: Option) => {
+        onChange(option.value)
+        setIsOpen(false)
+        setSearch('')
+        setHighlightedIdx(-1)
+    }
 
     return (
         <div ref={ref} className={`searchable-select-container ${className}`} style={{ position: 'relative', width: '100%', padding: 0, border: 'none', background: 'transparent', ...style }}>
             <div
                 id={id}
                 className={`form-input ${disabled ? 'disabled' : ''}`}
+                tabIndex={disabled ? -1 : 0}
                 style={{
                     cursor: disabled ? 'not-allowed' : 'pointer',
                     display: 'flex',
@@ -67,6 +78,18 @@ export function SearchableSelect({ options, value, onChange, placeholder = 'Sele
                     padding: '0 16px'
                 }}
                 onClick={() => !disabled && setIsOpen(!isOpen)}
+                onKeyDown={(e) => {
+                    if (disabled) return
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        setIsOpen(!isOpen)
+                    } else if (e.key === 'ArrowDown' && !isOpen) {
+                        e.preventDefault()
+                        setIsOpen(true)
+                    } else if (e.key === 'Escape' && isOpen) {
+                        setIsOpen(false)
+                    }
+                }}
             >
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: selectedOption ? 'var(--text-primary)' : 'var(--text-muted)', fontSize: '0.95rem' }}>
                     {selectedOption ? selectedOption.label : placeholder}
@@ -102,20 +125,35 @@ export function SearchableSelect({ options, value, onChange, placeholder = 'Sele
                             placeholder="Buscar..."
                             value={search}
                             autoFocus
-                            onChange={e => setSearch(e.target.value)}
+                            onChange={e => {
+                                setSearch(e.target.value)
+                                setHighlightedIdx(0)
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === 'ArrowDown') {
+                                    e.preventDefault()
+                                    setHighlightedIdx(prev => Math.min(prev + 1, filteredOptions.length - 1))
+                                } else if (e.key === 'ArrowUp') {
+                                    e.preventDefault()
+                                    setHighlightedIdx(prev => Math.max(prev - 1, 0))
+                                } else if (e.key === 'Enter') {
+                                    e.preventDefault()
+                                    if (highlightedIdx >= 0 && filteredOptions[highlightedIdx]) {
+                                        handleSelect(filteredOptions[highlightedIdx])
+                                    }
+                                } else if (e.key === 'Escape') {
+                                    setIsOpen(false)
+                                }
+                            }}
                             onClick={e => e.stopPropagation()} // Prevent closing when clicking input
                         />
                     </div>
                     <div style={{ overflowY: 'auto', padding: '4px' }}>
                         {filteredOptions.length > 0 ? (
-                            filteredOptions.map(option => (
+                            filteredOptions.map((option, idx) => (
                                 <div
                                     key={option.value}
-                                    onClick={() => {
-                                        onChange(option.value)
-                                        setIsOpen(false)
-                                        setSearch('')
-                                    }}
+                                    onClick={() => handleSelect(option)}
                                     style={{
                                         padding: '10px 14px',
                                         cursor: 'pointer',
@@ -124,12 +162,11 @@ export function SearchableSelect({ options, value, onChange, placeholder = 'Sele
                                         alignItems: 'center',
                                         justifyContent: 'space-between',
                                         fontSize: '0.9rem',
-                                        color: option.value === value ? 'var(--accent-light)' : 'var(--text-primary)',
-                                        background: option.value === value ? 'rgba(52, 199, 89, 0.1)' : 'transparent',
+                                        color: (option.value === value || idx === highlightedIdx) ? 'var(--accent-light)' : 'var(--text-primary)',
+                                        background: option.value === value ? 'rgba(52, 199, 89, 0.1)' : (idx === highlightedIdx ? 'var(--bg-card-hover)' : 'transparent'),
                                         transition: 'background 0.2s ease'
                                     }}
-                                    onMouseEnter={e => e.currentTarget.style.background = option.value === value ? 'rgba(52, 199, 89, 0.1)' : 'var(--bg-card-hover)'}
-                                    onMouseLeave={e => e.currentTarget.style.background = option.value === value ? 'rgba(52, 199, 89, 0.1)' : 'transparent'}
+                                    onMouseEnter={() => setHighlightedIdx(idx)}
                                 >
                                     {option.label}
                                     {option.value === value && <Check size={14} />}

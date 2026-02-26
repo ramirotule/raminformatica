@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Search, SlidersHorizontal, X } from 'lucide-react'
+import { Search, SlidersHorizontal, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import ProductCard from '@/components/ProductCard'
 import { dict } from '@/lib/dict'
 import { getPriceUSD } from '@/lib/utils'
@@ -32,6 +32,8 @@ export default function ProductosClient({ products, categories, brands }: Produc
     const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.get('categoria') ?? '')
     const [selectedBrand, setSelectedBrand] = useState<string>('')
     const [selectedCondition, setSelectedCondition] = useState<string>('')
+    const [visibleItems, setVisibleItems] = useState(20)
+    const ITEMS_PER_STEP = 20
 
     // Sync URL params
     useEffect(() => {
@@ -97,6 +99,21 @@ export default function ProductosClient({ products, categories, brands }: Produc
         setSelectedBrand('')
         setSelectedCondition('')
         setSortBy('reciente')
+        setVisibleItems(20)
+    }
+
+    // Reset visible items when filters change
+    useEffect(() => {
+        setVisibleItems(20)
+    }, [search, selectedCategory, selectedBrand, selectedCondition, sortBy])
+
+    const hasMore = visibleItems < filtered.length
+    const paginatedProducts = useMemo(() => {
+        return filtered.slice(0, visibleItems)
+    }, [filtered, visibleItems])
+
+    const handleShowMore = () => {
+        setVisibleItems(prev => prev + ITEMS_PER_STEP)
     }
 
     const hasFilters = !!(search || selectedCategory || selectedBrand || selectedCondition)
@@ -201,11 +218,30 @@ export default function ProductosClient({ products, categories, brands }: Produc
                     </button>
                 </div>
             ) : (
-                <div className="products-grid">
-                    {filtered.map((product) => (
-                        <ProductCard key={product.id} product={product} />
-                    ))}
-                </div>
+                <>
+                    <div className="products-grid">
+                        {paginatedProducts.map((product) => (
+                            <ProductCard key={product.id} product={product} />
+                        ))}
+                    </div>
+
+                    {hasMore && (
+                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 48 }}>
+                            <button
+                                className="btn btn-secondary"
+                                onClick={handleShowMore}
+                                style={{
+                                    paddingInline: 48,
+                                    height: 54,
+                                    fontSize: '1rem',
+                                    borderRadius: 'var(--radius-lg)'
+                                }}
+                            >
+                                Cargar más productos
+                            </button>
+                        </div>
+                    )}
+                </>
             )}
         </div>
     )

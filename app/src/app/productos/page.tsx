@@ -30,7 +30,7 @@ async function getData() {
             .eq('active', true)
             .order('created_at', { ascending: false })
             .order('sort_order', { foreignTable: 'product_images', ascending: true })
-            .limit(200),
+            .limit(1000),
         (supabase as any).from('categories').select('*').order('name'),
         (supabase as any).from('brands').select('*').order('name'),
     ])

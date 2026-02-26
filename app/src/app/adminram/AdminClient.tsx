@@ -576,10 +576,10 @@ function AdminProductos() {
                     const fileExt = file.name.split('.').pop()
                     const fileName = `${hash}.${fileExt}`
 
-                    const { error: uploadError } = await supabase.storage.from('Images').upload(fileName, file)
+                    const { error: uploadError } = await supabase.storage.from('IMAGES').upload(fileName, file)
 
                     if (!uploadError || (uploadError as any).status === 409 || uploadError.message?.includes('already exists')) {
-                        const { data: { publicUrl } } = supabase.storage.from('Images').getPublicUrl(fileName)
+                        const { data: { publicUrl } } = supabase.storage.from('IMAGES').getPublicUrl(fileName)
                         await (supabase as any).from('product_images').insert({
                             product_id: productId,
                             storage_path: fileName,
@@ -632,21 +632,24 @@ function AdminProductos() {
                 // UPDATE variant
                 const variant = editProduct.product_variants?.[0]
                 if (variant) {
-                    await ((supabase as any).from('product_variants') as any).update({
+                    const { error: vErr } = await ((supabase as any).from('product_variants') as any).update({
                         sku: form.sku || `${slug}-v1`, color: form.color || null,
                         storage: form.storage || null, connectivity: form.connectivity || null,
                     }).eq('id', variant.id)
+                    if (vErr) console.error('Error updating variant:', vErr)
                 }
 
                 // Update common fields (tags)
-                await (supabase as any).from('products').update({
+                const { error: tErr } = await (supabase as any).from('products').update({
                     tags: form.tags.split(',').map(t => t.trim().toLowerCase()).filter(t => t !== '')
                 }).eq('id', currentProductId)
+                if (tErr) console.error('Error updating tags:', tErr)
 
                 if (variant && form.priceUSD) {
-                    await (supabase as any).from('prices').upsert({
+                    const { error: prErr } = await (supabase as any).from('prices').upsert({
                         variant_id: variant.id, currency: 'USD', amount: parseFloat(form.priceUSD),
                     }, { onConflict: 'variant_id,currency' })
+                    if (prErr) console.error('Error upserting price:', prErr)
                 }
             } else {
                 // INSERT producto
@@ -664,11 +667,14 @@ function AdminProductos() {
                     .select()
                     .single()
 
-                if (pErr || !prod) throw new Error(pErr?.message ?? 'Error al crear producto')
+                if (pErr || !prod) {
+                    console.error('Error creating product:', pErr)
+                    throw new Error(pErr?.message ?? 'Error al crear producto')
+                }
                 currentProductId = prod.id
 
                 // INSERT variant
-                const { data: varData } = await (supabase as any)
+                const { data: varData, error: vErr } = await (supabase as any)
                     .from('product_variants')
                     .insert({
                         product_id: prod.id, sku: form.sku || `${slug}-v1`,
@@ -678,19 +684,26 @@ function AdminProductos() {
                     .select()
                     .single()
 
+                if (vErr) console.error('Error creating variant:', vErr)
+
                 // INSERT price
                 if (varData && form.priceUSD) {
-                    await (supabase as any).from('prices').insert({
+                    const { error: prErr } = await (supabase as any).from('prices').insert({
                         variant_id: varData.id, currency: 'USD', amount: parseFloat(form.priceUSD),
                     })
+                    if (prErr) console.error('Error creating price:', prErr)
+
                     // INSERT inventory
-                    await (supabase as any).from('inventory').insert({
+                    const { error: invErr } = await (supabase as any).from('inventory').insert({
                         variant_id: varData.id, qty_available: 0, qty_reserved: 0,
                     })
+                    if (invErr) console.error('Error creating inventory:', invErr)
                 }
             }
 
             // Handle Image Save
+            let imageErrors = false
+            let imageErrorDetails: string[] = []
             if (currentProductId) {
                 const currentExistingIds = new Set(images.filter(i => i.isExisting).map(i => i.id))
                 const removedImages = (editProduct?.product_images || []).filter((img: any) => !currentExistingIds.has(img.id))
@@ -698,36 +711,76 @@ function AdminProductos() {
                 for (const rmImg of removedImages) {
                     await (supabase as any).from('product_images').delete().eq('id', rmImg.id)
                     if (rmImg.storage_path && rmImg.storage_path.startsWith(currentProductId)) {
-                        await supabase.storage.from('Images').remove([rmImg.storage_path])
+                        await supabase.storage.from('IMAGES').remove([rmImg.storage_path])
                     }
                 }
 
                 for (let i = 0; i < images.length; i++) {
                     const img = images[i]
                     if (!img.isExisting && img.file) {
-                        const hash = await getFileHash(img.file)
-                        const fileExt = img.file.name.split('.').pop()
-                        const fileName = `${hash}.${fileExt}`
-                        const { error: uploadError } = await supabase.storage.from('Images').upload(fileName, img.file, { upsert: true })
+                        try {
+                            const hash = await getFileHash(img.file)
+                            const fileExt = img.file.name.split('.').pop()
+                            const fileName = `${hash}.${fileExt}`
+                            const { error: uploadError } = await supabase.storage.from('IMAGES').upload(fileName, img.file, { upsert: true })
 
-                        if (!uploadError || (uploadError as any).status === 409 || uploadError.message?.includes('already exists')) {
-                            const { data: { publicUrl } } = supabase.storage.from('Images').getPublicUrl(fileName)
-                            await (supabase as any).from('product_images').insert({ product_id: currentProductId, storage_path: fileName, public_url: publicUrl, alt: `${form.name} ${i + 1}`, sort_order: i })
-                        } else {
-                            showAlert('error', 'Guardado. Falló la subida de imagen. (Asegúrate de tener un bucket "Images" público)')
+                            if (!uploadError || (uploadError as any).status === 409 || uploadError.message?.includes('already exists')) {
+                                const { data: { publicUrl } } = supabase.storage.from('IMAGES').getPublicUrl(fileName)
+                                const { error: insErr } = await (supabase as any).from('product_images').insert({
+                                    product_id: currentProductId,
+                                    storage_path: fileName,
+                                    public_url: publicUrl,
+                                    alt: `${form.name} ${i + 1}`,
+                                    sort_order: i,
+                                    is_primary: i === 0
+                                })
+                                if (insErr) {
+                                    console.error('Error linking image:', insErr)
+                                    imageErrors = true
+                                    imageErrorDetails.push(`DB: ${insErr.message}`)
+                                }
+                            } else {
+                                console.error('Upload error:', uploadError)
+                                imageErrors = true
+                                imageErrorDetails.push(`Upload: ${uploadError.message}`)
+                            }
+                        } catch (err: any) {
+                            console.error('Error processing image:', err)
+                            imageErrors = true
+                            imageErrorDetails.push(`Process: ${err.message}`)
                         }
                     } else if (!img.isExisting && !img.file && img.url) {
-                        await (supabase as any).from('product_images').insert({ product_id: currentProductId, storage_path: img.url, public_url: img.url, alt: `${form.name} ${i + 1}`, sort_order: i })
+                        const { error: insErr } = await (supabase as any).from('product_images').insert({
+                            product_id: currentProductId,
+                            storage_path: img.url,
+                            public_url: img.url,
+                            alt: `${form.name} ${i + 1}`,
+                            sort_order: i,
+                            is_primary: i === 0
+                        })
+                        if (insErr) {
+                            console.error('Error linking image URL:', insErr)
+                            imageErrors = true
+                            imageErrorDetails.push(`URL DB: ${insErr.message}`)
+                        }
                     } else if (img.isExisting) {
-                        await (supabase as any).from('product_images').update({ sort_order: i }).eq('id', img.id)
+                        await (supabase as any).from('product_images').update({
+                            sort_order: i,
+                            is_primary: i === 0
+                        }).eq('id', img.id)
                     }
                 }
             }
 
-            showAlert('success', editProduct ? 'Producto actualizado correctamente.' : 'Producto creado correctamente.')
+            if (imageErrors) {
+                showAlert('error', `Guardado con errores en imágenes. Revisa el bucket "Images". Detalles: ${imageErrorDetails.join(', ')}`)
+            } else {
+                showAlert('success', editProduct ? 'Producto actualizado correctamente.' : 'Producto creado correctamente.')
+            }
             setModalOpen(false)
             load()
         } catch (error: any) {
+            console.error('Error in handleSave:', error)
             showAlert('error', error.message || 'Error al guardar')
         } finally {
             setIsSaving(false)
@@ -1678,9 +1731,9 @@ function AdminCategorias() {
                 const hash = await getFileHash(iconFile)
                 const fileExt = iconFile.name.split('.').pop()
                 const fileName = `cat-${hash}.${fileExt}`
-                const { error: uploadError } = await supabase.storage.from('Images').upload(fileName, iconFile, { upsert: true })
+                const { error: uploadError } = await supabase.storage.from('IMAGES').upload(fileName, iconFile, { upsert: true })
                 if (!uploadError || (uploadError as any).status === 409 || uploadError.message?.includes('already exists')) {
-                    const { data: { publicUrl } } = supabase.storage.from('Images').getPublicUrl(fileName)
+                    const { data: { publicUrl } } = supabase.storage.from('IMAGES').getPublicUrl(fileName)
                     data.icon_url = publicUrl
                 } else {
                     console.error("Error al subir imagen:", uploadError)
@@ -2363,8 +2416,8 @@ function AdminHome() {
                 const hash = await getFileHash(slideFile)
                 const ext = slideFile.name.split('.').pop()
                 const fileName = `home/${hash}.${ext}`
-                await supabase.storage.from('Images').upload(fileName, slideFile, { upsert: true })
-                const { data: { publicUrl } } = supabase.storage.from('Images').getPublicUrl(fileName)
+                await supabase.storage.from('IMAGES').upload(fileName, slideFile, { upsert: true })
+                const { data: { publicUrl } } = supabase.storage.from('IMAGES').getPublicUrl(fileName)
                 imageUrl = publicUrl
                 storagePath = fileName
             }
@@ -2436,8 +2489,8 @@ function AdminHome() {
                 const hash = await getFileHash(logoFile)
                 const ext = logoFile.name.split('.').pop()
                 const fileName = `brands/${hash}.${ext}`
-                await supabase.storage.from('Images').upload(fileName, logoFile, { upsert: true })
-                const { data: { publicUrl } } = supabase.storage.from('Images').getPublicUrl(fileName)
+                await supabase.storage.from('IMAGES').upload(fileName, logoFile, { upsert: true })
+                const { data: { publicUrl } } = supabase.storage.from('IMAGES').getPublicUrl(fileName)
                 logoUrl = publicUrl
                 storagePath = fileName
             }
@@ -2868,10 +2921,10 @@ function AdminNovedades() {
                 const fileExt = newsFile.name.split('.').pop()
                 const fileName = `weekly-news-${Date.now()}.${fileExt}`
 
-                const { error: uploadError } = await supabase.storage.from('Images').upload(fileName, newsFile, { upsert: true })
+                const { error: uploadError } = await supabase.storage.from('IMAGES').upload(fileName, newsFile, { upsert: true })
                 if (uploadError) throw uploadError
 
-                const { data: { publicUrl } } = supabase.storage.from('Images').getPublicUrl(fileName)
+                const { data: { publicUrl } } = supabase.storage.from('IMAGES').getPublicUrl(fileName)
                 finalImageUrl = publicUrl
                 finalStoragePath = fileName
             }

@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { ChevronRight, ChevronLeft, Zap, TrendingUp, Star } from 'lucide-react'
 import ProductCard from '@/components/ProductCard'
-import PromoModal from '@/components/PromoModal'
 import WeeklyNews from '@/components/WeeklyNews'
 import { dict } from '@/lib/dict'
 import type { ProductWithDetails, HomeSlide, BrandLogo } from '@/lib/database.types'
@@ -279,7 +278,6 @@ export default function HomeClient({ products, slides, brandLogos }: HomeClientP
 
     return (
         <>
-            <PromoModal />
             {/* ─── HERO CAROUSEL ───────────────────────────── */}
             {/* <HeroCarousel slides={slides} products={products} /> */}
 

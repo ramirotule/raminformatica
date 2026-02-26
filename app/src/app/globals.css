@@ -2366,3 +2366,7 @@ tbody td {
 .brand-ticker-container:hover .brand-ticker-track {
   animation-play-state: paused;
 }
+
+.brand-ticker-container:hover .brand-ticker-track {
+  animation-play-state: paused;
+}
