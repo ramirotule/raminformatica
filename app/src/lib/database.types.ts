@@ -64,8 +64,21 @@ export interface Database {
                 Insert: Omit<WeeklyNews, 'id' | 'created_at'>
                 Update: Partial<Omit<WeeklyNews, 'id' | 'created_at'>>
             }
+            provider_costs: {
+                Row: ProviderCost
+                Insert: Omit<ProviderCost, 'id' | 'created_at'>
+                Update: Partial<Omit<ProviderCost, 'id' | 'created_at'>>
+            }
         }
     }
+}
+
+export interface ProviderCost {
+    id: string
+    product_id: string
+    provider_id: string
+    cost_price: number
+    updated_at: string
 }
 
 export interface Category {

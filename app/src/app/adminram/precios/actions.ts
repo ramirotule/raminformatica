@@ -241,6 +241,18 @@ export async function processSync(items: ParsedItem[], providerId?: string) {
                     .eq('product_id', item.matchId);
 
                 if (variants && variants.length > 0) {
+                    // 1. Guardar en provider_costs para el comparador
+                    if (providerId) {
+                        await supabaseAdmin
+                            .from('provider_costs')
+                            .upsert({
+                                product_id: item.matchId,
+                                provider_id: providerId,
+                                cost_price: item.cost,
+                                updated_at: new Date().toISOString()
+                            }, { onConflict: 'product_id,provider_id' });
+                    }
+
                     for (const v of variants) {
                         // Usamos RPC o Upsert directo según la versión de Supabase/PostgREST
                         const { error: priceErr } = await supabaseAdmin
@@ -351,4 +363,99 @@ export async function updatePricesFromRawText(rawText: string, provider: string)
     const { items } = await parseImportData(rawText, provider as any);
     const { items: matched } = await searchMatches(items);
     return processSync(matched);
+}
+
+/**
+ * Obtiene todos los productos con sus costos de diferentes proveedores para el comparador.
+ */
+export async function getComparisonData() {
+    try {
+        const [pRes, provRes, costsRes] = await Promise.all([
+            supabaseAdmin.from('products').select('id, name, cost_price, provider_id').eq('active', true).order('name'),
+            supabaseAdmin.from('providers').select('id, name').eq('active', true),
+            supabaseAdmin.from('provider_costs').select('*')
+        ]);
+
+        if (pRes.error) throw pRes.error;
+
+        return {
+            success: true,
+            products: pRes.data || [],
+            providers: provRes.data || [],
+            costs: costsRes.data || []
+        };
+    } catch (err: any) {
+        console.error("Error fetching comparison data:", err);
+        return { success: false, message: err.message };
+    }
+}
+
+/**
+ * Aplica el mejor precio (mínimo) a un producto específico.
+ */
+export async function applyBestPrice(productId: string, bestProviderId: string, bestCost: number) {
+    try {
+        // 1. Recalcular precio de venta
+        const finalPrice = calculateFinalPrice(bestCost);
+
+        // 2. Actualizar producto (costo y proveedor actual)
+        const { error: pErr } = await supabaseAdmin.from('products').update({
+            cost_price: bestCost,
+            provider_id: bestProviderId,
+        }).eq('id', productId);
+
+        if (pErr) throw pErr;
+
+        // 3. Actualizar precios de las variantes
+        const { data: variants } = await supabaseAdmin.from('product_variants').select('id').eq('product_id', productId);
+        if (variants) {
+            for (const v of variants) {
+                await supabaseAdmin.from('prices').upsert({
+                    variant_id: v.id,
+                    currency: 'USD',
+                    amount: finalPrice,
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'variant_id,currency' });
+            }
+        }
+
+        return { success: true };
+    } catch (err: any) {
+        console.error("Error applying best price:", err);
+        return { success: false, message: err.message };
+    }
+}
+
+/**
+ * Aplica los mejores precios a TODOS los productos que tengan costos de proveedores.
+ */
+export async function applyAllBestPrices() {
+    try {
+        const { data: allCosts } = await supabaseAdmin.from('provider_costs').select('*');
+        if (!allCosts || allCosts.length === 0) return { success: false, message: "No hay costos guardados para comparar." };
+
+        // Agrupar por producto y encontrar el mínimo
+        const bestPrices: Record<string, { provider_id: string, cost: number }> = {};
+        for (const c of allCosts) {
+            if (!bestPrices[c.product_id] || c.cost_price < bestPrices[c.product_id].cost) {
+                bestPrices[c.product_id] = {
+                    provider_id: c.provider_id,
+                    cost: c.cost_price
+                };
+            }
+        }
+
+        const productIds = Object.keys(bestPrices);
+        let updated = 0;
+
+        for (const pid of productIds) {
+            const best = bestPrices[pid];
+            const res = await applyBestPrice(pid, best.provider_id, best.cost);
+            if (res.success) updated++;
+        }
+
+        return { success: true, message: `Se actualizaron ${updated} productos con su mejor precio.` };
+    } catch (err: any) {
+        return { success: false, message: err.message };
+    }
 }

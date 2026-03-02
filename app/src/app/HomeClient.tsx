@@ -129,14 +129,14 @@ function BrandTicker({ logos }: { logos: BrandLogo[] }) {
 
     return (
         <section style={{ padding: '60px 0', overflow: 'hidden', borderTop: '1px solid var(--border)' }}>
-            <div className="container" style={{ marginBottom: 32 }}>
+            {/* <div className="container" style={{ marginBottom: 32 }}>
                 <div>
                     <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: 4 }}>Nuestras Marcas</h3>
                     <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Socios estratégicos de RAM</p>
                 </div>
-            </div>
+            </div> */}
 
-            <div className="container">
+            {/* <div className="container">
                 <div className="brand-ticker-container" style={{ position: 'relative', width: '100%', overflow: 'hidden', padding: '40px 0' }}>
                     <div
                         className="brand-ticker-track"
@@ -187,8 +187,8 @@ function BrandTicker({ logos }: { logos: BrandLogo[] }) {
                                     src={logo.logo_url}
                                     alt={logo.name}
                                     style={{
-                                        maxWidth: '80%',
-                                        maxHeight: '60%',
+                                        maxWidth: '100%',
+                                        maxHeight: '100%',
                                         objectFit: 'contain',
                                         transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
                                     }}
@@ -197,7 +197,7 @@ function BrandTicker({ logos }: { logos: BrandLogo[] }) {
                         ))}
                     </div>
                 </div>
-            </div>
+            </div> */}
         </section>
     )
 }

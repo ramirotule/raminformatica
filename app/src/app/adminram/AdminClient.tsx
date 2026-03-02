@@ -42,8 +42,9 @@ import type { Product, ProductWithDetails, Category, Brand, ProductVariant, Pric
 import { SearchableSelect } from '@/components/SearchableSelect'
 import { calculateSellingPrice } from '@/lib/constants'
 import AdminPrecios from './AdminPrecios'
+import AdminComparator from './AdminComparator'
 
-type AdminSection = 'dashboard' | 'productos' | 'categorias' | 'marcas' | 'proveedores' | 'home' | 'precios' | 'novedades'
+type AdminSection = 'dashboard' | 'productos' | 'categorias' | 'marcas' | 'proveedores' | 'home' | 'precios' | 'novedades' | 'comparador'
 
 async function getFileHash(file: File): Promise<string> {
     const arrayBuffer = await file.arrayBuffer()
@@ -62,6 +63,7 @@ function Sidebar({ active, onChange }: { active: AdminSection; onChange: (s: Adm
         { id: 'marcas', label: dict.admin.marcas, icon: <Building2 size={16} /> },
         { id: 'proveedores', label: 'Proveedores', icon: <Warehouse size={16} /> },
         { id: 'precios', label: 'Sincronizar Precios', icon: <RefreshCw size={16} /> },
+        { id: 'comparador', label: 'Comparador', icon: <TrendingUp size={16} /> },
         { id: 'novedades', label: 'Novedades', icon: <Bell size={16} /> },
     ]
     return (
@@ -576,10 +578,10 @@ function AdminProductos() {
                     const fileExt = file.name.split('.').pop()
                     const fileName = `${hash}.${fileExt}`
 
-                    const { error: uploadError } = await supabase.storage.from('IMAGES').upload(fileName, file)
+                    const { error: uploadError } = await supabase.storage.from('Images').upload(fileName, file)
 
                     if (!uploadError || (uploadError as any).status === 409 || uploadError.message?.includes('already exists')) {
-                        const { data: { publicUrl } } = supabase.storage.from('IMAGES').getPublicUrl(fileName)
+                        const { data: { publicUrl } } = supabase.storage.from('Images').getPublicUrl(fileName)
                         await (supabase as any).from('product_images').insert({
                             product_id: productId,
                             storage_path: fileName,
@@ -711,7 +713,7 @@ function AdminProductos() {
                 for (const rmImg of removedImages) {
                     await (supabase as any).from('product_images').delete().eq('id', rmImg.id)
                     if (rmImg.storage_path && rmImg.storage_path.startsWith(currentProductId)) {
-                        await supabase.storage.from('IMAGES').remove([rmImg.storage_path])
+                        await supabase.storage.from('Images').remove([rmImg.storage_path])
                     }
                 }
 
@@ -722,10 +724,10 @@ function AdminProductos() {
                             const hash = await getFileHash(img.file)
                             const fileExt = img.file.name.split('.').pop()
                             const fileName = `${hash}.${fileExt}`
-                            const { error: uploadError } = await supabase.storage.from('IMAGES').upload(fileName, img.file, { upsert: true })
+                            const { error: uploadError } = await supabase.storage.from('Images').upload(fileName, img.file, { upsert: true })
 
                             if (!uploadError || (uploadError as any).status === 409 || uploadError.message?.includes('already exists')) {
-                                const { data: { publicUrl } } = supabase.storage.from('IMAGES').getPublicUrl(fileName)
+                                const { data: { publicUrl } } = supabase.storage.from('Images').getPublicUrl(fileName)
                                 const { error: insErr } = await (supabase as any).from('product_images').insert({
                                     product_id: currentProductId,
                                     storage_path: fileName,
@@ -1731,9 +1733,9 @@ function AdminCategorias() {
                 const hash = await getFileHash(iconFile)
                 const fileExt = iconFile.name.split('.').pop()
                 const fileName = `cat-${hash}.${fileExt}`
-                const { error: uploadError } = await supabase.storage.from('IMAGES').upload(fileName, iconFile, { upsert: true })
+                const { error: uploadError } = await supabase.storage.from('Images').upload(fileName, iconFile, { upsert: true })
                 if (!uploadError || (uploadError as any).status === 409 || uploadError.message?.includes('already exists')) {
-                    const { data: { publicUrl } } = supabase.storage.from('IMAGES').getPublicUrl(fileName)
+                    const { data: { publicUrl } } = supabase.storage.from('Images').getPublicUrl(fileName)
                     data.icon_url = publicUrl
                 } else {
                     console.error("Error al subir imagen:", uploadError)
@@ -1954,7 +1956,8 @@ function AdminMarcas() {
     const [loading, setLoading] = useState(true)
     const [isSaving, setIsSaving] = useState(false)
     const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
-    const [form, setForm] = useState({ name: '', slug: '' })
+    const [form, setForm] = useState({ name: '', slug: '', logo_url: '' })
+    const [logoFile, setLogoFile] = useState<File | null>(null)
     const [editId, setEditId] = useState<string | null>(null)
     const [modalOpen, setModalOpen] = useState(false)
     const [deleteConfirm, setDeleteConfirm] = useState<{ id: string, name: string, count: number } | null>(null)
@@ -1996,7 +1999,27 @@ function AdminMarcas() {
     async function handleSave() {
         setIsSaving(true)
         try {
-            const data = { name: form.name, slug: form.slug || slugify(form.name) }
+            const data = {
+                name: form.name,
+                slug: form.slug || slugify(form.name),
+                logo_url: form.logo_url || null
+            }
+
+            if (logoFile) {
+                const hash = await getFileHash(logoFile)
+                const ext = logoFile.name.split('.').pop()
+                const fileName = `brands/${hash}.${ext}`
+                const { error: uploadError } = await supabase.storage.from('Images').upload(fileName, logoFile, { upsert: true })
+
+                if (!uploadError || (uploadError as any).status === 409 || uploadError.message?.includes('already exists')) {
+                    const { data: { publicUrl } } = supabase.storage.from('Images').getPublicUrl(fileName)
+                    data.logo_url = publicUrl
+                } else {
+                    console.error("Error al subir logo de marca:", uploadError)
+                    throw new Error(`Falló la subida del logo: ${uploadError.message}`)
+                }
+            }
+
             let error
             if (editId) {
                 ; ({ error } = await ((supabase as any).from('brands') as any).update(data).eq('id', editId))
@@ -2006,6 +2029,7 @@ function AdminMarcas() {
             if (error) throw error
             showAlert('success', editId ? 'Marca actualizada.' : 'Marca creada.')
             setModalOpen(false)
+            setLogoFile(null)
             load()
         } catch (error: any) {
             showAlert('error', error.message || 'Error al guardar')
@@ -2051,7 +2075,7 @@ function AdminMarcas() {
         <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
                 <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>{dict.admin.marcas}</h1>
-                <button id="admin-new-brand" className="btn btn-primary btn-sm" onClick={() => { setEditId(null); setForm({ name: '', slug: '' }); setModalOpen(true) }}>
+                <button id="admin-new-brand" className="btn btn-primary btn-sm" onClick={() => { setEditId(null); setForm({ name: '', slug: '', logo_url: '' }); setLogoFile(null); setModalOpen(true) }}>
                     <Plus size={15} /> {dict.admin.nuevo}
                 </button>
             </div>
@@ -2062,6 +2086,7 @@ function AdminMarcas() {
                 <div className="table-wrap">
                     <table>
                         <thead><tr>
+                            <th style={{ width: 60 }}>Logo</th>
                             <th onClick={() => handleSort('name')} style={{ cursor: 'pointer', userSelect: 'none' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                                     Nombre {sortField === 'name' && (sortOrder === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
@@ -2082,12 +2107,17 @@ function AdminMarcas() {
                         <tbody>
                             {sortedItems.map((b) => (
                                 <tr key={b.id}>
+                                    <td>
+                                        {b.logo_url && (
+                                            <img src={b.logo_url} alt={b.name} style={{ width: 32, height: 32, objectFit: 'contain' }} />
+                                        )}
+                                    </td>
                                     <td style={{ fontWeight: 600 }}>{b.name}</td>
                                     <td style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontFamily: 'monospace' }}>{b.slug}</td>
                                     <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{new Date(b.created_at).toLocaleDateString('es-AR')}</td>
                                     <td>
                                         <div style={{ display: 'flex', gap: 6 }}>
-                                            <button className="btn btn-ghost btn-sm" onClick={() => { setEditId(b.id); setForm({ name: b.name, slug: b.slug }); setModalOpen(true) }} title="Editar"><Pencil size={14} /></button>
+                                            <button className="btn btn-ghost btn-sm" onClick={() => { setEditId(b.id); setForm({ name: b.name, slug: b.slug, logo_url: b.logo_url || '' }); setLogoFile(null); setModalOpen(true) }} title="Editar"><Pencil size={14} /></button>
                                             <button className="btn btn-danger" onClick={() => handleDelete(b.id, b.name)} title="Eliminar"><Trash2 size={14} /></button>
                                         </div>
                                     </td>
@@ -2114,6 +2144,25 @@ function AdminMarcas() {
                             <label className="form-label" htmlFor="brand-slug">Slug</label>
                             <input id="brand-slug" className="form-input" value={form.slug}
                                 onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label" htmlFor="brand-logo">Logo</label>
+                            <input type="file" accept="image/*" className="form-input" style={{ padding: '4px 8px' }}
+                                onChange={(e) => {
+                                    if (e.target.files && e.target.files[0]) {
+                                        setLogoFile(e.target.files[0])
+                                    }
+                                }} />
+                            {(logoFile || form.logo_url) && (
+                                <div style={{ marginTop: 10, padding: 8, background: 'var(--bg-secondary)', borderRadius: 6, display: 'inline-flex', alignItems: 'center', gap: 12 }}>
+                                    {logoFile ? (
+                                        <img src={URL.createObjectURL(logoFile)} alt="Preview" style={{ height: 40, width: 40, objectFit: 'contain' }} />
+                                    ) : (
+                                        <img src={form.logo_url} alt="Logo actual" style={{ height: 40, width: 40, objectFit: 'contain' }} />
+                                    )}
+                                    <button className="btn btn-ghost btn-sm" style={{ color: 'var(--red)' }} onClick={() => { setLogoFile(null); setForm(f => ({ ...f, logo_url: '' })) }} title="Quitar logo"><X size={15} /></button>
+                                </div>
+                            )}
                         </div>
                         <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 8 }}>
                             <button className="btn btn-ghost" onClick={() => setModalOpen(false)}>Cancelar</button>
@@ -2416,10 +2465,16 @@ function AdminHome() {
                 const hash = await getFileHash(slideFile)
                 const ext = slideFile.name.split('.').pop()
                 const fileName = `home/${hash}.${ext}`
-                await supabase.storage.from('IMAGES').upload(fileName, slideFile, { upsert: true })
-                const { data: { publicUrl } } = supabase.storage.from('IMAGES').getPublicUrl(fileName)
-                imageUrl = publicUrl
-                storagePath = fileName
+                const { error: uploadError } = await supabase.storage.from('Images').upload(fileName, slideFile, { upsert: true })
+
+                if (!uploadError || (uploadError as any).status === 409 || uploadError.message?.includes('already exists')) {
+                    const { data: { publicUrl } } = supabase.storage.from('Images').getPublicUrl(fileName)
+                    imageUrl = publicUrl
+                    storagePath = fileName
+                } else {
+                    console.error("Error al subir slide:", uploadError)
+                    throw new Error(`Falló la subida de la imagen: ${uploadError.message}`)
+                }
             }
 
             if (!imageUrl) {
@@ -2489,10 +2544,16 @@ function AdminHome() {
                 const hash = await getFileHash(logoFile)
                 const ext = logoFile.name.split('.').pop()
                 const fileName = `brands/${hash}.${ext}`
-                await supabase.storage.from('IMAGES').upload(fileName, logoFile, { upsert: true })
-                const { data: { publicUrl } } = supabase.storage.from('IMAGES').getPublicUrl(fileName)
-                logoUrl = publicUrl
-                storagePath = fileName
+                const { error: uploadError } = await supabase.storage.from('Images').upload(fileName, logoFile, { upsert: true })
+
+                if (!uploadError || (uploadError as any).status === 409 || uploadError.message?.includes('already exists')) {
+                    const { data: { publicUrl } } = supabase.storage.from('Images').getPublicUrl(fileName)
+                    logoUrl = publicUrl
+                    storagePath = fileName
+                } else {
+                    console.error("Error al subir logo:", uploadError)
+                    throw new Error(`Falló la subida del logo: ${uploadError.message}`)
+                }
             }
 
             if (!logoUrl) {
@@ -2921,10 +2982,10 @@ function AdminNovedades() {
                 const fileExt = newsFile.name.split('.').pop()
                 const fileName = `weekly-news-${Date.now()}.${fileExt}`
 
-                const { error: uploadError } = await supabase.storage.from('IMAGES').upload(fileName, newsFile, { upsert: true })
+                const { error: uploadError } = await supabase.storage.from('Images').upload(fileName, newsFile, { upsert: true })
                 if (uploadError) throw uploadError
 
-                const { data: { publicUrl } } = supabase.storage.from('IMAGES').getPublicUrl(fileName)
+                const { data: { publicUrl } } = supabase.storage.from('Images').getPublicUrl(fileName)
                 finalImageUrl = publicUrl
                 finalStoragePath = fileName
             }
@@ -3150,6 +3211,7 @@ export default function AdminClient() {
         marcas: <AdminMarcas />,
         proveedores: <AdminProveedores />,
         precios: <AdminPrecios />,
+        comparador: <AdminComparator />,
         novedades: <AdminNovedades />,
     }
 
