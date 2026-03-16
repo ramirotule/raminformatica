@@ -46,38 +46,40 @@ export default function AdminPrecios() {
     }
 
     const handleSearchMatches = async () => {
-        if (selectedIndices.size === 0) return
         setIsLoading(true)
         try {
-            const itemsToMatch = parsedItems.filter((_, i) => selectedIndices.has(i))
-            const res = await searchMatches(itemsToMatch)
+            // Match ALL items in the list to be more thorough
+            const res = await searchMatches(parsedItems, databaseProviderId || undefined)
 
             if (res.success) {
-                let newItems = [...parsedItems]
-                let matchIdx = 0
-                for (let i = 0; i < newItems.length; i++) {
-                    if (selectedIndices.has(i)) {
-                        newItems[i] = res.items[matchIdx]
-                        matchIdx++
+                let newItems = res.items
+                const nextIndices = new Set<number>() // Reiniciamos la selección
+
+                // Seleccionar automáticamente:
+                // 1. Coincidencias al >= 85% (Actualizaciones)
+                // 2. Productos Nuevos (Creaciones)
+                newItems.forEach((item, idx) => {
+                    if (item.status === 'matched' || item.status === 'new') {
+                        nextIndices.add(idx)
                     }
-                }
+                })
 
                 // NUEVO: Ver faltantes (desactivaciones)
                 if (databaseProviderId) {
                     const matchedIds = res.items.map(it => it.matchId).filter(id => !!id) as string[]
                     const missing = await getMissingProducts(matchedIds, databaseProviderId)
                     if (missing.length > 0) {
+                        const currentCount = newItems.length
                         newItems = [...newItems, ...missing]
-                        // Seleccionamos también los de desactivar por defecto
-                        const nextIndices = new Set(selectedIndices)
-                        for (let k = parsedItems.length; k < newItems.length; k++) {
+                        // También seleccionamos los que se van a desactivar porque "coinciden" en que faltan al 100%
+                        for (let k = currentCount; k < newItems.length; k++) {
                             nextIndices.add(k)
                         }
-                        setSelectedIndices(nextIndices)
                     }
                 }
 
                 setParsedItems(newItems)
+                setSelectedIndices(nextIndices)
             }
         } catch (err) {
             console.error(err)
@@ -226,7 +228,7 @@ export default function AdminPrecios() {
                             <tr>
                                 <th style={{ width: 40 }}><input type="checkbox" checked={selectedIndices.size === parsedItems.length} onChange={toggleSelectAll} /></th>
                                 <th>Producto / Coincidencia</th>
-                                <th style={{ width: 90 }}>Costo</th>
+                                <th style={{ width: 130 }}>Costo</th>
                                 <th style={{ width: 110 }}>Similitud</th>
                                 <th style={{ width: 140 }}>Precio Venta</th>
                                 <th>Estado / Acción</th>
@@ -248,8 +250,17 @@ export default function AdminPrecios() {
                                             </div>
                                         )}
                                     </td>
-                                    <td style={{ fontFamily: 'monospace', fontSize: '0.85rem', opacity: 0.8 }}>
-                                        {item.status !== 'deactivate' ? `$${item.cost}` : '—'}
+                                    <td style={{ fontSize: '0.85rem' }}>
+                                        {item.status !== 'deactivate' ? (
+                                            item.currentCost !== undefined && item.currentCost !== item.cost ? (
+                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                    <span style={{ textDecoration: 'line-through', opacity: 0.5, fontSize: '0.75rem' }}>${item.currentCost}</span>
+                                                    <span style={{ fontWeight: 800, color: 'var(--orange)' }}>${item.cost}</span>
+                                                </div>
+                                            ) : (
+                                                <span style={{ fontFamily: 'monospace', opacity: 0.8 }}>${item.cost}</span>
+                                            )
+                                        ) : '—'}
                                     </td>
                                     <td>
                                         {item.similarity !== undefined && (
@@ -401,7 +412,13 @@ export default function AdminPrecios() {
                                     Y redondeamos al múltiplo de 5 más cercano.
                                 </>
                             ) : (
-                                "Para GCgroup se toma el precio directo especificado en el JSON."
+                                <>
+                                    Para <strong>GCgroup</strong> aplicamos:<br />
+                                    <code style={{ display: 'block', margin: '8px 0', padding: '4px 8px', background: 'var(--bg-secondary)', borderRadius: 4, fontWeight: 700 }}>
+                                        (Costo / 0.90) + 25
+                                    </code>
+                                    Y redondeamos al múltiplo de 5 más cercano.
+                                </>
                             )}
                         </div>
                     </div>

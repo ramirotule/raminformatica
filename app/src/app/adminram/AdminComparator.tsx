@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { getComparisonData, applyBestPrice, applyAllBestPrices } from './precios/actions'
 import { formatUSD } from '@/lib/utils'
+import { SearchableSelect } from '@/components/SearchableSelect'
 
 interface Product {
     id: string
@@ -46,6 +47,7 @@ export default function AdminComparator() {
     const [syncingAll, setSyncingAll] = useState(false)
     const [result, setResult] = useState<{ success: boolean; message: string } | null>(null)
     const [searchQuery, setSearchQuery] = useState('')
+    const [providerFilter, setProviderFilter] = useState('')
 
     const loadData = async () => {
         setLoading(true)
@@ -100,9 +102,11 @@ export default function AdminComparator() {
         return productCosts.reduce((prev, curr) => (prev.cost_price < curr.cost_price ? prev : curr))
     }
 
-    const filteredProducts = products.filter(p =>
-        p.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    const filteredProducts = products.filter(p => {
+        const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase())
+        const matchesProvider = !providerFilter || p.provider_id === providerFilter
+        return matchesSearch && matchesProvider
+    })
 
     if (loading) {
         return (
@@ -174,17 +178,29 @@ export default function AdminComparator() {
                 </div>
             </div>
 
-            {/* Search and Filters */}
-            <div style={{ marginBottom: 20, position: 'relative' }}>
-                <Search style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} size={18} />
-                <input
-                    type="text"
-                    placeholder="Buscar producto por nombre..."
-                    className="form-input"
-                    style={{ paddingLeft: 48 }}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
+            <div style={{ marginBottom: 20, display: 'flex', gap: 12 }}>
+                <div style={{ flex: 1, position: 'relative' }}>
+                    <Search style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} size={18} />
+                    <input
+                        type="text"
+                        placeholder="Buscar producto por nombre..."
+                        className="form-input"
+                        style={{ paddingLeft: 48 }}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
+                <div style={{ width: 180 }}>
+                    <SearchableSelect
+                        value={providerFilter}
+                        onChange={(v) => setProviderFilter(v)}
+                        options={[
+                            { value: '', label: 'Todos los Proveedores' },
+                            ...providers.map(prov => ({ value: prov.id, label: prov.name }))
+                        ]}
+                        placeholder="Filtrar por Proveedor"
+                    />
+                </div>
             </div>
 
             {/* Table */}

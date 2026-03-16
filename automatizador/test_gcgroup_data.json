@@ -1,0 +1,51 @@
+{
+  "metadatos": {
+    "fecha_extraccion": "2025-01-20T10:30:00",
+    "proveedor": "GCGroup",
+    "total_productos": 6
+  },
+  "productos": {
+    "IPHONE NEW": [
+      {
+        "producto": "iPhone 16 Pro Max 256GB",
+        "precio_costo": 1200.00,
+        "precio_venta": 1456.00,
+        "precio_original": 1216.00
+      },
+      {
+        "producto": "iPhone 15 Pro 128GB", 
+        "precio_costo": 950.00,
+        "precio_venta": 1145.00,
+        "precio_original": 965.00
+      }
+    ],
+    "SAMSUNG": [
+      {
+        "producto": "Galaxy S24 Ultra 512GB",
+        "precio_costo": 800.00,
+        "precio_venta": 965.00,
+        "precio_original": 815.00
+      },
+      {
+        "producto": "Galaxy Z Fold 6 256GB",
+        "precio_costo": 1100.00,
+        "precio_venta": 1330.00,
+        "precio_original": 1120.00
+      }
+    ],
+    "MOTOROLA": [
+      {
+        "producto": "Edge 50 Pro 256GB",
+        "precio_costo": 600.00,
+        "precio_venta": 730.00,
+        "precio_original": 610.00
+      },
+      {
+        "producto": "Razr 50 Ultra 512GB",
+        "precio_costo": 750.00,
+        "precio_venta": 905.00,
+        "precio_original": 765.00
+      }
+    ]
+  }
+}

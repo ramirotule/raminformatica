@@ -13,6 +13,7 @@ import {
     RefreshCw,
     X,
     Check,
+    CheckCircle2,
     ShieldCheck,
     AlertCircle,
     Search,
@@ -121,6 +122,98 @@ function Dashboard() {
     const [stats, setStats] = useState({ productos: 0, categorias: 0, marcas: 0, sinStock: 0 })
     const [loading, setLoading] = useState(true)
     const [mfaEnabled, setMfaEnabled] = useState(false)
+    const [verifyingPrices, setVerifyingPrices] = useState(false)
+    const [priceIssues, setPriceIssues] = useState<any[]>([])
+    const [verificationDone, setVerificationDone] = useState(false)
+    const [editCostModalOpen, setEditCostModalOpen] = useState(false)
+    const [editCostData, setEditCostData] = useState<{id: string, name: string, cost: number} | null>(null)
+    const [editCostInput, setEditCostInput] = useState('')
+    const [isSavingCost, setIsSavingCost] = useState(false)
+
+    async function verifyPrices() {
+        setVerifyingPrices(true)
+        setVerificationDone(false)
+        setPriceIssues([])
+        try {
+            // Obtener variantes y precios
+            const { data: variantsData, error: vErr } = await (supabase as any)
+                .from('product_variants')
+                .select('id, product_id, prices(amount, currency)')
+            
+            const variantMap = new Map()
+            if (variantsData) {
+                variantsData.forEach((v: any) => {
+                    const priceUSD = v.prices?.find((p: any) => p.currency === 'USD')?.amount
+                    if (priceUSD !== undefined) {
+                        variantMap.set(v.product_id, priceUSD)
+                    }
+                })
+            }
+
+            const { data: productsData, error } = await (supabase as any)
+                .from('products')
+                .select('id, name, cost_price, price_usd')
+                .eq('active', true)
+            
+            if (error) throw error
+
+            const issues = []
+            for (const p of (productsData as any[]) || []) {
+                const cost = p.cost_price
+                if (!cost) continue
+
+                let sellPrice = p.price_usd
+                if (sellPrice === undefined || sellPrice === null) {
+                    sellPrice = variantMap.get(p.id)
+                }
+
+                if (sellPrice !== undefined && sellPrice !== null) {
+                    // La fórmula real es (costo / 0.90) + 25 y redondeado al múltiplo de 5 más cercano
+                    const exactAllowed = (cost / 0.90) + 25
+                    const minAllowed = Math.round(exactAllowed / 5) * 5
+
+                    if (sellPrice < minAllowed - 0.01) {
+                        issues.push({ id: p.id, name: p.name, cost, sellPrice, minAllowed })
+                    }
+                }
+            }
+            setPriceIssues(issues)
+            setVerificationDone(true)
+        } catch (err) {
+            console.error('Error verificando precios', err)
+            alert('Error verificando precios')
+        } finally {
+            setVerifyingPrices(false)
+        }
+    }
+
+    function openEditCostModal(id: string, name: string, currentCost: number) {
+        setEditCostData({ id, name, cost: currentCost })
+        setEditCostInput(currentCost.toString())
+        setEditCostModalOpen(true)
+    }
+
+    async function saveCostPrice() {
+        if (!editCostData) return
+        const newCost = parseFloat(editCostInput.replace(',', '.'))
+        if (isNaN(newCost) || newCost < 0) {
+            alert("Precio no válido")
+            return
+        }
+
+        setIsSavingCost(true)
+        try {
+            const { error } = await (supabase as any).from('products').update({ cost_price: newCost }).eq('id', editCostData.id)
+            if (error) throw error
+            setEditCostModalOpen(false)
+            verifyPrices()
+        } catch (err) {
+            console.error('Error actualizando costo', err)
+            alert("Error al actualizar el precio de costo")
+        } finally {
+            setIsSavingCost(false)
+        }
+    }
 
     useEffect(() => {
         async function load() {
@@ -186,6 +279,75 @@ function Dashboard() {
                 ))}
             </div>
 
+            <div className="card" style={{ padding: 24, marginBottom: 32 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                    <div>
+                        <h2 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Verificador de Precios</h2>
+                        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: 4 }}>
+                            Verifica que los productos activos cumplan: Precio Venta ≥ Redondeado(5, (Costo / 0.90) + $25)
+                        </p>
+                    </div>
+                    <button 
+                        onClick={verifyPrices} 
+                        disabled={verifyingPrices}
+                        className="btn btn-primary"
+                        style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+                    >
+                        {verifyingPrices ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
+                        Verificar Precios
+                    </button>
+                </div>
+                
+                {verificationDone && (
+                    <div style={{ marginTop: 24 }}>
+                        {priceIssues.length === 0 ? (
+                            <div className="alert alert-success" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <CheckCircle2 size={16} /> Todos los productos cumplen con la regla de precio.
+                            </div>
+                        ) : (
+                            <div>
+                                <div className="alert alert-error" style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+                                    <AlertCircle size={16} /> Se encontraron {priceIssues.length} producto(s) por debajo del precio mínimo esperado.
+                                </div>
+                                <div className="table-wrap" style={{ maxHeight: 350, overflowY: 'auto' }}>
+                                    <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
+                                        <thead style={{ position: 'sticky', top: 0, background: 'var(--bg-card)', zIndex: 1 }}>
+                                            <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                                                <th style={{ padding: '12px 8px' }}>Producto</th>
+                                                <th style={{ padding: '12px 8px' }}>Costo</th>
+                                                <th style={{ padding: '12px 8px' }}>Precio Actual</th>
+                                                <th style={{ padding: '12px 8px' }}>Mínimo Esperado</th>
+                                                <th style={{ padding: '12px 8px', width: 60, textAlign: 'center' }}>Acción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {priceIssues.map(issue => (
+                                                <tr key={issue.id} style={{ borderBottom: '1px solid var(--border)', fontSize: '0.9rem' }}>
+                                                    <td style={{ padding: 8, fontWeight: 500 }}>{issue.name}</td>
+                                                    <td style={{ padding: 8 }}>${issue.cost.toFixed(2)}</td>
+                                                    <td style={{ padding: 8, color: 'var(--red)', fontWeight: 700 }}>${issue.sellPrice.toFixed(2)}</td>
+                                                    <td style={{ padding: 8, color: 'var(--green)', fontWeight: 700 }}>${issue.minAllowed.toFixed(2)}</td>
+                                                    <td style={{ padding: 8, textAlign: 'center' }}>
+                                                        <button 
+                                                            className="btn btn-ghost btn-sm" 
+                                                            style={{ padding: 4 }}
+                                                            onClick={() => openEditCostModal(issue.id, issue.name, issue.cost)}
+                                                            title="Editar Costo"
+                                                        >
+                                                            <Pencil size={14} color="var(--text-secondary)" />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+
             {!mfaEnabled && (
                 <div className="card" style={{
                     padding: 24,
@@ -213,6 +375,35 @@ function Dashboard() {
                     </a>
                 </div>
             )}
+
+            {editCostModalOpen && editCostData && (
+                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setEditCostModalOpen(false)}>
+                    <div className="modal" style={{ maxWidth: 400 }}>
+                        <div className="modal-title">
+                            <span>Editar Costo de Producto</span>
+                            <button onClick={() => setEditCostModalOpen(false)} className="btn btn-ghost btn-sm"><X size={16} /></button>
+                        </div>
+                        <div style={{ marginBottom: 16 }}>
+                            <p style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 8 }}>{editCostData.name}</p>
+                            <label className="form-label">Nuevo Precio de Costo (USD)</label>
+                            <input 
+                                type="number" 
+                                className="form-input" 
+                                value={editCostInput} 
+                                onChange={(e) => setEditCostInput(e.target.value)} 
+                                placeholder="Ej. 150.50" 
+                                autoFocus
+                            />
+                        </div>
+                        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+                            <button className="btn btn-ghost" onClick={() => setEditCostModalOpen(false)}>Cancelar</button>
+                            <button className="btn btn-primary" onClick={saveCostPrice} disabled={isSavingCost}>
+                                {isSavingCost ? <Loader2 className="animate-spin" size={15} /> : <Check size={15} />} Guardar Costo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
@@ -236,6 +427,7 @@ function AdminProductos() {
         is_featured: false,
         priceUSD: '', cost_price: '', sku: '', color: '', storage: '', connectivity: '',
         tags: '',
+        long_description: '',
     })
     const [images, setImages] = useState<{ id: string, file?: File, url: string, isExisting: boolean, storagePath?: string }[]>([])
     const [draggedIdx, setDraggedIdx] = useState<number | null>(null)
@@ -261,6 +453,7 @@ function AdminProductos() {
     const [sortField, setSortField] = useState<SortField>('name')
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
     const [isSaving, setIsSaving] = useState(false)
+    const [providerFilter, setProviderFilter] = useState('')
 
     const handleSort = (field: SortField) => {
         if (sortField === field) {
@@ -320,7 +513,7 @@ function AdminProductos() {
 
     const filteredProducts = products.filter(p => {
         const query = searchQuery.toLowerCase()
-        return (
+        const matchesSearch = (
             p.name.toLowerCase().includes(query) ||
             (p.brands?.name?.toLowerCase() || '').includes(query) ||
             (p.categories?.name?.toLowerCase() || '').includes(query) ||
@@ -328,6 +521,8 @@ function AdminProductos() {
             p.tags?.some(t => t.toLowerCase().includes(query)) ||
             (p.product_variants?.[0]?.sku?.toLowerCase() || '').includes(query)
         )
+        const matchesProvider = !providerFilter || p.provider_id === providerFilter
+        return matchesSearch && matchesProvider
     })
 
     const sortedProducts = [...filteredProducts].sort((a, b) => {
@@ -514,7 +709,8 @@ function AdminProductos() {
             color: '',
             storage: '',
             connectivity: '',
-            tags: ''
+            tags: '',
+            long_description: ''
         })
         setImages([])
         setShowMoreDetails(false)
@@ -542,6 +738,7 @@ function AdminProductos() {
             storage: variant?.storage ?? '',
             connectivity: variant?.connectivity ?? '',
             tags: p.tags ? p.tags.join(', ') : '',
+            long_description: p.long_description || ''
         })
         setShowMoreDetails(false)
         const sortedImages = [...(p.product_images || [])].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
@@ -625,6 +822,7 @@ function AdminProductos() {
                         cost_price: form.cost_price ? parseFloat(form.cost_price) : null,
                         price_usd: form.priceUSD ? parseFloat(form.priceUSD) : null,
                         condition: form.condition as 'new', short_description: form.short_description || null,
+                        long_description: form.long_description || null,
                         active: form.active, is_featured: form.is_featured,
                     })
                     .eq('id', editProduct.id)
@@ -663,6 +861,7 @@ function AdminProductos() {
                         cost_price: form.cost_price ? parseFloat(form.cost_price) : null,
                         price_usd: form.priceUSD ? parseFloat(form.priceUSD) : null,
                         condition: form.condition as 'new', short_description: form.short_description || null,
+                        long_description: form.long_description || null,
                         active: form.active, is_featured: form.is_featured,
                         tags: form.tags.split(',').map(t => t.trim().toLowerCase()).filter(t => t !== '')
                     })
@@ -832,6 +1031,17 @@ function AdminProductos() {
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             style={{ border: 'none', background: 'transparent', padding: '8px', color: 'var(--text)', outline: 'none', width: 200 }}
+                        />
+                    </div>
+                    <div style={{ width: 180 }}>
+                        <SearchableSelect
+                            value={providerFilter}
+                            onChange={(v) => setProviderFilter(v)}
+                            options={[
+                                { value: '', label: 'Todos los Proveedores' },
+                                ...providers.map(p => ({ value: p.id, label: p.name }))
+                            ]}
+                            placeholder="Filtrar por Proveedor"
                         />
                     </div>
                     <button id="admin-refresh-products" className="btn btn-ghost btn-sm" onClick={load} aria-label="Recargar">
@@ -1225,10 +1435,17 @@ function AdminProductos() {
                                         </div>
 
                                         <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                                            <label className="form-label" htmlFor="form-desc">{dict.admin.descripcion}</label>
+                                            <label className="form-label" htmlFor="form-long-desc">Características Principales (Lista)</label>
+                                            <textarea id="form-long-desc" className="form-textarea" rows={5} value={form.long_description}
+                                                onChange={(e) => setForm((f) => ({ ...f, long_description: e.target.value }))}
+                                                placeholder="📱 Pantalla: 6.9...&#10;⚡ Procesador: ..." />
+                                        </div>
+
+                                        <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                                            <label className="form-label" htmlFor="form-desc">{dict.admin.descripcion} (Texto completo inferior)</label>
                                             <textarea id="form-desc" className="form-textarea" rows={3} value={form.short_description}
                                                 onChange={(e) => setForm((f) => ({ ...f, short_description: e.target.value }))}
-                                                placeholder="Descripción breve del producto" />
+                                                placeholder="Descripción detallada del producto..." />
                                         </div>
                                     </div>
                                 )}

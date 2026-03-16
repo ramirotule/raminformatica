@@ -1,0 +1,1662 @@
+{
+  "metadatos": {
+    "ultima_actualizacion": "16/03/2026 11:06",
+    "fecha_extraccion_gcgroup": "16/03/2026 11:06",
+    "productos_gcgroup": 165,
+    "proveedor_gcgroup": "GcGroup",
+    "formula_precio_gcgroup": "(costo + 10%) + $20, redondeado a múltiplo de 5",
+    "total_productos": 165
+  },
+  "productos": [
+    {
+      "nombre": "IPHONE 15 128 GB SIM/ESIM",
+      "precio": 725,
+      "precio_costo": 630.0,
+      "categoria": "CELULARES IPHONE NEW",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "IPHONE 15 256 GB SIM/ESIM",
+      "precio": 845,
+      "precio_costo": 740.0,
+      "categoria": "BLACK / BLUE / PINK",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "IPHONE 16 128 GB SIM/ESIM",
+      "precio": 845,
+      "precio_costo": 740.0,
+      "categoria": "BLACK / BLUE / PINK",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "IPHONE 16 256 GB SIM/ESIM",
+      "precio": 960,
+      "precio_costo": 840.0,
+      "categoria": "BLACK / WHITE / TEAL / ULTRAMARINE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "IPHONE 16 PRO 128 GB SIM",
+      "precio": 1125,
+      "precio_costo": 990.0,
+      "categoria": "BLACK / PINK / TEAL / ULTRAMARINE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "IPHONE 16 PRO MAX 256 GB SIM",
+      "precio": 1375,
+      "precio_costo": 1215.0,
+      "categoria": "DESERT / WHITE / NATURAL",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "IPHONE 17 PRO 256 GB ESIM",
+      "precio": 1425,
+      "precio_costo": 1260.0,
+      "categoria": "DESERT",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "IPHONE 17 PRO 256 GB ESIM",
+      "precio": 1435,
+      "precio_costo": 1270.0,
+      "categoria": "ORANGE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "IPHONE 17 PRO MAX 256 GB ESIM",
+      "precio": 1570,
+      "precio_costo": 1390.0,
+      "categoria": "BLUE / SILVER",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "IPHONE 17 PRO MAX 256 GB ESIM",
+      "precio": 1625,
+      "precio_costo": 1440.0,
+      "categoria": "ORANGE / BLUE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG A06 4/64 GB",
+      "precio": 130,
+      "precio_costo": 95.0,
+      "categoria": "CELULARES SAMSUNG",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "TABLET SAMSUNG X230 A11+ 11.0\" 6/128GB WIFI SILVER/GREY",
+      "precio": 305,
+      "precio_costo": 250.0,
+      "categoria": "CELULARES SAMSUNG",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "TABLET SAMSUNG X520 S10 FE 10,9\" 8/128GB GRAY",
+      "precio": 480,
+      "precio_costo": 410.0,
+      "categoria": "CELULARES SAMSUNG",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG A06 4/128 GB",
+      "precio": 170,
+      "precio_costo": 130.0,
+      "categoria": "BLACK",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG A07 4/128 GB",
+      "precio": 165,
+      "precio_costo": 125.0,
+      "categoria": "BLACK",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG A16 4/128 GB",
+      "precio": 170,
+      "precio_costo": 130.0,
+      "categoria": "BLACK",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG A26 5G 8/256 GB",
+      "precio": 295,
+      "precio_costo": 245.0,
+      "categoria": "BLACK",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG A36 5G 8/128 GB",
+      "precio": 320,
+      "precio_costo": 265.0,
+      "categoria": "BLACK",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG S25 FE 8/128 GB",
+      "precio": 610,
+      "precio_costo": 525.0,
+      "categoria": "BLACK",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG S26 ULTRA 12/512 GB",
+      "precio": 1470,
+      "precio_costo": 1300.0,
+      "categoria": "BLACK",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI REDMI A5 4/128 GB",
+      "precio": 155,
+      "precio_costo": 115.0,
+      "categoria": "BLACK",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI NOTE 14 PRO 5G 8/256 GB",
+      "precio": 355,
+      "precio_costo": 295.0,
+      "categoria": "BLACK",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI NOTE 14 PRO 5G 12/512 GB",
+      "precio": 405,
+      "precio_costo": 340.0,
+      "categoria": "BLACK",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI NOTE 15 PRO 8/256 GB",
+      "precio": 325,
+      "precio_costo": 270.0,
+      "categoria": "BLACK",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI POCO X7 PRO 5G 8/256 GB",
+      "precio": 410,
+      "precio_costo": 345.0,
+      "categoria": "BLACK",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG A17 8/256 GB",
+      "precio": 255,
+      "precio_costo": 205.0,
+      "categoria": "BLACK / GRAY",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI REDMI 15 8/256 GB",
+      "precio": 235,
+      "precio_costo": 190.0,
+      "categoria": "BLACK / GRAY",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI REDMI 15C 4/128 GB",
+      "precio": 165,
+      "precio_costo": 125.0,
+      "categoria": "BLACK / GRAY",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG A36 5G 8/256 GB",
+      "precio": 340,
+      "precio_costo": 285.0,
+      "categoria": "BLACK / LAVANDER / LIME / WHITE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG A36 5G 12/256 GB",
+      "precio": 385,
+      "precio_costo": 325.0,
+      "categoria": "BLACK / WHITE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG A56 5G 8/128 GB",
+      "precio": 380,
+      "precio_costo": 320.0,
+      "categoria": "LAVANDER / LIME / WHITE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG A56 5G 8/256 GB",
+      "precio": 440,
+      "precio_costo": 375.0,
+      "categoria": "OLIVE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG A56 5G 12/256 GB",
+      "precio": 455,
+      "precio_costo": 385.0,
+      "categoria": "GRAPHITE / OLIVE / LIGHTGRAY",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG S24 FE 8/128 GB",
+      "precio": 495,
+      "precio_costo": 425.0,
+      "categoria": "GRAY / PINK",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG S25 FE 8/256 GB",
+      "precio": 680,
+      "precio_costo": 590.0,
+      "categoria": "BLACK / ICEBLUE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG S25 FE 8/512 GB",
+      "precio": 715,
+      "precio_costo": 620.0,
+      "categoria": "BLACK / ICEBLUE / WHITE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG S25 ULTRA 12/256 GB",
+      "precio": 1065,
+      "precio_costo": 935.0,
+      "categoria": "BLACK / ICEBLUE / NAVY / WHITE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG S25 ULTRA 12/512 GB",
+      "precio": 1130,
+      "precio_costo": 995.0,
+      "categoria": "BLACK / GRAY / WHITESILVER / SILVERBLUE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG S26 12/256 GB",
+      "precio": 940,
+      "precio_costo": 825.0,
+      "categoria": "BLACK / GRAY / WHITESILVER / SILVERBLUE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG S25 ULTRA 12/1 TB",
+      "precio": 1225,
+      "precio_costo": 1080.0,
+      "categoria": "WHITE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG S26 12/512 GB",
+      "precio": 1110,
+      "precio_costo": 975.0,
+      "categoria": "BLACK / VIOLET / BLUE / WHITE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG S26 PLUS 12/256 GB",
+      "precio": 1190,
+      "precio_costo": 1050.0,
+      "categoria": "BLACK / WHITE / VIOLET / BLUE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG S26 PLUS 12/512 GB",
+      "precio": 1370,
+      "precio_costo": 1210.0,
+      "categoria": "BLUE / VIOLET / WHITE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SAMSUNG S26 ULTRA 12/256 GB",
+      "precio": 1305,
+      "precio_costo": 1150.0,
+      "categoria": "BLACK / BLUE / VIOLET / WHITE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "MOTOROLA E15 2/64 GB",
+      "precio": 125,
+      "precio_costo": 90.0,
+      "categoria": "CELULARES MOTOROLA",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "MOTOROLA G06 4/64 GB",
+      "precio": 140,
+      "precio_costo": 105.0,
+      "categoria": "GREEN",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "MOTOROLA G56 5G 8/256 GB",
+      "precio": 245,
+      "precio_costo": 200.0,
+      "categoria": "GREEN",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI NOTE 14 PRO+ 5G 8/256 GB",
+      "precio": 410,
+      "precio_costo": 345.0,
+      "categoria": "GREEN",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI POCO M8 PRO 5G 12/512 GB",
+      "precio": 480,
+      "precio_costo": 410.0,
+      "categoria": "GREEN",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "MOTOROLA G06 4/128 GB",
+      "precio": 165,
+      "precio_costo": 125.0,
+      "categoria": "BLUE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI NOTE 15 5G 8/512 GB",
+      "precio": 370,
+      "precio_costo": 310.0,
+      "categoria": "BLUE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI POCO C85 6/128 GB",
+      "precio": 165,
+      "precio_costo": 125.0,
+      "categoria": "BLUE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "MOTOROLA G06 4/256 GB",
+      "precio": 175,
+      "precio_costo": 135.0,
+      "categoria": "BLUE / GREEN / NARANJA",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "MOTOROLA G06 POWER 4/256 GB",
+      "precio": 190,
+      "precio_costo": 150.0,
+      "categoria": "KHAKI",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "MOTOROLA G15 4/256 GB",
+      "precio": 185,
+      "precio_costo": 145.0,
+      "categoria": "BLUE / GREEN / GREY",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "MOTOROLA G15 4/512 GB",
+      "precio": 205,
+      "precio_costo": 160.0,
+      "categoria": "GREY / ORANGE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "MOTOROLA G35 5G 4/128 GB",
+      "precio": 195,
+      "precio_costo": 155.0,
+      "categoria": "GRAY",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "MOTOROLA G35 5G 8/256 GB",
+      "precio": 210,
+      "precio_costo": 165.0,
+      "categoria": "BLACK / GREEN",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI REDMI A7 PRO 4/64 GB",
+      "precio": 165,
+      "precio_costo": 125.0,
+      "categoria": "BLACK / GREEN",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI NOTE 14 5G 12/512 GB",
+      "precio": 295,
+      "precio_costo": 245.0,
+      "categoria": "BLACK / GREEN",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI 15T PRO 5G 12/512 GB",
+      "precio": 985,
+      "precio_costo": 865.0,
+      "categoria": "BLACK / GREEN",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "MOTOROLA G55 5G 8/256 GB",
+      "precio": 235,
+      "precio_costo": 190.0,
+      "categoria": "PURPLE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI NOTE 14 6/128 GB",
+      "precio": 205,
+      "precio_costo": 160.0,
+      "categoria": "PURPLE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI NOTE 14S 8/256 GB",
+      "precio": 270,
+      "precio_costo": 220.0,
+      "categoria": "PURPLE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "MOTOROLA G75 5G 8/256 GB",
+      "precio": 275,
+      "precio_costo": 225.0,
+      "categoria": "BLACK / GREY",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "INFINIX HOT 60i 8/256 GB",
+      "precio": 220,
+      "precio_costo": 175.0,
+      "categoria": "BLACK / GREY",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "MOTOROLA G86 5G 8/256 GB",
+      "precio": 295,
+      "precio_costo": 245.0,
+      "categoria": "DARK BLUE / GREEN / LILAC BLUE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "MOTOROLA G86 POWER 5G 8/256 GB",
+      "precio": 310,
+      "precio_costo": 255.0,
+      "categoria": "AZUL",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "MOTOROLA G86 POWER 5G 8/512 GB",
+      "precio": 325,
+      "precio_costo": 270.0,
+      "categoria": "LILAC",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "MOTOROLA EDGE 50 PRO 5G 12/512 GB",
+      "precio": 480,
+      "precio_costo": 410.0,
+      "categoria": "FORESTBLUE / GREEN / MARSHBLUE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "MOTOROLA EDGE 50 ULTRA 5G 16/512 GB",
+      "precio": 715,
+      "precio_costo": 620.0,
+      "categoria": "NEGRO",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI 14 5G 12/512 GB",
+      "precio": 555,
+      "precio_costo": 475.0,
+      "categoria": "NEGRO",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI 15 5G 12/512 GB",
+      "precio": 895,
+      "precio_costo": 785.0,
+      "categoria": "NEGRO",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "MOTOROLA EDGE 60 PRO 5G 12/512 GB",
+      "precio": 565,
+      "precio_costo": 485.0,
+      "categoria": "BLUE / PANT AMAZONITE / ZEPHYR",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "MOTOROLA EDGE 70 5G 12/512 GB",
+      "precio": 545,
+      "precio_costo": 470.0,
+      "categoria": "COBALTO / GRIS / PURPLE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "INFINIX SMART 10 3/64 GB",
+      "precio": 135,
+      "precio_costo": 100.0,
+      "categoria": "CELULARES INFINIX",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "INFINIX HOT 50i 4/256 GB",
+      "precio": 175,
+      "precio_costo": 135.0,
+      "categoria": "BLACK / GOLD / SILVER",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "INFINIX HOT 60 PRO 8/256 GB",
+      "precio": 220,
+      "precio_costo": 175.0,
+      "categoria": "BLACK / GREEN / SILVER",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI POCO M8 5G 8/256 GB",
+      "precio": 285,
+      "precio_costo": 235.0,
+      "categoria": "BLACK / GREEN / SILVER",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "INFINIX HOT 60 PRO+ 8/256 GB",
+      "precio": 280,
+      "precio_costo": 230.0,
+      "categoria": "CORAL / ORANGE / SILVER",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "INFINIX NOTE 50X 5G 8/256 GB",
+      "precio": 240,
+      "precio_costo": 195.0,
+      "categoria": "BLACK / VIOLET",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "INFINIX NOTE 50 PRO 8/256 GB",
+      "precio": 320,
+      "precio_costo": 265.0,
+      "categoria": "PINK",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "INFINIX GT 30 PRO 5G 12/256 GB",
+      "precio": 425,
+      "precio_costo": 360.0,
+      "categoria": "RACING EDITION",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI REDMI A5 3/64 GB",
+      "precio": 130,
+      "precio_costo": 95.0,
+      "categoria": "CELULARES XIAOMI",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI REDMI A7 PRO 4/128 GB",
+      "precio": 175,
+      "precio_costo": 135.0,
+      "categoria": "BLACK / BLUE / GREEN",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI REDMI 15 6/128 GB",
+      "precio": 190,
+      "precio_costo": 150.0,
+      "categoria": "BLACK / BLUE / GREEN",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI REDMI 15C 4/256 GB",
+      "precio": 180,
+      "precio_costo": 140.0,
+      "categoria": "BLACK / BLUE / GREEN",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI REDMI 15C 8/256 GB",
+      "precio": 205,
+      "precio_costo": 160.0,
+      "categoria": "BLACK / BLUE / GREEN",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI NOTE 13 PRO 5G 12/512 GB",
+      "precio": 345,
+      "precio_costo": 290.0,
+      "categoria": "BLACK / BLUE / GREEN",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI NOTE 14 5G 6/128 GB",
+      "precio": 240,
+      "precio_costo": 195.0,
+      "categoria": "BLACK / BLUE / GREEN",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI NOTE 15 8/256 GB",
+      "precio": 265,
+      "precio_costo": 215.0,
+      "categoria": "BLACK / BLUE / GREEN",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI NOTE 14 8/256 GB",
+      "precio": 235,
+      "precio_costo": 190.0,
+      "categoria": "BLUE / GOLD / GREEN",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI NOTE 14 PRO 8/256 GB",
+      "precio": 315,
+      "precio_costo": 260.0,
+      "categoria": "BLUE / PURPLE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI NOTE 14 PRO+ 5G 12/512 GB",
+      "precio": 470,
+      "precio_costo": 400.0,
+      "categoria": "BLACK / BLUE / PURPLE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI NOTE 15 6/128 GB",
+      "precio": 235,
+      "precio_costo": 190.0,
+      "categoria": "BLUE / GOLD / PURPLE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI NOTE 15 5G 8/256 GB",
+      "precio": 315,
+      "precio_costo": 260.0,
+      "categoria": "BLACK / BLUE / GREEN / PURPLE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI NOTE 15 PRO 5G 8/256 GB",
+      "precio": 390,
+      "precio_costo": 330.0,
+      "categoria": "BLACK / BLUE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI POCO C71 3/64 GB",
+      "precio": 135,
+      "precio_costo": 100.0,
+      "categoria": "BLACK / BLUE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI POCO C71 4/128 GB",
+      "precio": 155,
+      "precio_costo": 115.0,
+      "categoria": "BLACK / BLUE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI NOTE 15 PRO 5G 8/512 GB",
+      "precio": 405,
+      "precio_costo": 340.0,
+      "categoria": "BLACK / BLUE / PURPLE / TITANIUM",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI NOTE 15 PRO+ 5G 8/256 GB",
+      "precio": 460,
+      "precio_costo": 390.0,
+      "categoria": "BLACK / BLUE / PURPLE / TITANIUM",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI NOTE 15 PRO+ 5G 12/512 GB",
+      "precio": 520,
+      "precio_costo": 445.0,
+      "categoria": "BLACK / BLUE / MOCHA BROWN",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI POCO C85 8/256 GB",
+      "precio": 205,
+      "precio_costo": 160.0,
+      "categoria": "BLACK / GREEN / PURPLE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI POCO M7 6/128 GB",
+      "precio": 180,
+      "precio_costo": 140.0,
+      "categoria": "BLACK / GREEN / PURPLE",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI POCO M7 8/256 GB",
+      "precio": 215,
+      "precio_costo": 170.0,
+      "categoria": "BLACK / BLUE / SILVER",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI POCO M7 PRO 5G 12/512 GB",
+      "precio": 355,
+      "precio_costo": 295.0,
+      "categoria": "BLACK / SILVER",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI POCO M8 PRO 5G 8/256 GB",
+      "precio": 395,
+      "precio_costo": 335.0,
+      "categoria": "GREEN / SILVER",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI POCO X7 PRO 5G 12/512 GB",
+      "precio": 505,
+      "precio_costo": 430.0,
+      "categoria": "BLACK / GREEN / YELOW",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI POCO F7 5G 12/512 GB",
+      "precio": 585,
+      "precio_costo": 505.0,
+      "categoria": "GREEN / YELOW",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI POCO F7 PRO 5G 12/512 GB",
+      "precio": 680,
+      "precio_costo": 590.0,
+      "categoria": "BLACK / PLATA",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "XIAOMI POCO F8 PRO 5G 12/512 GB",
+      "precio": 815,
+      "precio_costo": 710.0,
+      "categoria": "BLUE / NEGRO",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "AURICULAR JBL TUNE T520BT BLACK/WHITE",
+      "precio": 70,
+      "precio_costo": 40.0,
+      "categoria": "JBL PARLANTES/AURICULARES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "AURICULAR JBL TUNE T720BT BLACK/WHITE",
+      "precio": 85,
+      "precio_costo": 55.0,
+      "categoria": "JBL PARLANTES/AURICULARES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "JBL GO 4 BLUETOOTH 4.2 WATTS BLACK/WHITE/BLUE/RED/CAMUFLADO",
+      "precio": 70,
+      "precio_costo": 40.0,
+      "categoria": "JBL PARLANTES/AURICULARES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "JBL CLIP 5 BLUETOOTH 7 WATTS BLACK/BLUE/RED",
+      "precio": 80,
+      "precio_costo": 50.0,
+      "categoria": "JBL PARLANTES/AURICULARES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "JBL FLIP 7 35 WATTS RED/WHITE/PINK/CAMUFLADO",
+      "precio": 140,
+      "precio_costo": 105.0,
+      "categoria": "JBL PARLANTES/AURICULARES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "JBL CHARGE 6 45 WATTS BLACK/BLUE/RED/PINK/WHITE",
+      "precio": 185,
+      "precio_costo": 145.0,
+      "categoria": "JBL PARLANTES/AURICULARES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "JBL XTREME 4 100 WATTS 24 HORAS NEGRO",
+      "precio": 320,
+      "precio_costo": 265.0,
+      "categoria": "JBL PARLANTES/AURICULARES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "JBL BOOMBOX 4 210 WATTS 2V CAMUFLADO/BLACK",
+      "precio": 570,
+      "precio_costo": 490.0,
+      "categoria": "JBL PARLANTES/AURICULARES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "JBL BARRA DE SONIDO CINE SB580 3,1 SOUNDBAR USB BLUETOOTH 440WATTS",
+      "precio": 345,
+      "precio_costo": 290.0,
+      "categoria": "JBL PARLANTES/AURICULARES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "JOYSTICK PS5 BLACK",
+      "precio": 110,
+      "precio_costo": 75.0,
+      "categoria": "VIDEO JUEGOS",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "JOYSTICK PS5 WHITE",
+      "precio": 110,
+      "precio_costo": 75.0,
+      "categoria": "VIDEO JUEGOS",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "JOYSTICK PS5 CAMUFLADO",
+      "precio": 110,
+      "precio_costo": 75.0,
+      "categoria": "VIDEO JUEGOS",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "JOYSTICK PS5 RED",
+      "precio": 110,
+      "precio_costo": 75.0,
+      "categoria": "VIDEO JUEGOS",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "JOYSTICK PS5 STARLIGHT BLUE",
+      "precio": 110,
+      "precio_costo": 75.0,
+      "categoria": "VIDEO JUEGOS",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "JOYSTICK PS5 COBALT BLUE",
+      "precio": 110,
+      "precio_costo": 75.0,
+      "categoria": "VIDEO JUEGOS",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "JOYSTICK PS5 STERLING SILVER",
+      "precio": 110,
+      "precio_costo": 75.0,
+      "categoria": "VIDEO JUEGOS",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "JOYSTICK PS5 CHROMA PEARL",
+      "precio": 110,
+      "precio_costo": 75.0,
+      "categoria": "VIDEO JUEGOS",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "VOLANTE  LOGITECH G29 PS5 / PS4 / PC",
+      "precio": 360,
+      "precio_costo": 300.0,
+      "categoria": "VIDEO JUEGOS",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "SONY PS5 DIGITAL 1TB",
+      "precio": 575,
+      "precio_costo": 495.0,
+      "categoria": "VIDEO JUEGOS",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "APPLE PENCIL USBC",
+      "precio": 145,
+      "precio_costo": 110.0,
+      "categoria": "AIRPODS/PENCIL",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "APPLE PENCIL PRO",
+      "precio": 180,
+      "precio_costo": 140.0,
+      "categoria": "AIRPODS/PENCIL",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "AIRPODS 4",
+      "precio": 175,
+      "precio_costo": 135.0,
+      "categoria": "AIRPODS/PENCIL",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "AIRPODS 4 NOISE CANCELLING",
+      "precio": 215,
+      "precio_costo": 170.0,
+      "categoria": "AIRPODS/PENCIL",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "AIRPODS PRO 3RA USBC",
+      "precio": 310,
+      "precio_costo": 255.0,
+      "categoria": "AIRPODS/PENCIL",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "WATCH SE 3 GPS 40MM",
+      "precio": 355,
+      "precio_costo": 295.0,
+      "categoria": "APPLE WATCH",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "WATCH 11 42MM GPS",
+      "precio": 460,
+      "precio_costo": 390.0,
+      "categoria": "APPLE WATCH",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "WATCH 11 46MM GPS",
+      "precio": 490,
+      "precio_costo": 420.0,
+      "categoria": "APPLE WATCH",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "WATCH ULTRA 3 GPS CELL 49MM",
+      "precio": 925,
+      "precio_costo": 810.0,
+      "categoria": "APPLE WATCH",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "IPAD A16 11” 128 GB",
+      "precio": 490,
+      "precio_costo": 420.0,
+      "categoria": "IPAD",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "IPAD A16 11” 256 GB",
+      "precio": 625,
+      "precio_costo": 540.0,
+      "categoria": "IPAD",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "IPAD AIR 7 11” M3 128 GB",
+      "precio": 725,
+      "precio_costo": 630.0,
+      "categoria": "IPAD",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "IPAD AIR 7 11” M3 256 GB",
+      "precio": 835,
+      "precio_costo": 730.0,
+      "categoria": "IPAD",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "IPAD PRO 11” M5 256 GB",
+      "precio": 1145,
+      "precio_costo": 1010.0,
+      "categoria": "IPAD",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "85” Smart TV Samsung QLED 4K Q7 Tizen OS",
+      "precio": 2070,
+      "precio_costo": 1840.0,
+      "categoria": "TELEVISORES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "75” Smart TV UHD 4K Samsung U8000F",
+      "precio": 1235,
+      "precio_costo": 1090.0,
+      "categoria": "TELEVISORES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "75” Smart TV LG UHD AI UHD 4K Procesador Alpha 7 8va Gen con Inteligencia Artificial 75UA8550PSA",
+      "precio": 1175,
+      "precio_costo": 1035.0,
+      "categoria": "TELEVISORES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "65” Smart TV Samsung QLED 4K Q7 Tizen OS IA",
+      "precio": 1055,
+      "precio_costo": 925.0,
+      "categoria": "TELEVISORES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "65” Smart TV Samsung LED 4K Crystal UHD DU7000",
+      "precio": 805,
+      "precio_costo": 700.0,
+      "categoria": "TELEVISORES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "65” Smart TV LG UHD AI UHD 4K Procesador Alpha 7 8va Gen con Inteligencia Artificial 65UA8050PSA",
+      "precio": 790,
+      "precio_costo": 690.0,
+      "categoria": "TELEVISORES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "65” Smart TV Philips LED 4K UHD 65PUD8100/77 Ambilight",
+      "precio": 725,
+      "precio_costo": 630.0,
+      "categoria": "TELEVISORES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "60” Smart TV 4K UHD Admiral AD60G3FN",
+      "precio": 520,
+      "precio_costo": 445.0,
+      "categoria": "TELEVISORES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "55” Smart TV Samsung QLED 4K Q7 Tizen OS",
+      "precio": 645,
+      "precio_costo": 560.0,
+      "categoria": "TELEVISORES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "55” Smart TV Samsung 4K QLED Q65D",
+      "precio": 620,
+      "precio_costo": 535.0,
+      "categoria": "TELEVISORES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "55” Smart TV Samsung LED 4K U8000 Crystal UHD",
+      "precio": 510,
+      "precio_costo": 435.0,
+      "categoria": "TELEVISORES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "55” TV LED Philips UHD 55PUD7309/77",
+      "precio": 470,
+      "precio_costo": 400.0,
+      "categoria": "TELEVISORES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "55” Smart TV TCL 4K UHD LED 55V6C Google TV",
+      "precio": 465,
+      "precio_costo": 395.0,
+      "categoria": "TELEVISORES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "50” Smart TV UHD 4K Samsung UN50DU7000GCZB",
+      "precio": 460,
+      "precio_costo": 390.0,
+      "categoria": "TELEVISORES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "50” Smart TV Admiral QLED 4K UHD new model",
+      "precio": 380,
+      "precio_costo": 320.0,
+      "categoria": "TELEVISORES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "43” Smart TV Full HD Samsung UN43T5300A",
+      "precio": 370,
+      "precio_costo": 310.0,
+      "categoria": "TELEVISORES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "43” Smart TV LED Philips 43PFD6910/77",
+      "precio": 305,
+      "precio_costo": 250.0,
+      "categoria": "TELEVISORES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "32” Smart TV Samsung HD UN32T4300A",
+      "precio": 240,
+      "precio_costo": 195.0,
+      "categoria": "TELEVISORES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "32” Smart TV TCL QLED FHD 32S5K Google TV",
+      "precio": 245,
+      "precio_costo": 200.0,
+      "categoria": "TELEVISORES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "32” Smart AOC / Admiral",
+      "precio": 205,
+      "precio_costo": 160.0,
+      "categoria": "TELEVISORES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    },
+    {
+      "nombre": "32” Philco HD",
+      "precio": 190,
+      "precio_costo": 150.0,
+      "categoria": "TELEVISORES",
+      "proveedor": "GcGroup",
+      "ganancia_porcentaje": 10,
+      "extra_usd": 25,
+      "fecha_actualizacion": "16/03/2026 11:06"
+    }
+  ]
+}

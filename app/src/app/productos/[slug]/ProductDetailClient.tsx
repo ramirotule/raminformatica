@@ -133,11 +133,37 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     )}
                     <p className="price-notice">* Precio sujeto a cambios sin previo aviso</p>
                 </div>
+                
+                {product.long_description && (
+                    <div style={{ 
+                        marginBottom: 32, 
+                        background: 'rgba(255, 255, 255, 0.02)', 
+                        padding: '16px 20px', 
+                        borderRadius: 'var(--radius-md)',
+                        border: '1px solid var(--border-light)'
+                    }}>
+                        <h4 style={{ 
+                            fontSize: '0.9rem', 
+                            fontWeight: 800, 
+                            marginBottom: 12, 
+                            color: 'var(--text-primary)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 8
+                        }}>
+                            📦 Características principales
+                        </h4>
+                        <div style={{ 
+                            fontSize: '0.9rem', 
+                            lineHeight: '1.6', 
+                            color: 'var(--text-secondary)',
+                            whiteSpace: 'pre-wrap'
+                        }}>
+                            {product.long_description}
+                        </div>
+                    </div>
+                )}
 
-                <div className="detail-description">
-                    <h3 style={{ fontSize: '1rem', marginBottom: 8, color: 'var(--text-primary)' }}>Descripción</h3>
-                    <p>{product.short_description || 'Sin descripción disponible.'}</p>
-                </div>
 
                 {/* Acciones */}
                 <div className="detail-actions">
@@ -189,6 +215,34 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                             <p className="feature-desc">Producto 100% original</p>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            {/* ─── Descripción (Ancho completo debajo) ────────────────────── */}
+            <div style={{ 
+                gridColumn: '1 / -1', 
+                marginTop: 48, 
+                paddingTop: 48, 
+                borderTop: '1px solid var(--border)',
+                animation: 'fadeIn 0.6s ease-out forwards'
+            }}>
+                <h3 style={{ 
+                    fontSize: '1.5rem', 
+                    fontWeight: 800, 
+                    marginBottom: 24, 
+                    color: 'var(--text-primary)',
+                    letterSpacing: '-0.02em'
+                }}>
+                    Descripción del producto
+                </h3>
+                <div style={{
+                    color: 'var(--text-secondary)',
+                    lineHeight: '1.8',
+                    fontSize: '1.05rem',
+                    whiteSpace: 'pre-wrap', // Esto respeta los saltos de línea
+                    maxWidth: '900px' // Opcional: para que no sea excesivamente ancho en pantallas gigantes
+                }}>
+                    {product.short_description || 'Sin descripción disponible.'}
                 </div>
             </div>
 
