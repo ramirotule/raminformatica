@@ -73,6 +73,9 @@ def procesar_lista_kadabra():
     print(f"✅ Archivo procesado exitosamente: {excel_output_path}")
     print(f"📊 Productos procesados: {len(df)} productos")
     
+    # Generar JSON
+    generar_json_kadabra(productos)
+    
     # Mostrar muestra de los primeros productos
     if len(df) > 0:
         print("\n📋 Muestra de productos procesados:")
@@ -81,6 +84,37 @@ def procesar_lista_kadabra():
             print(f"   {row['Descripción'][:60]}...")
             print(f"   Precio: U$S {row['Precio Venta']}")
             print()
+
+import json
+def generar_json_kadabra(productos, archivo_salida="../app/public/productos_kadabra.json"):
+    """Generar JSON para Kadabra"""
+    try:
+        final_data = {
+            "metadatos": {
+                "ultima_actualizacion": datetime.now().strftime("%d/%m/%Y %H:%M"),
+                "proveedor": "Kadabra",
+                "total_productos": len(productos)
+            },
+            "productos": []
+        }
+        
+        for p in productos:
+            final_data["productos"].append({
+                "nombre": p['Descripción'],
+                "precio": p['Precio Venta'], # Kadabra ya viene en USD
+                "categoria": "OTROS", # Kadabra no parece tener categorías claras en el TXT actual
+                "proveedor": "Kadabra"
+            })
+            
+        os.makedirs(os.path.dirname(archivo_salida), exist_ok=True)
+        with open(archivo_salida, 'w', encoding='utf-8') as f:
+            json.dump(final_data, f, indent=2, ensure_ascii=False)
+            
+        print(f"✅ JSON generado: {archivo_salida} ({len(productos)} productos)")
+        return True
+    except Exception as e:
+        print(f"❌ Error generando JSON: {e}")
+        return False
 
 if __name__ == "__main__":
     try:

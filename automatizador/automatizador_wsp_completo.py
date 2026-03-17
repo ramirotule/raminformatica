@@ -20,24 +20,24 @@ class AutomatizadorWSP:
         # Permitir al usuario indicar un día específico; si se deja vacío, usar hoy
         self.fecha_hoy = self.solicitar_fecha_objetivo()
         self.proveedores = {
-            "Rodrigo Provee": {
-                "archivo_salida": "output/lista_rodrigo.txt",
-                "filtro_inicio": ["lista", "precios", "iphone", "samsung"],  # Palabras que indican inicio de lista
-                "nombre_corto": "rodrigo",
-                "busqueda_alternativa": ["rodrigo", "provee"]  # Términos alternativos para buscar
-            },
-            "Kadabra Provee": {  # Simplificado
-                "archivo_salida": "output/lista_kadabra.txt", 
-                "filtro_inicio": ["lista", "precios", "iphone", "samsung"],
-                "nombre_corto": "kadabra",
-                "busqueda_alternativa": ["kadabra", "provee"]
-            },
             "GcGroup": {
                 "archivo_salida": "output/lista_gcgroup.txt",
                 "filtro_inicio": ["lista de hoy"],  # Específico para GcGroup
                 "nombre_corto": "gcgroup",
                 "busqueda_alternativa": ["gc", "group", "gcgroup"]
-            }
+            },
+            "Kadabra Tecnología": {  # Simplificado
+                "archivo_salida": "output/lista_kadabra.txt", 
+                "filtro_inicio": ["lista", "precios", "iphone", "samsung"],
+                "nombre_corto": "kadabra",
+                "busqueda_alternativa": ["kadabra", "kadabra tecnologia", "kadabra tecnología"]
+            },
+            "Zentek BA": {
+                "archivo_salida": "output/lista_zentek.txt",
+                "filtro_inicio": ["lista de hoy"],  # Específico para Zentek BA
+                "nombre_corto": "zentek",
+                "busqueda_alternativa": ["zentek", "zentekba", "zentek ba"]
+            },
         }
         
     def obtener_fecha_hoy(self):
@@ -1185,16 +1185,10 @@ class AutomatizadorWSP:
             for nombre_busqueda in nombres_a_probar:
                 print(f"   🔎 Probando con: '{nombre_busqueda}'")
                 
-                # Hacer clic nuevamente y limpiar completamente
-                self.driver.execute_script("arguments[0].click();", search_box)
-                time.sleep(0.5)
-                
-                # Limpiar usando Ctrl+A y Delete
-                search_box.send_keys('\ue009' + 'a')  # Ctrl+A (seleccionar todo)
-                time.sleep(0.3)
-                search_box.send_keys('\ue017')  # Delete
-                time.sleep(0.5)
-                
+                # Limpiar COMPLETAMENTE antes de cada intento
+                self.forzar_limpieza_busqueda(search_box)
+                time.sleep(1)
+
                 # Escribir el nombre del proveedor
                 search_box.send_keys(nombre_busqueda)
                 time.sleep(3)
@@ -1495,14 +1489,8 @@ class AutomatizadorWSP:
             search_box = WebDriverWait(self.driver, 5).until(
                 EC.presence_of_element_located((By.XPATH, '//div[@contenteditable="true"][@data-tab="3"]'))
             )
-            
-            # Hacer clic y limpiar
-            self.driver.execute_script("arguments[0].click();", search_box)
-            time.sleep(0.5)
-            search_box.send_keys('\ue009' + 'a')  # Ctrl+A
-            time.sleep(0.3)
-            search_box.send_keys('\ue017')  # Delete
-            time.sleep(0.5)
+            self.forzar_limpieza_busqueda(search_box)
+            time.sleep(1)
             
             # Limpiar variables del mensaje objetivo para el siguiente proveedor
             self.mensaje_objetivo_encontrado = False
@@ -1510,6 +1498,48 @@ class AutomatizadorWSP:
             
         except Exception as e:
             print(f"⚠️ Error limpiando búsqueda: {e}")
+
+    def forzar_limpieza_busqueda(self, search_box):
+        """Método ultra-robusto para limpiar el buscador de WhatsApp"""
+        try:
+            # 1. Intentar hacer clic en el botón "X" (Cerrar búsqueda) si aparece
+            try:
+                x_button = self.driver.find_elements(By.XPATH, '//button[@aria-label="Cerrar búsqueda"] | //span[@data-icon="x-alt"]/..')
+                if x_button:
+                    self.driver.execute_script("arguments[0].click();", x_button[0])
+                    time.sleep(0.5)
+                    # Si el botón X funcionó, el search_box podría haber cambiado o estar vacío
+            except:
+                pass
+
+            # 2. Limpieza vía JavaScript con disparador de eventos (crucial para React/frameworks)
+            self.driver.execute_script("""
+                var el = arguments[0];
+                el.focus();
+                el.innerText = '';
+                el.innerHTML = '';
+                el.dispatchEvent(new Event('input', { bubbles: true }));
+                el.dispatchEvent(new Event('change', { bubbles: true }));
+            """, search_box)
+            time.sleep(0.3)
+
+            # 3. Limpieza vía teclado (respaldo físico)
+            self.driver.execute_script("arguments[0].click();", search_box)
+            search_box.send_keys('\ue009' + 'a')  # Ctrl+A
+            time.sleep(0.2)
+            search_box.send_keys('\ue003')  # Backspace
+            time.sleep(0.2)
+            search_box.send_keys('\ue017')  # Delete
+            
+            # 4. Escape para cerrar menús desplegables de búsqueda
+            search_box.send_keys('\ue00c') # Escape
+            
+            # 5. Verificación final vía JS
+            self.driver.execute_script("arguments[0].innerText = '';", search_box)
+            self.driver.execute_script("arguments[0].dispatchEvent(new Event('input', { bubbles: true }));", search_box)
+            
+        except Exception as e:
+            print(f"⚠️ Error en forzar_limpieza: {e}")
 
     def verificar_mensaje_completo(self, mensaje, numero_mensaje):
         """Verificar si un mensaje está completo o fue cortado"""
@@ -1628,8 +1658,8 @@ class AutomatizadorWSP:
         return exito
     
     def procesar_todos_proveedores(self):
-        """Procesar solo el proveedor GcGroup automáticamente"""
-        print("🚀 INICIANDO AUTOMATIZACIÓN DE WHATSAPP SOLO PARA GcGroup")
+        """Procesar todos los proveedores automáticamente"""
+        print("🚀 INICIANDO AUTOMATIZACIÓN DE WHATSAPP PARA TODOS LOS PROVEEDORES")
         print("="*70)
         
         # Estadísticas de eficiencia
@@ -1642,18 +1672,18 @@ class AutomatizadorWSP:
         
         resultados = {}
         try:
-            nombre_proveedor = "GcGroup"
-            config = self.proveedores[nombre_proveedor]
-            
-            # Intentar procesar proveedor
-            exito = self.procesar_proveedor(nombre_proveedor, config)
-            
-            if exito:
-                chats_procesados += 1
-            else:
-                chats_saltados += 1
+            for nombre_proveedor, config in self.proveedores.items():
+                print(f"\n🔍 Procesando: {nombre_proveedor}")
                 
-            resultados[nombre_proveedor] = exito
+                # Intentar procesar proveedor
+                exito = self.procesar_proveedor(nombre_proveedor, config)
+                
+                if exito:
+                    chats_procesados += 1
+                else:
+                    chats_saltados += 1
+                    
+                resultados[nombre_proveedor] = exito
             
             # Mostrar estadísticas de eficiencia
             print(f"\n{'='*70}")
@@ -1661,17 +1691,17 @@ class AutomatizadorWSP:
             print(f"{'='*70}")
             print(f"✅ Chats procesados (con mensajes de hoy): {chats_procesados}")
             print(f"⏭️  Chats saltados (sin mensajes de hoy): {chats_saltados}")
-            print(f"⚡ Eficiencia: Se evitó procesar {chats_saltados} chat(s) innecesario(s)")
             
             # Mostrar resumen final
             self.mostrar_resumen(resultados)
-            # Si fue exitoso, ejecutar procesamiento automático
-            if exito:
+            
+            # Si hubo algún éxito, ejecutar procesamiento automático de los scripts
+            if chats_procesados > 0:
                 print("\n⏳ Ejecutando procesamiento automático en 3 segundos...")
                 time.sleep(3)
-                self.ejecutar_procesamiento_automatico()
+                self.ejecutar_procesamiento_automatico(resultados)
             else:
-                print("\n⚠️ No se ejecutará el procesamiento automático porque no hubo extracción exitosa")
+                print("\n⚠️ No se ejecutará el procesamiento automático porque no hubo extracción exitosa de ningún proveedor")
             return True
         except Exception as e:
             print(f"❌ Error general: {e}")
@@ -1680,77 +1710,86 @@ class AutomatizadorWSP:
             if self.driver:
                 self.driver.quit()
                 print("🔒 Navegador cerrado")
+
     
-    def ejecutar_procesamiento_automatico(self):
-        """Ejecutar scripts de procesamiento automáticamente"""
+    def ejecutar_procesamiento_automatico(self, resultados):
+        """Ejecutar scripts de procesamiento automáticamente para cada proveedor exitoso"""
         print(f"\n{'='*70}")
         print("🔄 INICIANDO PROCESAMIENTO AUTOMÁTICO")
         print(f"{'='*70}")
         
-        scripts_a_ejecutar = [
-            {
-                "nombre": "procesar_gcgroup_refactor.py",
-                "descripcion": "Procesamiento específico de GCGroup - Genera productos_ram.json directamente"
+        # Mapeo de proveedores a sus scripts
+        mapeo_scripts = {
+            "GcGroup": {
+                "nombre": "procesar_gcgroup.py",
+                "descripcion": "Procesamiento específico de GCGroup - Genera productos_gcgroup.json"
+            },
+            "Kadabra Tecnología": {
+                "nombre": "procesar_kadabra.py",
+                "descripcion": "Procesamiento de Kadabra - Genera productos_kadabra.json"
+            },
+            "Zentek BA": {
+                "nombre": "procesar_zentekba.py",
+                "descripcion": "Procesamiento de Zentek BA - Genera productos_zentek.json"
             }
-        ]
+        }
         
-        for script in scripts_a_ejecutar:
-            print(f"\n🚀 Ejecutando: {script['nombre']}")
+        for nombre_proveedor, exito in resultados.items():
+            if not exito:
+                continue
+                
+            script = mapeo_scripts.get(nombre_proveedor)
+            if not script:
+                print(f"⚠️ No hay script configurado para {nombre_proveedor}")
+                continue
+                
+            print(f"\n🚀 Ejecutando: {script['nombre']} (Proveedor: {nombre_proveedor})")
             print(f"📝 {script['descripcion']}")
             print("-" * 50)
             
             try:
-                # Verificar que el archivo del script existe
                 if not os.path.exists(script['nombre']):
                     print(f"❌ Archivo no encontrado: {script['nombre']}")
                     continue
                 
-                # Ejecutar el script y capturar la salida
                 resultado = subprocess.run(
                     [sys.executable, script['nombre']], 
                     capture_output=True, 
                     text=True,
                     encoding='utf-8',
-                    errors='replace',  # Reemplazar caracteres problemáticos en lugar de fallar
+                    errors='replace',
                     cwd=os.getcwd()
                 )
                 
-                # Mostrar la salida del script
+                # Mostrar salida
                 if resultado.stdout:
-                    # Filtrar líneas vacías
-                    lineas = [linea for linea in resultado.stdout.split('\n') if linea.strip()]
-                    for linea in lineas:
-                        try:
-                            # Intentar imprimir la línea tal como está
-                            print(f"   {linea}")
-                        except UnicodeEncodeError:
-                            # Si hay problemas de encoding, limpiar caracteres problemáticos
-                            linea_limpia = linea.encode('ascii', errors='ignore').decode('ascii')
-                            print(f"   {linea_limpia}")
+                    for linea in resultado.stdout.split('\n'):
+                        if linea.strip(): print(f"   {linea}")
                 
                 if resultado.stderr:
                     print(f"⚠️ Advertencias/Errores:")
-                    lineas_error = [linea for linea in resultado.stderr.split('\n') if linea.strip()]
-                    for linea in lineas_error:
-                        try:
-                            print(f"   {linea}")
-                        except UnicodeEncodeError:
-                            linea_limpia = linea.encode('ascii', errors='ignore').decode('ascii')
-                            print(f"   {linea_limpia}")
+                    for linea in resultado.stderr.split('\n'):
+                        if linea.strip(): print(f"   {linea}")
                 
                 if resultado.returncode == 0:
                     print(f"✅ {script['nombre']} ejecutado exitosamente")
-                    
-                    # Pausa especial después de procesar_gcgroup_refactor.py para generar archivo de difusión
-                    if script['nombre'] == 'procesar_gcgroup_refactor.py':
-                        print("⏳ Esperando 3 segundos para que se genere el archivo de difusión...")
-                        time.sleep(3)
                 else:
                     print(f"❌ Error ejecutando {script['nombre']} (código: {resultado.returncode})")
                     
             except Exception as e:
                 print(f"❌ Error ejecutando {script['nombre']}: {e}")
-        
+
+        # Consolidar todos los productos en un solo archivo productos_ram.json
+        print(f"\n🚀 Ejecutando consolidación final de precios...")
+        try:
+            if os.path.exists("consolidar_precios.py"):
+                subprocess.run([sys.executable, "consolidar_precios.py"], cwd=os.getcwd())
+                print("✅ Consolidación final completada")
+            else:
+                print("⚠️ No se encontró consolidar_precios.py")
+        except Exception as e:
+            print(f"❌ Error en consolidación final: {e}")
+
         print(f"\n{'='*70}")
         print("🎉 PROCESAMIENTO AUTOMÁTICO COMPLETADO")
         print(f"{'='*70}")

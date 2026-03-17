@@ -20,7 +20,7 @@ def ejecutar_script(script_name):
         env['PYTHONIOENCODING'] = 'utf-8'
         
         result = subprocess.run(
-            ['python', script_name], 
+            ['python3', script_name], 
             capture_output=True, 
             text=True, 
             encoding='utf-8',
@@ -273,23 +273,35 @@ def main():
     
     print("\n" + "-" * 50)
     
-    # Ejecutar ambos scripts
+    # Ejecutar scripts de proveedores
     scripts_exitosos = 0
     
-    if ejecutar_script("procesar_gcgroup.py"):
-        scripts_exitosos += 1
+    # Lista de scripts de proveedores a ejecutar
+    scripts_proveedores = [
+        "procesar_gcgroup.py",
+        "procesar_zentekba.py",
+        "procesar_kadabra.py"
+    ]
     
-    if ejecutar_script("procesar_kadabra.py"):
-        scripts_exitosos += 1
-    
-    if ejecutar_script("procesar_rodrigo.py"):
-        scripts_exitosos += 1
+    for script in scripts_proveedores:
+        if os.path.exists(script):
+            if ejecutar_script(script):
+                scripts_exitosos += 1
+        else:
+            print(f"⚠️ Saltando {script} (no encontrado)")
     
     if scripts_exitosos == 0:
-        print("❌ No se pudo ejecutar ningún script. Proceso abortado.")
+        print("❌ No se pudo ejecutar ningún script de proveedor. Proceso abortado.")
         return
     
     print(f"\n✅ Se ejecutaron {scripts_exitosos} scripts exitosamente")
+
+    # Nueva etapa: Consolidar mejores precios para la WEB
+    print("\n💎 Optimizando mejores precios para la web...")
+    if ejecutar_script("consolidar_precios.py"):
+        print("✅ Precios consolidados (solo el mejor precio será público)")
+    else:
+        print("⚠️ Falló la consolidación de precios")
     
     # Combinar archivos TXT
     print("\n🔄 Combinando archivos TXT...")

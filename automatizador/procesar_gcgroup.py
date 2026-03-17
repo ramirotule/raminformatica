@@ -3,7 +3,7 @@
 
 """
 Procesador de precios específico para GCGroup
-Formula: (precio_costo + 18%) + $20 USD, redondeado a múltiplo de 5
+Formula: (precio_costo + 10%) + $25 USD, redondeado a múltiplo de 5
 """
 
 import re
@@ -16,94 +16,126 @@ class ProcesadorGCGroup:
     def __init__(self):
         self.productos_extraidos = []
         # Regex actualizado para el formato real: "PRODUCTO - $ PRECIO"
-        self.precio_regex = r'^([^-]+)\s*-\s*\$\s*(\d+(?:\.\d+)?)$'
-    
+        self.precio_regex = r'^([^-]+)\s*-\s*\$\s*(\d+(?:\.\d+)?)\s*$'
+
     def normalizar_categoria(self, categoria_raw):
         """
-        Normalizar categorías según las reglas de negocio:
-        - Remover " - GTIA 3 MESES" de marcas  
-        - Agrupar TV, QLED, ULED en TELEVISORES
-        - Agregar "CELULARES" a marcas de teléfonos
-        - Agrupar PS5, XBOX, joysticks en VIDEO JUEGOS
-        - Mantener categorías específicas como están
+        Normalizar categorías según las reglas de negocio de GCGroup
         """
-        categoria = categoria_raw.strip()
+        cat = categoria_raw.upper().strip()
         
-        # Regla 1: Limpiar información adicional (GTIA, entrega, etc.)
-        if " - " in categoria:
-            partes = categoria.split(" - ")
-            categoria = partes[0].strip()
+        # Mapeo según requerimiento del usuario
+        if any(brand in cat for brand in ["IPHONE", "SAMSUNG", "MOTOROLA", "INFINIX", "XIAOMI", "ITEL", "TECHNO"]):
+            # Pero excluir específicamente tablets de Samsung/Xiaomi si vienen en esta categoría
+            if "TABLETS" in cat:
+                return "Tablets & Ipads"
+            return "Celulares"
+        elif "WATCH" in cat:
+            return "Smartwatch"
+        elif "TV" in cat or "TELEVISOR" in cat or "QLED" in cat or "ULED" in cat:
+            return "Televisores"
+        elif "PLAYSTATION" in cat or "VIDEO JUEGOS" in cat or "JOYSTICK" in cat or "VR2" in cat:
+            return "Video Juegos"
+        elif "CARGADOR" in cat or "POWER ADAPTER" in cat:
+            return "Cargadores"
+        elif "JBL" in cat or "PARLANTE" in cat or "AURICULAR" in cat:
+            return "Audio JBL"
+        elif "AIRPODS" in cat or "PENCIL" in cat:
+            return "AirPods" # Se ajustará a 'Accesorios' para Pencils en el loop de productos
+        elif "TABLET" in cat or "IPAD" in cat:
+            return "Tablets & Ipads"
+        elif "MACBOOK" in cat or "NOTEBOOK" in cat:
+            return "Notebooks & Macbooks"
+            
+        return categoria_raw.strip()
+    
+    def obtener_icono_categoria(self, categoria):
+        """Obtener el icono apropiado para cada categoría"""
+        cat_upper = categoria.upper()
         
-        # Regla 2: Agrupar televisores (TV, QLED, ULED, TVS)
-        palabras_tv = ["TV", "QLED", "ULED", "TVS"]
-        if any(palabra in categoria.upper() for palabra in palabras_tv):
-            return "TELEVISORES"
-        
-        # Regla 3: Agregar "CELULARES" a marcas de teléfonos
-        marcas_celulares = ["SAMSUNG", "MOTOROLA", "INFINIX", "ITEL", "XIAOMI"]
-        if any(marca in categoria.upper() for marca in marcas_celulares):
-            # SAMSUNG → CELULARES SAMSUNG
-            marca_encontrada = next(marca for marca in marcas_celulares if marca in categoria.upper())
-            return f"CELULARES {marca_encontrada}"
-        
-        # Regla 4: Categorías de iPhone con prefijo CELULARES
-        categorias_iphone = ["IPHONE NEW", "IPHONE TESTER", "IPHONE AS IS"]
-        if any(iphone_cat in categoria.upper() for iphone_cat in categorias_iphone):
-            # IPHONE NEW → CELULARES IPHONE NEW
-            # IPHONE TESTER → CELULARES IPHONE TESTER  
-            # IPHONE AS IS → CELULARES IPHONE AS IS
-            if "IPHONE NEW" in categoria.upper():
-                return "CELULARES IPHONE NEW"
-            elif "IPHONE TESTER" in categoria.upper():
-                return "CELULARES IPHONE TESTER"
-            elif "IPHONE AS IS" in categoria.upper():
-                return "CELULARES IPHONE AS IS"
-        
-        # Regla 5: Agrupar gaming en VIDEO JUEGOS
-        categorias_gaming = ["PLAYSTATION", "XBOX"]
-        productos_gaming = ["PS5", "XBOX", "JOYSTICK"]
-        if (any(cat in categoria.upper() for cat in categorias_gaming) or
-            any(prod in categoria.upper() for prod in productos_gaming)):
-            return "VIDEO JUEGOS"
-        
-        # Regla 6: Mantener categorías específicas tal como están
-        categorias_especiales = [
-            "PARLANTES JBL",
-            "CARGADOR APPLE ORIGINAL",
-            "AIRPODS", 
-            "APPLE WATCH",
-            "IPAD",
-            "MACBOOK"
-        ]
-        if categoria in categorias_especiales:
-            return categoria
-        
-        return categoria
+        if "TELEVISORES" in cat_upper:
+            return "📺"
+        elif "NOTEBOOKS" in cat_upper:
+            return "💻"
+        elif "SMARTWATCH" in cat_upper:
+            return "⌚"
+        elif "AIRPODS" in cat_upper:
+            return "🎧"
+        elif "VIDEO JUEGOS" in cat_upper:
+            return "🕹️"
+        elif "AUDIO JBL" in cat_upper:
+            return "🎵"
+        elif "TABLETS" in cat_upper:
+            return "📱"
+        elif "CELULARES" in cat_upper:
+            return "📱"
+        elif "CARGADORES" in cat_upper:
+            return "🔌"
+        elif "ACCESORIOS" in cat_upper:
+            return "🔌"
+        else:
+            return "📱"
         
     def calcular_precio_venta(self, precio_costo):
         """
         Calcular precio de venta usando la fórmula:
-        (precio_costo + 18%) + $20 USD, redondeado a múltiplo de 5
+        (precio_costo / 0.9) + $20 USD, redondeado a múltiplo de 5 (al más cercano)
+        
+        Equivalente a la fórmula Excel: =REDOND.MULT(precio_costo/0.9+20;5)
         """
         try:
             # Convertir a float si es string
             if isinstance(precio_costo, str):
                 precio_costo = float(precio_costo.replace(',', '.'))
             
-            # Aplicar 18% de ganancia
-            precio_con_ganancia = precio_costo * 1.18
+            # Aplicar fórmula: dividir por 0.9 (margen del 90% para el costo)
+            precio_con_margen = precio_costo / 0.9
             
-            # Sumar $25 USD extras
-            precio_con_extras = precio_con_ganancia + 25
+            # Sumar $20 USD extras
+            precio_con_extras = precio_con_margen + 25
             
-            # Redondear a múltiplo de 5
-            precio_final = math.ceil(precio_con_extras / 5) * 5
+            # Redondear al múltiplo de 5 más cercano (como REDOND.MULT de Excel)
+            precio_final = round(precio_con_extras / 5) * 5
             
             return int(precio_final)
             
         except Exception as e:
             print(f"⚠️ Error calculando precio para {precio_costo}: {e}")
             return None
+
+    def formatear_nombre_producto(self, nombre, categoria):
+        """
+        Formatear nombre del producto:
+        - Agregar marca si es necesario
+        - Capitalizar palabras (Title Case)
+        - Mantener unidades en mayúsculas
+        """
+        nombre_final = nombre.strip()
+        
+        # Prefijos según categoría
+        prefix = ""
+        cat = categoria.upper()
+        if "SAMSUNG" in cat: prefix = "Samsung"
+        elif "XIAOMI" in cat: prefix = "Xiaomi"
+        elif "MOTOROLA" in cat: prefix = "Motorola"
+        elif "IPHONE" in cat: prefix = "iPhone"
+        
+        if prefix and not nombre_final.lower().startswith(prefix.lower()):
+            nombre_final = f"{prefix} {nombre_final}"
+            
+        palabras = nombre_final.split()
+        nuevas_palabras = []
+        for pal in palabras:
+            pal_upper = pal.upper().replace("/", "").replace("(", "").replace(")", "")
+            excepciones = ["GB", "TB", "SSD", "RAM", "DS", "5G", "4G", "LTE", "SIM", "ESIM"]
+            if any(ex == pal_upper for ex in excepciones) or pal_upper.startswith("M") and len(pal_upper) <= 2:
+                nuevas_palabras.append(pal.upper())
+            else:
+                if len(pal) > 1:
+                    nuevas_palabras.append(pal[0].upper() + pal[1:].lower())
+                else:
+                    nuevas_palabras.append(pal.upper())
+        return " ".join(nuevas_palabras)
 
     def extraer_productos_del_texto(self, texto_completo):
         """Extraer productos y precios del texto de GCGroup"""
@@ -134,25 +166,46 @@ class ProcesadorGCGroup:
                 if not linea or linea.startswith('#') or linea.startswith('='):
                     continue
                     
-                # Detectar categorías (líneas que empiezan con ► o son texto en mayúsculas sin precios)
-                if ((linea.startswith('►') or 
-                     (linea.isupper() and '$' not in linea and not any(char.isdigit() for char in linea))) and
-                    linea not in ['LISTA DE MODELOS Y COLORES DEL DÍA'] and
-                    'ACEPTAMOS' not in linea and 'NO TOMAMOS' not in linea and 'GARANTÍAS' not in linea and
-                    not linea.startswith('•') and not linea.startswith('PRODUCTOS QUE') and
-                    not linea.startswith('ARTÍCULOS DE') and len(linea) < 80):
-                    
-                    # Limpiar símbolo ► si existe
+                # Detectar y saltar líneas que son solo colores (ej: "BLACK / BLUE / GOLD")
+                colores_lista = [
+                    'BLACK', 'WHITE', 'BLUE', 'GREEN', 'YELLOW', 'PINK', 'RED', 'PURPLE', 'ORANGE', 
+                    'GOLD', 'SILVER', 'GRAPHITE', 'SPACE GRAY', 'STARLIGHT', 'MIDNIGHT', 'DEEP PURPLE',
+                    'NATURAL', 'TITANIUM', 'BLACK TITANIUM', 'WHITE TITANIUM', 'BLUE TITANIUM', 'NATURAL TITANIUM',
+                    'SPACE BLACK', 'ALPINE GREEN', 'SIERRA BLUE', 'PACIFIC BLUE', 'SKY', 'MINT', 'CREAM', 
+                    'LAVENDER', 'LILAC', 'PLATA', 'NEGRO', 'BLANCO', 'AZUL', 'ROJO', 'VERDE', 'AMARILLO', 
+                    'ROSA', 'LILA', 'NARANJA', 'GRIS', 'VIOLETA', 'PURPURA', 'CELESTE', 'GRAY', 'GREY'
+                ]
+                
+                # Función rápida para detectar si una línea es solo de colores
+                def es_solo_colores(l):
+                    if not l: return False
+                    # Limpiar separadores comunes
+                    l_limpia = l.replace('/', ' ').replace(',', ' ').replace('&', ' ').replace('-', ' ').upper()
+                    palabras = l_limpia.split()
+                    if not palabras: return False
+                    # Si el 80% o más de las palabras son colores, es una línea de colores
+                    coincidencias = sum(1 for p in palabras if p in colores_lista)
+                    return (coincidencias / len(palabras)) >= 0.7
+                
+                if es_solo_colores(linea):
+                    # print(f"   ⏩ Saltando línea de colores: {linea}")
+                    continue
+
+                # Detectar categorías (EstRICTO: solo si empieza con ►)
+                if linea.startswith('►'):
+                    # Limpiar símbolo ►
                     categoria_original = linea.replace('►', '').strip()
                     
+                    # Ignorar líneas irrelevantes que empiecen con ►
+                    if (len(categoria_original) < 3 or 
+                        "LISTA DE" in categoria_original.upper() or
+                        "DEL DÍA" in categoria_original.upper()):
+                        continue
+                        
                     # Aplicar normalización de categorías
                     categoria_actual = self.normalizar_categoria(categoria_original)
                     
-                    # Mostrar mapeo si hubo cambio
-                    if categoria_original != categoria_actual:
-                        print(f"   📂 Categoría mapeada: {categoria_original} → {categoria_actual}")
-                    else:
-                        print(f"   📂 Categoría encontrada: {categoria_actual}")
+                    print(f"   📂 Categoría encontrada: {categoria_actual} (Original: {categoria_original})")
                     continue
                 
                 # Buscar productos con precios explícitos
@@ -164,6 +217,19 @@ class ProcesadorGCGroup:
                     # Limpiar nombre del producto
                     producto = producto_raw.strip()
                     
+                    # Formatear nombre
+                    producto = self.formatear_nombre_producto(producto, categoria_actual)
+                    
+                    # --- RE-CATEGORIZACIÓN INTELIGENTE (GcGroup) ---
+                    cat_final = categoria_actual
+                    prod_upper = producto.upper()
+                    
+                    if "PENCIL" in prod_upper:
+                        cat_final = "Accesorios"
+                    elif "AIRPODS" in prod_upper or "AIR PODS" in prod_upper:
+                        cat_final = "AirPods"
+                    # -----------------------------------------------
+
                     # Calcular precio de venta
                     precio_venta = self.calcular_precio_venta(precio_costo)
                     
@@ -172,13 +238,13 @@ class ProcesadorGCGroup:
                             'producto': producto,
                             'precio_costo': precio_costo,
                             'precio_venta': precio_venta,
-                            'categoria': categoria_actual,
-                            'ganancia_porcentaje': 18,
-                            'extra_usd': 20
+                            'categoria': cat_final,
+                            'ganancia_porcentaje': 10,
+                            'extra_usd': 25
                         }
                         
                         self.productos_extraidos.append(producto_info)
-                        print(f"   ✅ {producto}: ${precio_costo} → ${precio_venta}")
+                        print(f"   ✅ {producto}: ${precio_costo} → ${precio_venta} (Cat: {cat_final})")
                 else:
                     # Para listas de disponibilidad, contar productos sin precio
                     if (es_lista_disponibilidad and 
@@ -203,154 +269,85 @@ class ProcesadorGCGroup:
         except Exception as e:
             print(f"❌ Error extrayendo productos: {e}")
             return []
-
-    def generar_json_productos(self, archivo_salida="../public/productos_ram.json"):
-        """Generar JSONs: uno público (sin info sensible) y uno completo (privado)"""
+    
+    def generar_json_productos(self, archivo_salida="../app/public/productos_gcgroup.json"):
+        """Generar JSON de productos GCGroup (sobrescribir siempre el específico, mezclar el consolidado)"""
         try:
             # Archivos de salida
             archivo_publico = archivo_salida
-            archivo_privado = "productos_ram_completo.json"  # En carpeta automatizador (privada)
+            archivo_privado = "productos_ram_completo.json"
             
-            # === CARGAR JSON EXISTENTE ===
-            estructura_publica = {"metadatos": {}, "productos": {}}
-            estructura_completa = {"metadatos": {}, "productos": {}}
-            
-            # Cargar JSON público existente
-            if os.path.exists(archivo_publico):
-                try:
-                    with open(archivo_publico, 'r', encoding='utf-8') as f:
-                        json_publico = json.load(f)
-                    estructura_publica = json_publico.copy()
-                    print(f"📖 JSON público cargado con {len(estructura_publica.get('productos', {}))} categorías")
-                except Exception as e:
-                    print(f"⚠️ Error leyendo JSON público: {e}")
-            
-            # Cargar JSON completo existente
-            if os.path.exists(archivo_privado):
-                try:
-                    with open(archivo_privado, 'r', encoding='utf-8') as f:
-                        json_completo = json.load(f)
-                    estructura_completa = json_completo.copy()
-                    print(f"📖 JSON completo cargado con {len(estructura_completa.get('productos', {}))} categorías")
-                except Exception as e:
-                    print(f"⚠️ Error leyendo JSON completo: {e}")
-            
-            # === FILTRAR PRODUCTOS NO-GCGROUP ===
-            # Para JSON público: mantener productos sin precio_costo
-            productos_publicos_no_gc = {}
-            for categoria, productos in estructura_publica.get("productos", {}).items():
-                productos_filtrados = []
-                for producto in productos:
-                    if ('precio_costo' not in producto or 
-                        producto.get('proveedor', 'GcGroup') != 'GcGroup'):
-                        productos_filtrados.append(producto)
-                if productos_filtrados:
-                    productos_publicos_no_gc[categoria] = productos_filtrados
-            
-            # Para JSON completo: mantener productos sin precio_costo
-            productos_completos_no_gc = {}
-            for categoria, productos in estructura_completa.get("productos", {}).items():
-                productos_filtrados = []
-                for producto in productos:
-                    if ('precio_costo' not in producto or 
-                        producto.get('proveedor', 'GcGroup') != 'GcGroup'):
-                        productos_filtrados.append(producto)
-                if productos_filtrados:
-                    productos_completos_no_gc[categoria] = productos_filtrados
-            
-            # Reinicializar con productos no-GCGroup
-            estructura_publica["productos"] = productos_publicos_no_gc
-            estructura_completa["productos"] = productos_completos_no_gc
-            
-            print(f"🔄 Manteniendo productos de otros proveedores")
-            
-            # === METADATOS ===
-            metadatos_base = {
-                "ultima_actualizacion": datetime.now().strftime("%d/%m/%Y %H:%M")
-            }
-            
-            # Metadatos públicos (información mínima y limpia)
-            metadatos_publicos = metadatos_base.copy()
-            
-            # Metadatos completos (con información sensible para uso interno)
-            metadatos_completos = metadatos_base.copy()
-            metadatos_completos.update({
-                "fecha_extraccion_gcgroup": datetime.now().strftime("%d/%m/%Y %H:%M"),
-                "proveedor_gcgroup": "GcGroup",
-                "productos_gcgroup": len(self.productos_extraidos),
-                "formula_precio_gcgroup": "(costo + 18%) + $20, redondeado a múltiplo de 5"
-            })
-            
-            # Actualizar metadatos
-            if "metadatos" not in estructura_publica:
-                estructura_publica["metadatos"] = {}
-            if "metadatos" not in estructura_completa:
-                estructura_completa["metadatos"] = {}
-                
-            estructura_publica["metadatos"].update(metadatos_publicos)
-            estructura_completa["metadatos"].update(metadatos_completos)
-            
-            # === AGREGAR PRODUCTOS GCGROUP ===
-            productos_gcgroup_agregados = 0
-            
-            for producto in self.productos_extraidos:
-                categoria = producto['categoria']
-                
-                # Crear categorías si no existen
-                if categoria not in estructura_publica["productos"]:
-                    estructura_publica["productos"][categoria] = []
-                if categoria not in estructura_completa["productos"]:
-                    estructura_completa["productos"][categoria] = []
-                
-                # PRODUCTO PÚBLICO (sin información sensible)
-                producto_publico = {
-                    "nombre": producto['producto'],
-                    "precio": producto['precio_venta'],
-                    "categoria": categoria
-                }
-                
-                # PRODUCTO COMPLETO (con toda la información)
-                producto_completo = {
-                    "nombre": producto['producto'],
-                    "precio": producto['precio_venta'],
-                    "precio_costo": producto['precio_costo'],  # Solo en versión completa
-                    "categoria": categoria,
-                    "proveedor": "GcGroup",
-                    "ganancia_porcentaje": 18,  # Solo en versión completa
-                    "extra_usd": 20,  # Solo en versión completa
-                    "fecha_actualizacion": datetime.now().strftime("%d/%m/%Y %H:%M")
-                }
-                
-                estructura_publica["productos"][categoria].append(producto_publico)
-                estructura_completa["productos"][categoria].append(producto_completo)
-                productos_gcgroup_agregados += 1
-            
-            # === ACTUALIZAR TOTALES ===
-            total_productos_publico = sum(len(productos) for productos in estructura_publica["productos"].values())
-            total_productos_completo = sum(len(productos) for productos in estructura_completa["productos"].values())
-            
-            estructura_publica["metadatos"]["total_productos"] = total_productos_publico
-            estructura_completa["metadatos"]["total_productos"] = total_productos_completo
-            
-            # === GUARDAR ARCHIVOS ===
+            # --- 1. GENERAR JSON ESPECÍFICO (SOLO GCGROUP) ---
             os.makedirs(os.path.dirname(archivo_publico), exist_ok=True)
             
-            # Guardar JSON público
+            productos_publicos_lista = []
+            for p in self.productos_extraidos:
+                productos_publicos_lista.append({
+                    "nombre": p['producto'],
+                    "precio": p['precio_venta'],
+                    "categoria": p['categoria']
+                })
+            
+            estructura_publica = {
+                "metadatos": {
+                    "ultima_actualizacion": datetime.now().strftime("%d/%m/%Y %H:%M"),
+                    "total_productos": len(productos_publicos_lista),
+                    "proveedor": "GcGroup"
+                },
+                "productos": productos_publicos_lista
+            }
+            
             with open(archivo_publico, 'w', encoding='utf-8') as f:
                 json.dump(estructura_publica, f, indent=2, ensure_ascii=False)
             
-            # Guardar JSON completo
+            print(f"✅ JSON público ESPECÍFICO generado: {archivo_publico}")
+            
+            # --- 2. ACTUALIZAR JSON CONSOLIDADO (CON MEZCLA) ---
+            # Cargar o inicializar estructura completa
+            estructura_completa = {"metadatos": {}, "productos": []}
+            if os.path.exists(archivo_privado):
+                try:
+                    with open(archivo_privado, 'r', encoding='utf-8') as f:
+                        estructura_completa = json.load(f)
+                        # Asegurar que productos sea una lista
+                        if isinstance(estructura_completa.get('productos'), dict):
+                            # Convertir de dict de categorías a lista plana si fuera necesario
+                            lista_plana = []
+                            for cat, prods in estructura_completa['productos'].items():
+                                lista_plana.extend(prods)
+                            estructura_completa['productos'] = lista_plana
+                except Exception as e:
+                    print(f"⚠️ Error cargando consolidado: {e}")
+            
+            # Filtrar productos anteriores de GCGROUP
+            productos_existentes = estructura_completa.get('productos', [])
+            productos_no_gc = [p for p in productos_existentes if p.get('proveedor') != 'GcGroup']
+            
+            # Agregar nuevos productos de GCGROUP (con info completa)
+            nuevos_gc = []
+            for p in self.productos_extraidos:
+                nuevos_gc.append({
+                    "nombre": p['producto'],
+                    "precio": p['precio_venta'],
+                    "precio_costo": p['precio_costo'],
+                    "categoria": p['categoria'],
+                    "proveedor": "GcGroup",
+                    "fecha_actualizacion": datetime.now().strftime("%d/%m/%Y %H:%M")
+                })
+            
+            # Unir y guardar
+            estructura_completa['productos'] = productos_no_gc + nuevos_gc
+            estructura_completa['metadatos'].update({
+                "ultima_actualizacion": datetime.now().strftime("%d/%m/%Y %H:%M"),
+                "productos_gcgroup": len(nuevos_gc),
+                "total_productos": len(estructura_completa['productos'])
+            })
+            
             with open(archivo_privado, 'w', encoding='utf-8') as f:
                 json.dump(estructura_completa, f, indent=2, ensure_ascii=False)
             
-            # === REPORTES ===
-            print(f"✅ JSON público generado: {archivo_publico}")
-            print(f"🔒 JSON completo generado: {archivo_privado}")
-            print(f"📊 {productos_gcgroup_agregados} productos de GCGroup agregados/actualizados")
-            print(f"📈 Total productos públicos: {total_productos_publico}")
-            print(f"🔒 Total productos completos: {total_productos_completo}")
-            print(f"📂 Total categorías: {len(estructura_publica['productos'])}")
-            print(f"🛡️  Información sensible oculta en versión pública")
+            print(f"✅ JSON CONSOLIDADO actualizado: {archivo_privado}")
+            print(f"📊 {len(nuevos_gc)} productos de GCGroup integrados")
             return True
             
         except Exception as e:
@@ -368,7 +365,8 @@ class ProcesadorGCGroup:
             
             with open(archivo_con_fecha, 'w', encoding='utf-8') as f:
                 # Encabezado
-                f.write(f"🔥 LISTA DE PRECIOS RAM - {datetime.now().strftime('%d/%m/%Y')} 🔥\n")
+                f.write(f"🔥 LISTA DE PRECIOS RAM INFORMÁTICA - {datetime.now().strftime('%d/%m/%Y')} 🔥\n")
+                f.write(f" 🌐 WWW.RAMINFORMATICA.COM.AR\n")
                 f.write("=" * 50 + "\n\n")
                 
                 # Agrupar por categorías
@@ -381,7 +379,8 @@ class ProcesadorGCGroup:
                 
                 # Escribir por categorías
                 for categoria, productos in categorias.items():
-                    f.write(f"📱 {categoria}\n")
+                    icono = self.obtener_icono_categoria(categoria)
+                    f.write(f"{icono} {categoria}\n")
                     f.write("-" * 30 + "\n")
                     
                     for producto in productos:
