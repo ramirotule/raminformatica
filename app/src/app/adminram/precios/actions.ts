@@ -43,8 +43,47 @@ export async function parseImportData(input: string, provider: 'gcgroup' | 'zent
     const items: ParsedItem[] = [];
 
     try {
-        if (provider === 'gcgroup') {
-            const data = JSON.parse(input);
+        if (provider === 'gcgroup' || provider === 'zentek') {
+            // Zentek now also uses JSON for specific products (MacBook, IPad, RayBan)
+            let data;
+            try {
+                data = JSON.parse(input);
+            } catch (e) {
+                // Fallback for raw text if zentek
+                if (provider === 'zentek') {
+                    const lines = input.split('\n');
+                    for (const line of lines) {
+                        const trimmed = line.trim();
+                        if (!trimmed || trimmed.length < 5) continue;
+
+                        const priceRegex = /[\$]?\s?(\d+[\.\,]?\d*)/g;
+                        const matches = [...trimmed.matchAll(priceRegex)];
+
+                        if (matches.length > 0) {
+                            const lastMatch = matches[matches.length - 1];
+                            const priceStr = lastMatch[1].replace(',', '.');
+                            const cost = parseFloat(priceStr);
+
+                            if (isNaN(cost) || cost < 10) continue;
+
+                            let name = trimmed.substring(0, lastMatch.index).trim();
+                            if (name.length < 3) continue;
+                            name = name.replace(/^[\d\.\-\)\>]+\s?/, '');
+
+                            items.push({
+                                name: smartCapitalize(name),
+                                originalDescription: trimmed,
+                                cost,
+                                finalPrice: calculateFinalPrice(cost),
+                                status: 'pending'
+                            });
+                        }
+                    }
+                    return { success: true, items, message: "Datos parseados (Raw Text)." };
+                }
+                throw e; // Reraise if gcgroup fails
+            }
+
             const productos = Array.isArray(data.productos) ? data.productos : [];
             for (const p of productos) {
                 if (!p.nombre || p.precio === undefined) continue;
@@ -54,39 +93,11 @@ export async function parseImportData(input: string, provider: 'gcgroup' | 'zent
                     originalDescription: p.nombre,
                     categoryName: p.categoria,
                     cost: cost,
-                    finalPrice: calculateFinalPrice(cost, true, p.precio),
+                    finalPrice: calculateFinalPrice(cost, true),
                     status: 'pending'
                 });
             }
-        } else {
-            const lines = input.split('\n');
-            for (const line of lines) {
-                const trimmed = line.trim();
-                if (!trimmed || trimmed.length < 5) continue;
-
-                const priceRegex = /[\$]?\s?(\d+[\.\,]?\d*)/g;
-                const matches = [...trimmed.matchAll(priceRegex)];
-
-                if (matches.length > 0) {
-                    const lastMatch = matches[matches.length - 1];
-                    const priceStr = lastMatch[1].replace(',', '.');
-                    const cost = parseFloat(priceStr);
-
-                    if (isNaN(cost) || cost < 10) continue;
-
-                    let name = trimmed.substring(0, lastMatch.index).trim();
-                    if (name.length < 3) continue;
-                    name = name.replace(/^[\d\.\-\)\>]+\s?/, '');
-
-                    items.push({
-                        name: smartCapitalize(name),
-                        originalDescription: trimmed,
-                        cost,
-                        finalPrice: calculateFinalPrice(cost),
-                        status: 'pending'
-                    });
-                }
-            }
+            return { success: true, items, message: "Datos parseados (JSON)." };
         }
 
         return { success: true, items, message: "Datos parseados correctamente." };

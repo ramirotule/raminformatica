@@ -26,6 +26,58 @@ export default function AdminPrecios() {
         fetchProviders()
     }, [])
 
+    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+        
+        const reader = new FileReader()
+        reader.onload = (e) => {
+            const content = e.target?.result as string
+            setInput(content)
+            // Auto detect provider if JSON
+            try {
+                const data = JSON.parse(content)
+                if (data.metadatos?.proveedor?.toLowerCase().includes('zentek')) {
+                    setProvider('zentek')
+                } else {
+                    setProvider('gcgroup')
+                }
+            } catch (err) {
+                // Not a JSON or invalid, stay with current provider
+            }
+        }
+        reader.readAsText(file)
+    }
+
+    const handleAutoLoad = async (fileName: string) => {
+        setIsLoading(true)
+        setResult(null)
+        try {
+            const res = await fetch(`/${fileName}`)
+            if (!res.ok) throw new Error("No se pudo cargar el archivo automático.")
+            const data = await res.json()
+            setInput(JSON.stringify(data, null, 2))
+            
+            if (fileName.includes('zentek')) {
+                setProvider('zentek')
+            } else {
+                setProvider('gcgroup')
+            }
+            
+            // Trigger automatic parse after loading
+            const parseRes = await parseImportData(JSON.stringify(data), fileName.includes('zentek') ? 'zentek' : 'gcgroup')
+            if (parseRes.success) {
+                setParsedItems(parseRes.items)
+                setSelectedIndices(new Set(parseRes.items.map((_, i) => i)))
+                setView('preview')
+            }
+        } catch (err: any) {
+            setResult({ success: false, message: 'Error cargando archivo automático: ' + err.message })
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
     const handleParse = async () => {
         setIsLoading(true)
         setResult(null)
@@ -327,45 +379,87 @@ export default function AdminPrecios() {
                 </p>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 24, alignItems: 'start' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 24, alignItems: 'start' }}>
                 <div className="card" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
+                    
+                    {/* Sección de Carga Rápida */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '16px', background: 'rgba(52, 199, 89, 0.05)', borderRadius: 12, border: '1px solid rgba(52, 199, 89, 0.1)' }}>
+                        <h4 style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--green-dark)', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                            <FileJson size={14} /> CARGA MÁGICA (Archivos Generados)
+                        </h4>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                            <button 
+                                onClick={() => handleAutoLoad('productos_zentek.json')}
+                                className="btn btn-ghost btn-sm"
+                                style={{ background: 'white', border: '1px solid var(--border)', fontSize: '0.75rem', height: 'auto', padding: '8px' }}
+                            >
+                                📦 Zentek Apple/RayBan
+                            </button>
+                            <button 
+                                onClick={() => handleAutoLoad('productos_ram.json')}
+                                className="btn btn-ghost btn-sm"
+                                style={{ background: 'white', border: '1px solid var(--border)', fontSize: '0.75rem', height: 'auto', padding: '8px' }}
+                            >
+                                💎 Todos (Mejor Precio)
+                            </button>
+                        </div>
+                    </div>
 
-                    <div style={{ display: 'flex', gap: 12 }}>
-                        <button
-                            onClick={() => setProvider('gcgroup')}
-                            style={{
-                                flex: 1, padding: '16px', borderRadius: 12,
-                                border: `2px solid ${provider === 'gcgroup' ? 'var(--green)' : 'var(--border)'}`,
-                                background: provider === 'gcgroup' ? 'rgba(52, 199, 89, 0.05)' : 'transparent',
-                                cursor: 'pointer', transition: 'all 0.2s ease',
-                                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8
-                            }}
-                        >
-                            <FileJson size={24} color={provider === 'gcgroup' ? 'var(--green)' : 'var(--text-muted)'} />
-                            <span style={{ fontWeight: 700, fontSize: '0.9rem', color: provider === 'gcgroup' ? 'var(--text-primary)' : 'var(--text-muted)' }}>GCgroup (JSON)</span>
-                        </button>
-                        <button
-                            onClick={() => setProvider('zentek')}
-                            style={{
-                                flex: 1, padding: '16px', borderRadius: 12,
-                                border: `2px solid ${provider === 'zentek' ? 'var(--green)' : 'var(--border)'}`,
-                                background: provider === 'zentek' ? 'rgba(52, 199, 89, 0.05)' : 'transparent',
-                                cursor: 'pointer', transition: 'all 0.2s ease',
-                                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8
-                            }}
-                        >
-                            <FileText size={24} color={provider === 'zentek' ? 'var(--green)' : 'var(--text-muted)'} />
-                            <span style={{ fontWeight: 700, fontSize: '0.9rem', color: provider === 'zentek' ? 'var(--text-primary)' : 'var(--text-muted)' }}>Zentek (Raw Text)</span>
-                        </button>
+                    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                        <div style={{ flex: 1, display: 'flex', gap: 12 }}>
+                            <button
+                                onClick={() => setProvider('gcgroup')}
+                                style={{
+                                    flex: 1, padding: '12px', borderRadius: 12,
+                                    border: `2px solid ${provider === 'gcgroup' ? 'var(--green)' : 'var(--border)'}`,
+                                    background: provider === 'gcgroup' ? 'rgba(52, 199, 89, 0.05)' : 'transparent',
+                                    cursor: 'pointer', transition: 'all 0.2s ease',
+                                    display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center'
+                                }}
+                            >
+                                <FileJson size={20} color={provider === 'gcgroup' ? 'var(--green)' : 'var(--text-muted)'} />
+                                <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>GCgroup</span>
+                            </button>
+                            <button
+                                onClick={() => setProvider('zentek')}
+                                style={{
+                                    flex: 1, padding: '12px', borderRadius: 12,
+                                    border: `2px solid ${provider === 'zentek' ? 'var(--green)' : 'var(--border)'}`,
+                                    background: provider === 'zentek' ? 'rgba(52, 199, 89, 0.05)' : 'transparent',
+                                    cursor: 'pointer', transition: 'all 0.2s ease',
+                                    display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center'
+                                }}
+                            >
+                                <FileText size={20} color={provider === 'zentek' ? 'var(--green)' : 'var(--text-muted)'} />
+                                <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>Zentek Text</span>
+                            </button>
+                        </div>
+                        
+                        <div style={{ position: 'relative' }}>
+                             <input 
+                                type="file" 
+                                id="json-upload" 
+                                accept=".json,.txt" 
+                                onChange={handleFileUpload} 
+                                style={{ display: 'none' }} 
+                            />
+                            <label 
+                                htmlFor="json-upload" 
+                                className="btn btn-ghost"
+                                style={{ gap: 8, background: 'var(--bg-secondary)', padding: '0 16px', height: 48, display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+                            >
+                                <Upload size={18} /> Subir File
+                            </label>
+                        </div>
                     </div>
 
                     <div style={{ position: 'relative' }}>
                         <textarea
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            placeholder={provider === 'gcgroup' ? 'Pega el JSON aquí...' : 'Pega el texto del proveedor aquí...'}
+                            placeholder={provider === 'gcgroup' ? 'Pega el JSON aquí...' : 'Pega el texto de Zentek aquí...'}
                             style={{
-                                width: '100%', height: '350px', padding: '20px', borderRadius: '16px',
+                                width: '100%', height: '300px', padding: '20px', borderRadius: '16px',
                                 background: 'var(--bg-secondary)', border: '1px solid var(--border)',
                                 color: 'var(--text-primary)', fontFamily: 'monospace', fontSize: '0.85rem',
                                 outline: 'none', resize: 'none', transition: 'border-color 0.2s ease'
@@ -421,6 +515,16 @@ export default function AdminPrecios() {
                                 </>
                             )}
                         </div>
+                    </div>
+
+                    <div className="card" style={{ padding: 20, borderStyle: 'dashed' }}>
+                        <h4 style={{ fontSize: '0.85rem', fontWeight: 800, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <Zap size={14} color="var(--orange)" />
+                            Tip de Productividad
+                        </h4>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                            Usa la <strong>"Carga Mágica"</strong> para importar los archivos que el sistema ya procesó. Es la forma más rápida y segura.
+                        </p>
                     </div>
                 </div>
             </div>

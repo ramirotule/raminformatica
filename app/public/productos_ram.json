@@ -1,0 +1,1009 @@
+{
+  "metadatos": {
+    "ultima_actualizacion": "17/03/2026 12:26",
+    "total_productos": 173,
+    "proveedor": "GcGroup",
+    "productos_gcgroup": 173,
+    "ultima_actualizacion_publica": "17/03/2026 12:26",
+    "total_productos_publicos": 166,
+    "duplicados_precio_alto_omitidos": 7
+  },
+  "productos": [
+    {
+      "nombre": "Iphone 15 128 GB Sim/esim",
+      "precio": 725,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Iphone 15 256 GB Sim/esim",
+      "precio": 845,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Iphone 16 128 GB Sim/esim",
+      "precio": 845,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Iphone 16 256 GB Sim/esim",
+      "precio": 960,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Iphone 17 256 GB Sim/esim",
+      "precio": 995,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Iphone 17 Pro 256 GB ESIM",
+      "precio": 1415,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Iphone 17 Pro Max 256 GB ESIM",
+      "precio": 1580,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung A06 4/64 GB",
+      "precio": 135,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung A06 4/128 GB",
+      "precio": 170,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung A07 4/64 GB",
+      "precio": 155,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung A07 4/128 GB",
+      "precio": 165,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung A16 4/128 GB",
+      "precio": 175,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung A17 4/128 GB",
+      "precio": 215,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung A17 8/256 GB",
+      "precio": 270,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung A26 5G 6/128 GB",
+      "precio": 270,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung A26 5G 8/256 GB",
+      "precio": 305,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung A36 5G 8/128 GB",
+      "precio": 320,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung A36 5G 8/256 GB",
+      "precio": 345,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung A36 5G 12/256 GB",
+      "precio": 385,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung A56 5G 8/128 GB",
+      "precio": 380,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung A56 5G 8/256 GB",
+      "precio": 440,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung A56 5G 12/256 GB",
+      "precio": 455,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung S24 Fe 8/128 GB",
+      "precio": 495,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung S25 Fe 8/256 GB",
+      "precio": 680,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung S25 12/256 GB",
+      "precio": 805,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung S25 Ultra 12/256 GB",
+      "precio": 1065,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung S25 Ultra 12/512 GB",
+      "precio": 1130,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung S26 12/256 GB",
+      "precio": 940,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung S26 12/512 GB",
+      "precio": 1110,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung S26 Plus 12/256 GB",
+      "precio": 1190,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung S26 Plus 12/512 GB",
+      "precio": 1370,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung S26 Ultra 12/512 GB",
+      "precio": 1470,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Samsung Zflip 7 12/512 GB",
+      "precio": 1115,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Motorola E15 2/64 GB",
+      "precio": 125,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Motorola G06 4/64 GB",
+      "precio": 140,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Motorola G06 4/128 GB",
+      "precio": 165,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Motorola G06 4/256 GB",
+      "precio": 175,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Motorola G06 Power 4/256 GB",
+      "precio": 190,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Motorola G15 4/256 GB",
+      "precio": 185,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Motorola G15 4/512 GB",
+      "precio": 205,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Motorola G35 5G 4/128 GB",
+      "precio": 195,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Motorola G35 5G 8/256 GB",
+      "precio": 210,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Motorola G56 5G 8/256 GB",
+      "precio": 245,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Motorola G56 5G 12/256 GB",
+      "precio": 255,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Motorola G75 5G 8/256 GB",
+      "precio": 275,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Motorola G86 5G 8/256 GB",
+      "precio": 295,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Motorola G86 Power 5G 8/256 GB",
+      "precio": 310,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Motorola G86 Power 5G 8/512 GB",
+      "precio": 325,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Motorola Edge 50 Pro 5G 12/512 GB",
+      "precio": 480,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Motorola Edge 50 Ultra 5G 16/512 GB",
+      "precio": 720,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Motorola Edge 60 Fusion 5G 12/256 GB",
+      "precio": 355,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Motorola Edge 60 Pro 5G 12/512 GB",
+      "precio": 565,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Motorola Edge 60 Pro 5G 16/512 GB",
+      "precio": 575,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Motorola Edge 70 5G 12/512 GB",
+      "precio": 545,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Infinix Smart 10 3/64 GB",
+      "precio": 135,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Infinix Hot 50i 4/256 GB",
+      "precio": 175,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Infinix Hot 60i 8/256 GB",
+      "precio": 220,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Infinix Hot 60 Pro 8/256 GB",
+      "precio": 220,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Infinix Note 50x 5G 8/256 GB",
+      "precio": 240,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Infinix Note 50 Pro 8/256 GB",
+      "precio": 320,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Infinix Gt 30 Pro 5G 12/256 GB",
+      "precio": 425,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Redmi A5 3/64 GB",
+      "precio": 130,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Redmi A5 4/128 GB",
+      "precio": 165,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Redmi A7 Pro 4/64 GB",
+      "precio": 165,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Redmi A7 Pro 4/128 GB",
+      "precio": 175,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Redmi 15 6/128 GB",
+      "precio": 190,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Redmi 15 8/256 GB",
+      "precio": 235,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Redmi 15c 4/128 GB",
+      "precio": 165,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Redmi 15c 4/256 GB",
+      "precio": 180,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Redmi 15c 8/256 GB",
+      "precio": 205,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Note 14 6/128 GB",
+      "precio": 205,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Note 14 8/256 GB",
+      "precio": 235,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Note 14 5G 6/128 GB",
+      "precio": 240,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Note 14 5G 12/512 GB",
+      "precio": 295,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Note 14s 8/256 GB",
+      "precio": 270,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Note 14 Pro 8/256 GB",
+      "precio": 315,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Note 14 Pro 5G 8/256 GB",
+      "precio": 355,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Note 14 Pro 5G 12/512 GB",
+      "precio": 405,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Note 14 Pro + 12/512 GB",
+      "precio": 460,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Note 15 6/128 GB",
+      "precio": 235,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Note 15 8/256 GB",
+      "precio": 265,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Note 15 5G 8/256 GB",
+      "precio": 315,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Note 15 5G 8/512 GB",
+      "precio": 370,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Note 15 Pro 8/256 GB",
+      "precio": 325,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Note 15 Pro 12/512 GB",
+      "precio": 390,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Note 15 Pro 5G 8/256 GB",
+      "precio": 385,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Note 15 Pro 5G 8/512 GB",
+      "precio": 405,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Poco C71 3/64 GB",
+      "precio": 135,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Poco C71 4/128 GB",
+      "precio": 155,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Poco C85 6/128 GB",
+      "precio": 165,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Poco C85 8/256 GB",
+      "precio": 205,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Poco M7 6/128 GB",
+      "precio": 180,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Poco M7 8/256 GB",
+      "precio": 215,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Poco M7 Pro 5G 12/512 GB",
+      "precio": 340,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Poco M8 5G 8/256 GB",
+      "precio": 285,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Poco M8 Pro 5G 8/256 GB",
+      "precio": 395,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Poco M8 Pro 5G 12/512 GB",
+      "precio": 480,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Poco X7 Pro 5G 8/256 GB",
+      "precio": 410,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Poco X7 Pro 5G 12/512 GB",
+      "precio": 505,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Poco F7 5G 12/512 GB",
+      "precio": 585,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Poco F7 Pro 5G 12/512 GB",
+      "precio": 680,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi Poco F8 Pro 5G 12/512 GB",
+      "precio": 815,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi 14t 5G 12/512 GB",
+      "precio": 555,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi 15 5G 12/512 GB",
+      "precio": 895,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi 15t 5G 12/256 GB",
+      "precio": 575,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Xiaomi 15t Pro 5G 12/512 GB",
+      "precio": 985,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Tablet Samsung X230 A11+ 11.0\" 6/128gb Wifi Grey",
+      "precio": 305,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Tablet Samsung X520 S10 Fe 10,9\" 8/128gb Gray",
+      "precio": 480,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Auricular Jbl Tune T520bt Black/white",
+      "precio": 70,
+      "categoria": "Audio JBL",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Auricular Jbl Tune T720bt Black/white",
+      "precio": 85,
+      "categoria": "Audio JBL",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Jbl Go 4 Bluetooth 4.2 Watts Black/white/blue/red/camuflado",
+      "precio": 70,
+      "categoria": "Audio JBL",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Jbl Clip 5 Bluetooth 7 Watts Black/blue/red",
+      "precio": 80,
+      "categoria": "Audio JBL",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Jbl Flip 7 35 Watts Red/white/pink/camuflado",
+      "precio": 140,
+      "categoria": "Audio JBL",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Jbl Charge 6 45 Watts Black/blue/red/pink/white",
+      "precio": 185,
+      "categoria": "Audio JBL",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Jbl Xtreme 4 100 Watts 24 Horas Negro",
+      "precio": 320,
+      "categoria": "Audio JBL",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Jbl Boombox 4 210 Watts 2v Camuflado/black",
+      "precio": 570,
+      "categoria": "Audio JBL",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Jbl Barra De Sonido Cine Sb580 3,1 Soundbar Usb Bluetooth 440watts",
+      "precio": 345,
+      "categoria": "Audio JBL",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Joystick Ps5 Black",
+      "precio": 110,
+      "categoria": "Video Juegos",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Joystick Ps5 White",
+      "precio": 110,
+      "categoria": "Video Juegos",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Joystick Ps5 Camuflado",
+      "precio": 110,
+      "categoria": "Video Juegos",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Joystick Ps5 Red",
+      "precio": 110,
+      "categoria": "Video Juegos",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Joystick Ps5 Starlight Blue",
+      "precio": 110,
+      "categoria": "Video Juegos",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Joystick Ps5 Cobalt Blue",
+      "precio": 110,
+      "categoria": "Video Juegos",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Joystick Ps5 Sterling Silver",
+      "precio": 110,
+      "categoria": "Video Juegos",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Joystick Ps5 Chroma Pearl",
+      "precio": 110,
+      "categoria": "Video Juegos",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Volante Logitech G29 Ps5 / Ps4 / Pc",
+      "precio": 360,
+      "categoria": "Video Juegos",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Sony Vr2 Horizon Bundle",
+      "precio": 565,
+      "categoria": "Video Juegos",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Sony Ps5 Digital 1tb",
+      "precio": 570,
+      "categoria": "Video Juegos",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Sony Ps5 Pro Digital 2tb",
+      "precio": 935,
+      "categoria": "Video Juegos",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Apple Pencil Usbc",
+      "precio": 145,
+      "categoria": "Accesorios",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Apple Pencil Pro",
+      "precio": 180,
+      "categoria": "Accesorios",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Airpods 4",
+      "precio": 175,
+      "categoria": "AirPods",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Airpods 4 Noise Cancelling",
+      "precio": 215,
+      "categoria": "AirPods",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Airpods Pro 3ra Usbc",
+      "precio": 310,
+      "categoria": "AirPods",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Watch Se 3 Gps 40mm",
+      "precio": 355,
+      "categoria": "Smartwatch",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Watch 11 42mm Gps",
+      "precio": 460,
+      "categoria": "Smartwatch",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Watch 11 46mm Gps",
+      "precio": 490,
+      "categoria": "Smartwatch",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Watch Ultra 3 Gps Cell 49mm",
+      "precio": 925,
+      "categoria": "Smartwatch",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Ipad A16 11” 128 GB",
+      "precio": 490,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Ipad A16 11” 256 GB",
+      "precio": 625,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Ipad Air 7 11” M3 128 GB",
+      "precio": 725,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Ipad Air 7 11” M3 256 GB",
+      "precio": 835,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Ipad Air 7 11” M4 128 GB",
+      "precio": 845,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Ipad Pro 11” M5 256 GB",
+      "precio": 1170,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "Macbook Neo A18 13” 8/256 GB",
+      "precio": 960,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "85” Smart Tv Samsung Qled 4k Q7 Tizen Os",
+      "precio": 2070,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "75” Smart Tv Uhd 4k Samsung U8000f",
+      "precio": 1235,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "75” Smart Tv Lg Uhd Ai Uhd 4k Procesador Alpha 7 8va Gen Con Inteligencia Artificial 75ua8550psa",
+      "precio": 1175,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "65” Smart Tv Samsung Qled 4k Q7 Tizen Os Ia",
+      "precio": 1055,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "65” Smart Tv Samsung Led 4k Crystal Uhd Du7000",
+      "precio": 805,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "65” Smart Tv Lg Uhd Ai Uhd 4k Procesador Alpha 7 8va Gen Con Inteligencia Artificial 65ua8050psa",
+      "precio": 790,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "65” Smart Tv Philips Led 4k Uhd 65pud8100/77 Ambilight",
+      "precio": 725,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "60” Smart Tv 4k Uhd Admiral Ad60g3fn",
+      "precio": 520,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "55” Smart Tv Samsung Qled 4k Q7 Tizen Os",
+      "precio": 645,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "55” Smart Tv Samsung 4k Qled Q65d",
+      "precio": 620,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "55” Smart Tv Samsung Led 4k U8000 Crystal Uhd",
+      "precio": 510,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "55” Tv Led Philips Uhd 55pud7309/77",
+      "precio": 470,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "55” Smart Tv Tcl 4k Uhd Led 55v6c Google Tv",
+      "precio": 465,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "50” Smart Tv Uhd 4k Samsung Un50du7000gczb",
+      "precio": 460,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "50” Smart Tv Admiral Qled 4k Uhd New Model",
+      "precio": 380,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "43” Smart Tv Full Hd Samsung Un43t5300a",
+      "precio": 370,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "43” Smart Tv Led Philips 43pfd6910/77",
+      "precio": 305,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "32” Smart Tv Samsung Hd Un32t4300a",
+      "precio": 240,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "32” Smart Tv Tcl Qled Fhd 32s5k Google Tv",
+      "precio": 245,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "32” Smart Aoc / Admiral",
+      "precio": 205,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup"
+    },
+    {
+      "nombre": "32” Philco Hd",
+      "precio": 190,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup"
+    }
+  ]
+}

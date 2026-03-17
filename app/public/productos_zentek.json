@@ -1,0 +1,315 @@
+{
+  "metadatos": {
+    "ultima_actualizacion": "16/03/2026 23:32",
+    "proveedor": "ZentekBA",
+    "total_productos": 43,
+    "categorias_incluidas": [
+      "Notebooks & Macbooks",
+      "Tablets & Ipads",
+      "RAY-BAN META"
+    ]
+  },
+  "productos": [
+    {
+      "nombre": "Macbook Air 13” - M3 24GB 512GB SSD",
+      "precio": 1410,
+      "precio_costo": 1245.0,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Macbook Air 15” - M3 16GB 256GB SSD",
+      "precio": 1380,
+      "precio_costo": 1220.0,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Macbook Air 13” - M4 16GB 256GB SSD",
+      "precio": 1240,
+      "precio_costo": 1095.0,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Macbook Air 13” - M4 16GB 512GB SSD",
+      "precio": 1480,
+      "precio_costo": 1310.0,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Macbook Air 15” - M4 16GB 256GB SSD",
+      "precio": 1495,
+      "precio_costo": 1325.0,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Macbook Air 15” - M4 16GB 512GB SSD",
+      "precio": 1835,
+      "precio_costo": 1630.0,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Macbook Pro 14” - M4 16GB 512GB SSD",
+      "precio": 1890,
+      "precio_costo": 1680.0,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Macbook Pro 14” - M4 Pro 24GB 512GB SSD",
+      "precio": 2360,
+      "precio_costo": 2100.0,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Macbook Pro 16” - M4 Pro 24GB 512GB SSD",
+      "precio": 3080,
+      "precio_costo": 2750.0,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Macbook Pro 16” - M4 Pro 48GB 512GB SSD",
+      "precio": 3415,
+      "precio_costo": 3050.0,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Macbook Pro 16” - M4 Max 36GB 1TB SSD",
+      "precio": 4415,
+      "precio_costo": 3950.0,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Macbook Pro 14” - M5 16GB 512GB SSD",
+      "precio": 1970,
+      "precio_costo": 1750.0,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Macbook Pro 14” - M5 16GB 1TB SSD",
+      "precio": 2245,
+      "precio_costo": 2000.0,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Macbook Pro 14” - M5 24GB 1TB SSD",
+      "precio": 2480,
+      "precio_costo": 2210.0,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ipad A16 11\" 128GB (solo Wifi)",
+      "precio": 470,
+      "precio_costo": 400.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ipad A16 11\" 256GB (solo Wifi)",
+      "precio": 580,
+      "precio_costo": 500.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ipad Mini 7ma 8.3\" 128GB (solo Wifi)",
+      "precio": 620,
+      "precio_costo": 535.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ipad Mini 7ma 8.3\" 256GB (solo Wifi)",
+      "precio": 730,
+      "precio_costo": 635.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ipad Mini 7ma 8.3\" 512GB (solo Wifi)",
+      "precio": 995,
+      "precio_costo": 875.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ipad Air M3 11\" 7ma 128GB (solo Wifi)",
+      "precio": 690,
+      "precio_costo": 600.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ipad Air M3 11\" 7ma 256GB (solo Wifi)",
+      "precio": 860,
+      "precio_costo": 750.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ipad Air M3 11\" 7ma 512GB (solo Wifi)",
+      "precio": 1170,
+      "precio_costo": 1030.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ipad Air M3 13\" 7ma 128GB (solo Wifi)",
+      "precio": 915,
+      "precio_costo": 800.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ipad Air M3 13\" 7ma 256GB (solo Wifi)",
+      "precio": 1115,
+      "precio_costo": 980.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ipad Pro M4 11\" 256GB (solo Wifi)",
+      "precio": 1060,
+      "precio_costo": 930.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ipad Pro M4 11\" 1TB (solo Wifi)",
+      "precio": 1535,
+      "precio_costo": 1360.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ipad Pro M4 13\" 256GB (solo Wifi)",
+      "precio": 1415,
+      "precio_costo": 1250.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ipad Pro M5 11\" 256GB (solo Wifi)",
+      "precio": 1135,
+      "precio_costo": 1000.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ipad Pro M5 11\" 512GB (solo Wifi)",
+      "precio": 1420,
+      "precio_costo": 1255.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ipad Pro M5 13\" 256GB (solo Wifi)",
+      "precio": 1460,
+      "precio_costo": 1290.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ipad Pro M5 13\" 512GB (solo Wifi)",
+      "precio": 1725,
+      "precio_costo": 1530.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ipad Pro M5 13\" 1TB",
+      "precio": 2235,
+      "precio_costo": 1990.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ipad Pro M5 13\" 2TB",
+      "precio": 2945,
+      "precio_costo": 2630.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ipad Pro M5 13\" 256GB + Cell",
+      "precio": 2005,
+      "precio_costo": 1780.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ipad Pro M5 13\" 512GB + Cell",
+      "precio": 2225,
+      "precio_costo": 1980.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Apple Pencil (carga Via Usb-c)",
+      "precio": 155,
+      "precio_costo": 115.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Apple Pencil 2 (carga Inalámbrica)",
+      "precio": 160,
+      "precio_costo": 120.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Nuevo - Apple Pencil Pro",
+      "precio": 175,
+      "precio_costo": 135.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ray-ban | Meta Wayfarer - Gen 1",
+      "precio": 460,
+      "precio_costo": 390.0,
+      "categoria": "RAY-BAN META",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ray-ban | Meta Wayfarer - Gen 2",
+      "precio": 545,
+      "precio_costo": 470.0,
+      "categoria": "RAY-BAN META",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Ray-ban | Meta Headliner - Gen 2",
+      "precio": 545,
+      "precio_costo": 470.0,
+      "categoria": "RAY-BAN META",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Macbook Neo 13\" Chip A18 Pro 8/256",
+      "precio": 960,
+      "precio_costo": 840.0,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "ZentekBA"
+    },
+    {
+      "nombre": "Macbook Neo 13\" Chip A18 Pro 8/512",
+      "precio": 1070,
+      "precio_costo": 940.0,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "ZentekBA"
+    }
+  ]
+}
