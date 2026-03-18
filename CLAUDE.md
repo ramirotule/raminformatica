@@ -1,44 +1,35 @@
-# CLAUDE.md — RAM Informática Agent Rules
+# RAM Informática — Orquestador Principal
 
-## PRINCIPIOS
+## IDENTIDAD DEL PROYECTO
+Ecommerce de tecnología. Marca: **RAM Informática**.
+Stack: Next.js 16 App Router · TypeScript · Supabase · Tailwind CSS · Framer Motion.
 
-- Siempre usar cloud.db como source of truth.
-- Nunca inventar tablas fuera del esquema.
-- UI y rutas siempre en español.
-- Priorizar arquitectura escalable.
+## AGENTES DISPONIBLES
+Antes de ejecutar cualquier tarea, identificá qué agente debe resolverla:
+
+| Agente | Responsabilidad | Contexto |
+|--------|----------------|----------|
+| **enrichment** | Descripciones e imágenes de productos | `.claude/agents/enrichment/CLAUDE.md` |
+| **marketing** | Redes sociales, posicionamiento, visibilidad de marca | `.claude/agents/marketing/CLAUDE.md` |
+
+## REGLAS GLOBALES
+- UI y rutas siempre en **español**
+- Source of truth: **Supabase** (nunca mock data permanente)
+- Arquitectura: escalable, modular, tipada
+- Mobile-first · Animaciones sutiles
+- No hardcodear strings (usar `dict.ts`)
+- Nunca asumir columnas sin validar contra el schema real
 
 ## FRONTEND
+- Componentes reutilizables en `/app/src/components/`
+- Leer productos desde Supabase, nunca desde JSON local
+- Dólar blue: consumir `https://dolarapi.com/v1/dolares/blue` cada 10 min
 
-- Next.js App Router.
-- Componentes reutilizables.
-- No hardcodear strings (crear diccionario ES).
-
-## BACKEND
-
-- Consultas siempre tipadas.
-- Nunca usar mock data permanente.
-- Leer productos desde Supabase.
+## BACKEND / SCRIPTS
+- Cliente Supabase: `/app/src/lib/supabase.ts` (anon) y `/lib/supabase.ts` (admin)
+- Scripts utilitarios: `/app/scripts/`
+- Env vars: `/app/.env.local`
 
 ## DISEÑO
-
-- Ecommerce moderno tipo Apple Store.
-- Animaciones sutiles (no exageradas).
-- Mobile-first.
-
-## CONSUMO REST API
-- El ecommerce maneja los precios en dolares por lo tanto
-la idea es que en el header de la pagina este actualizado cada 10 minutoos
-la cotizacion del dolar blue venta por lo tanto la idea es consumir una rest api que me de esa cotizacion usar esta curl https://dolarapi.com/v1/dolares/blue  y mostrar el precio en dolares y en pesos argentinos.
-
-
-## ADMIN PANEL
-
-- Debe existir desde el inicio.
-- CRUD completo.
-- Control real de stock.
-
-## REGLA CRÍTICA
-
-Si algo no está definido:
-- seguir estructura de cloud.db
-- nunca asumir sin validar.
+- Estilo: ecommerce moderno tipo Apple Store
+- Panel admin: `/app/src/app/adminram/` — CRUD completo con control de stock

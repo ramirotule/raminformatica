@@ -106,44 +106,153 @@ export async function parseImportData(input: string, provider: 'gcgroup' | 'zent
     }
 }
 
-/**
- * Algoritmo Jaro-Winkler para similitud de strings (0 a 1)
- */
+// ─────────────────────────────────────────────────────────────
+// MATCHING INTELIGENTE POR SPECS (reemplaza Jaro-Winkler)
+// Pesos: modelo 40% | storage 25% | RAM 15% | pantalla 10% | marca 10%
+// ─────────────────────────────────────────────────────────────
+
+const BRAND_ALIASES: Record<string, string> = {
+    MI: 'XIAOMI', REDMI: 'XIAOMI', POCO: 'XIAOMI', XIAOMI: 'XIAOMI',
+    APPLE: 'APPLE', IPHONE: 'APPLE', IPAD: 'APPLE', MACBOOK: 'APPLE', AIRPODS: 'APPLE',
+    SAMSUNG: 'SAMSUNG', MOTOROLA: 'MOTOROLA', MOTO: 'MOTOROLA',
+    INFINIX: 'INFINIX', TECNO: 'TECNO', TECHNO: 'TECNO', ITEL: 'ITEL',
+    REALME: 'REALME', OPPO: 'OPPO', VIVO: 'VIVO',
+    HUAWEI: 'HUAWEI', HONOR: 'HONOR', NOKIA: 'NOKIA', LG: 'LG', SONY: 'SONY',
+};
+
+// Modificadores de tier que diferencian sub-modelos (S25 vs S25 Ultra)
+const MODEL_TIER_MODIFIERS = new Set(['ULTRA', 'PRO', 'MAX', 'PLUS', 'MINI', 'LITE', 'FE', 'GO']);
+
+const NOISE_WORDS = new Set([
+    'NUEVO', 'NEW', 'ORIGINAL', 'SELLADO', 'LIBERADO', 'LIBRE',
+    'TECLADO', 'ESPANOL', 'LAYOUT', 'QWERTY', 'LEICA', 'OFICIAL', 'DUAL',
+    'SIM', 'ESIM', 'NANO', 'EDITION', 'EDICION', 'SPECIAL', 'LIMITED', 'VERSION',
+    'NEGRO', 'BLANCO', 'AZUL', 'ROJO', 'VERDE', 'AMARILLO', 'ROSA', 'GRIS',
+    'BLACK', 'WHITE', 'BLUE', 'RED', 'GREEN', 'YELLOW', 'PINK', 'PURPLE',
+    'GOLD', 'SILVER', 'GRAPHITE', 'TITANIUM',
+]);
+
+interface ProductSpecs {
+    brand: string | null;
+    model: string | null;
+    ram: string | null;
+    storage: string | null;
+    screen: string | null;
+}
+
+function normalizeForMatch(name: string): string {
+    return name
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^\w\s/\-]/g, ' ')
+        .toUpperCase()
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function extractSpecs(name: string): ProductSpecs {
+    const n = normalizeForMatch(name);
+    const specs: ProductSpecs = { brand: null, model: null, ram: null, storage: null, screen: null };
+
+    // Brand
+    for (const [alias, canonical] of Object.entries(BRAND_ALIASES)) {
+        if (new RegExp(`\\b${alias}\\b`).test(n)) { specs.brand = canonical; break; }
+    }
+
+    // RAM + Storage — soporta: 8/256, 8GB/256GB, 8/256GB
+    const slashMatch = n.match(/\b(\d{1,3})\s*(?:GB)?\s*\/\s*(\d{2,4})\s*(?:GB)?\b/);
+    if (slashMatch) {
+        const rv = parseInt(slashMatch[1]), sv = parseInt(slashMatch[2]);
+        if ([2,3,4,6,8,10,12,16,24,32].includes(rv)) specs.ram = `${rv}GB`;
+        if ([16,32,64,128,256,512,1024].includes(sv)) specs.storage = `${sv}GB`;
+    }
+
+    // RAM explícita
+    if (!specs.ram) {
+        const rm = n.match(/\b(\d{1,2})\s*GB\s*(?:DE\s*)?RAM\b/);
+        if (rm && [2,3,4,6,8,10,12,16,24,32].includes(parseInt(rm[1]))) specs.ram = `${rm[1]}GB`;
+    }
+
+    // Storage
+    if (!specs.storage) {
+        for (const m of n.matchAll(/\b(\d{2,4})\s*GB\b/g)) {
+            const v = parseInt(m[1]);
+            if ([64,128,256,512,1024].includes(v)) { specs.storage = `${v}GB`; break; }
+        }
+        if (!specs.storage) {
+            const tm = n.match(/\b(\d{1,2})\s*TB\b/);
+            if (tm) specs.storage = `${tm[1]}TB`;
+        }
+    }
+
+    // Screen
+    const sm = n.match(/\b(\d{1,2}[.,]\d)\s*(?:"|INCH|PULGADAS)\b/);
+    if (sm) specs.screen = sm[1].replace(',', '.');
+
+    // Model: quitar marca + specs numéricas + ruido + standalone units
+    let model = n;
+    for (const alias of Object.keys(BRAND_ALIASES)) model = model.replace(new RegExp(`\\b${alias}\\b`, 'g'), '');
+    model = model
+        .replace(/\b\d{1,3}\s*(?:GB)?\s*\/\s*\d{2,4}\s*(?:GB)?\b/g, '')
+        .replace(/\b\d{1,4}\s*(?:GB|TB|MB)\b/g, '')
+        .replace(/\b(?:GB|TB|MB|SSD)\b/g, '')
+        .replace(/\b\d{1,2}[.,]\d\s*(?:"|INCH|PULGADAS)\b/g, '')
+        .replace(/\b(?:5G|4G|LTE|WIFI|WI-FI)\b/g, '');
+    for (const word of NOISE_WORDS) model = model.replace(new RegExp(`\\b${word}\\b`, 'g'), '');
+    specs.model = model.replace(/\s+/g, ' ').trim().replace(/^[\s/\-]+|[\s/\-]+$/g, '') || null;
+
+    return specs;
+}
+
+function getCriticalTokens(model: string): Set<string> {
+    return new Set(model.split(' ').filter(t => /\d/.test(t) || MODEL_TIER_MODIFIERS.has(t)));
+}
+
+function getSpecsSimilarity(a: ProductSpecs, b: ProductSpecs): number {
+    let score = 0;
+
+    // Marca (10%) — marcas distintas = 0 inmediato
+    if (a.brand && b.brand) {
+        if (a.brand === b.brand) score += 0.10;
+        else return 0;
+    }
+
+    // Modelo (40%) via critical tokens
+    let modelScore = 0;
+    if (a.model && b.model) {
+        const ca = getCriticalTokens(a.model);
+        const cb = getCriticalTokens(b.model);
+        if (ca.size > 0 && cb.size > 0) {
+            const inter = [...ca].filter(t => cb.has(t)).length;
+            const union = new Set([...ca, ...cb]).size;
+            modelScore = inter / union;
+        } else {
+            // Fallback: token overlap de todo el modelo
+            const ta = new Set(a.model.split(' '));
+            const tb = new Set(b.model.split(' '));
+            const inter = [...ta].filter(t => tb.has(t)).length;
+            const union = new Set([...ta, ...tb]).size;
+            modelScore = union > 0 ? inter / union : 0;
+        }
+    }
+    score += modelScore * 0.40;
+
+    // Storage (25%)
+    if (a.storage && b.storage) { if (a.storage === b.storage) score += 0.25; }
+    else if (!a.storage || !b.storage) score += 0.125;
+
+    // RAM (15%)
+    if (a.ram && b.ram) { if (a.ram === b.ram) score += 0.15; }
+    else if (!a.ram || !b.ram) score += 0.075;
+
+    // Pantalla (10%)
+    if (a.screen && b.screen) { if (a.screen === b.screen) score += 0.10; }
+    else if (!a.screen || !b.screen) score += 0.05;
+
+    return Math.min(score, 1);
+}
+
 function getSimilarity(s1: string, s2: string): number {
-    if (s1.length === 0 || s2.length === 0) return 0;
-    if (s1 === s2) return 1;
-
-    let m = 0;
-    let range = (Math.floor(Math.max(s1.length, s2.length) / 2)) - 1;
-    let s1Matches = new Array(s1.length);
-    let s2Matches = new Array(s2.length);
-
-    for (let i = 0; i < s1.length; i++) {
-        let low = Math.max(0, i - range);
-        let high = Math.min(i + range + 1, s2.length);
-        for (let j = low; j < high; j++) {
-            if (!s2Matches[j] && s1[i] === s2[j]) {
-                s1Matches[i] = true;
-                s2Matches[j] = true;
-                m++;
-                break;
-            }
-        }
-    }
-
-    if (m === 0) return 0;
-
-    let t = 0;
-    let k = 0;
-    for (let i = 0; i < s1.length; i++) {
-        if (s1Matches[i]) {
-            while (!s2Matches[k]) k++;
-            if (s1[i] !== s2[k]) t++;
-            k++;
-        }
-    }
-
-    return ((m / s1.length) + (m / s2.length) + ((m - t / 2) / m)) / 3;
+    return getSpecsSimilarity(extractSpecs(s1), extractSpecs(s2));
 }
 
 /**

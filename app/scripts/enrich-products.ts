@@ -27,8 +27,6 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env.local') })
 const SUPABASE_URL  = process.env.NEXT_PUBLIC_SUPABASE_URL
 const SUPABASE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 const GEMINI_KEY    = process.env.GOOGLE_GENERATIVE_AI_API_KEY
-const GOOGLE_CSE_ID = process.env.GOOGLE_CSE_ID
-
 if (!SUPABASE_URL || !SUPABASE_KEY) {
   console.error('❌ Faltan NEXT_PUBLIC_SUPABASE_URL o SUPABASE_KEY en .env.local')
   process.exit(1)
@@ -37,14 +35,16 @@ if (!GEMINI_KEY) {
   console.error('❌ Falta GOOGLE_GENERATIVE_AI_API_KEY en .env.local')
   process.exit(1)
 }
-if (!GOOGLE_CSE_ID) {
-  console.error('❌ Falta GOOGLE_CSE_ID en .env.local')
-  process.exit(1)
-}
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 const genAI    = new GoogleGenerativeAI(GEMINI_KEY)
-const gemini   = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
+// Gemini con Google Search grounding — busca specs reales en la web en tiempo real
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const gemini   = genAI.getGenerativeModel({
+  model: 'gemini-2.5-flash',
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  tools: [{ googleSearch: {} } as any],
+})
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -185,37 +185,50 @@ Envolvé el resultado en: <long_description>…</long_description>
   return { short: null, long: null }
 }
 
-// ─── Google Image Search ──────────────────────────────────────────────────────
+// ─── DuckDuckGo Image Search ──────────────────────────────────────────────────
 
-interface GoogleImageResult {
-  items?: { link: string; image?: { thumbnailLink: string } }[]
+interface DDGImageResult {
+  results?: { image: string; width?: number; height?: number }[]
 }
 
 async function fetchProductImages(query: string, maxImages = 5): Promise<string[]> {
   const urls: string[] = []
   try {
-    const params = new URLSearchParams({
-      key:        GEMINI_KEY!,   // reutilizamos la misma Google API key
-      cx:         GOOGLE_CSE_ID!,
-      q:          query,
-      searchType: 'image',
-      num:        String(maxImages),
-      imgType:    'photo',
-      imgSize:    'large',
-      safe:       'active',
-    })
-
-    const res = await fetch(`https://www.googleapis.com/customsearch/v1?${params}`)
-    if (!res.ok) {
-      const err = await res.json() as { error?: { message: string } }
-      console.error(`  ⚠️  Google CSE error: ${err.error?.message ?? res.status}`)
-      return urls
+    const headers = {
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
+      'Referer':    'https://duckduckgo.com/',
     }
 
-    const data = await res.json() as GoogleImageResult
-    for (const item of data.items ?? []) {
+    // Step 1: get vqd token
+    const initRes = await fetch(
+      `https://duckduckgo.com/?q=${encodeURIComponent(query)}&iax=images&ia=images`,
+      { headers }
+    )
+    const html = await initRes.text()
+    const vqdMatch = html.match(/vqd=['"]([^'"]+)['"]/)
+    if (!vqdMatch) return urls
+    const vqd = vqdMatch[1]
+
+    // Step 2: fetch image results
+    const imgRes = await fetch(
+      `https://duckduckgo.com/i.js?q=${encodeURIComponent(query)}&vqd=${vqd}&p=1&o=json&l=us-en`,
+      { headers }
+    )
+    if (!imgRes.ok) return urls
+
+    const data = await imgRes.json() as DDGImageResult
+    for (const item of data.results ?? []) {
       if (urls.length >= maxImages) break
-      if (item.link) urls.push(item.link)
+      // Prefer larger images (filter out tiny thumbnails)
+      if (item.image && (item.width ?? 0) >= 400) urls.push(item.image)
+    }
+
+    // Fallback: accept any size if not enough results
+    if (urls.length < maxImages) {
+      for (const item of data.results ?? []) {
+        if (urls.length >= maxImages) break
+        if (item.image && !urls.includes(item.image)) urls.push(item.image)
+      }
     }
   } catch (err) {
     console.error(`  ⚠️  Error buscando imágenes: ${(err as Error).message}`)
@@ -319,10 +332,13 @@ async function main() {
 
       // ── Images ──
       if (!hasImages) {
-        // Evitar duplicar la marca si el nombre del producto ya la incluye
+        // Construir query precisa: evitar marca duplicada y agregar contexto de producto oficial
         const brand = p.brands?.name ?? ''
         const nameAlreadyHasBrand = brand && p.name.toLowerCase().startsWith(brand.toLowerCase())
-        const query = nameAlreadyHasBrand || !brand ? p.name : `${brand} ${p.name}`
+        const baseName = nameAlreadyHasBrand || !brand ? p.name : `${brand} ${p.name}`
+        // Limpiar variantes de storage/color del nombre para mejor match visual
+        const cleanName = baseName.replace(/\s+\d+\/\d+\s*(gb|tb)?/gi, '').replace(/\s+(esim|5g|4g)/gi, '').trim()
+        const query = `${cleanName} official product photo`
         console.log(`  🔎 Buscando imágenes: "${query}"`)
 
         const urls = await fetchProductImages(query)

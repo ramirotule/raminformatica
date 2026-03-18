@@ -34,6 +34,9 @@ CATEGORIA_MAP = {
     "MACBOOK": "Notebooks & Macbooks",
     "NOTEBOOK": "Notebooks & Macbooks",
     "LAPTOP": "Notebooks & Macbooks",
+    "IMAC": "Desktop / PC de Escritorio",
+    "MAC MINI": "Desktop / PC de Escritorio",
+    "MAC STUDIO": "Desktop / PC de Escritorio",
     "IPAD": "Tablets & Ipads",
     "TABLET": "Tablets & Ipads",
     "AIRPODS": "AirPods",
@@ -48,6 +51,9 @@ CATEGORIA_MAP = {
     "XBOX": "Video Juegos",
     "CARGADOR": "Cargadores",
     "AURICULAR": "Audio JBL",
+    "ACCESORIOS": "Accesorios",
+    "MOUSE": "Mouse",
+    "TECLADO": "Teclados",
 }
 
 # Líneas que indican que son headers o separadores, no productos
@@ -133,13 +139,17 @@ class ProcesadorKadabra:
         ))
 
     def limpiar_nombre_producto(self, nombre: str) -> str:
-        """Limpia emojis y caracteres raros del nombre."""
-        # Quitar emojis unicode
+        """Limpia emojis y caracteres raros del nombre (en cualquier posición)."""
+        # Quitar emojis suplementarios (U+10000–U+10FFFF)
         nombre = re.sub(r'[\U00010000-\U0010ffff]', '', nombre)
-        # Quitar emojis básicos
-        nombre = re.sub(r'[\U00002600-\U000027BF]', '', nombre)
-        # Limpiar caracteres especiales al inicio
-        nombre = re.sub(r'^[\s\-\*\•\→\►\▶\⚡\✅\❌\⚠️\🔹\🔸]+', '', nombre)
+        # Quitar emojis del plano básico (U+2000–U+27BF, U+2B00–U+2BFF, U+FE00–U+FEFF)
+        nombre = re.sub(r'[\u2000-\u27BF\u2B00-\u2BFF\uFE00-\uFEFF]', '', nombre)
+        # Quitar variantes de emoji y símbolos misceláneos
+        nombre = re.sub(r'[\u2600-\u26FF\u2700-\u27BF]', '', nombre)
+        # Quitar caracteres especiales de decoración (flechas, bullets, etc.)
+        nombre = re.sub(r'[✅❌⚠️🔹🔸►▶→•\*]', '', nombre)
+        # Quitar cualquier carácter no ASCII que quede al inicio/final
+        nombre = re.sub(r'^[^\x00-\x7F\wáéíóúÁÉÍÓÚñÑüÜ]+', '', nombre)
         nombre = re.sub(r'\s+', ' ', nombre).strip()
         return nombre
 
@@ -159,18 +169,45 @@ class ProcesadorKadabra:
         return ' '.join(resultado)
 
     def recategorizar_por_nombre(self, nombre: str, categoria_actual: str) -> str:
-        """Ajusta la categoría basándose en el nombre del producto."""
+        """Ajusta la categoría basándose en el nombre del producto (tiene prioridad sobre el header)."""
         nu = nombre.upper()
+
+        # Desktop / PC de Escritorio
+        if 'IMAC' in nu or 'MAC MINI' in nu or 'MAC STUDIO' in nu:
+            return 'Desktop / PC de Escritorio'
+
+        # Notebooks
         if 'MACBOOK' in nu:
             return 'Notebooks & Macbooks'
+
+        # Tablets
         if 'IPAD' in nu:
             return 'Tablets & Ipads'
+
+        # AirPods
         if 'AIRPODS' in nu or 'AIR PODS' in nu:
             return 'AirPods'
-        if 'WATCH' in nu or 'SERIES' in nu:
+
+        # Smartwatch
+        if re.search(r'\bWATCH\b|\bSERIES\b|\bMILANESE\b', nu):
             return 'Smartwatch'
-        if 'AIRTAG' in nu or 'PENCIL' in nu:
+
+        # Teclados
+        if 'MAGIC KEYBOARD' in nu or 'TECLADO' in nu:
+            return 'Teclados'
+
+        # Mouse
+        if 'MAGIC MOUSE' in nu or 'MAGIC TRACKPAD' in nu:
+            return 'Mouse'
+
+        # Cargadores
+        if re.search(r'CARGADOR|ADAPTADOR|CHARGER', nu):
+            return 'Cargadores'
+
+        # Accesorios Apple (Pencil, AirTag, etc.)
+        if re.search(r'PENCIL|AIRTAG|AIR TAG', nu):
             return 'Accesorios'
+
         return categoria_actual
 
     def extraer_productos_del_texto(self, texto_completo: str) -> list:
