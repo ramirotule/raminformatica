@@ -1,120 +1,104 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+consolidar_precios.py — Consolida precios de múltiples proveedores.
+
+Usa matcher.py para detectar el mismo producto vendido por distintos proveedores
+y conserva solo el de menor precio_costo.
+"""
+
 import json
 import os
-import re
 from datetime import datetime
 
-def normalizar_para_comparacion(nombre):
-    """
-    Normaliza el nombre del producto para detectar duplicados entre proveedores.
-    """
-    if not nombre:
-        return ""
-    
-    # 1. Todo a minúsculas
-    n = nombre.lower().strip()
-    
-    # 2. Quitar emojis y símbolos especiales
-    n = re.sub(r'[^\w\s/]', '', n)
-    
-    # 3. Normalizar espacios
-    n = re.sub(r'\s+', ' ', n)
-    
-    # 4. Normalizar unidades de memoria (quitar GB, TB pero mantener el número)
-    # n = re.sub(r'(\d+)\s*(gb|tb|ssd|ram)', r'\1', n)
-    # Nota: Decidí mantener las unidades pero sin espacio para evitar errores
-    n = n.replace(" gb", "gb").replace(" tb", "tb").replace(" ssd", "ssd").replace(" ram", "ram")
-    
-    # 5. Quitar palabras que sobran para la comparación
-    n = n.replace("nuevo", "").replace("new", "").replace("solo wifi", "wifi")
-    
-    # 6. Quitar espacios finales/iniciales después de limpieza
-    return n.strip()
+from matcher import deduplicate_by_best_price
 
-def consolidar_mejor_precio(archivo_entrada="productos_ram_completo.json", archivo_salida="../app/public/productos_ram.json"):
+
+def consolidar_mejor_precio(
+    archivo_entrada="productos_ram_completo.json",
+    archivo_salida="../app/public/productos_ram.json"
+):
     """
-    Lee todos los productos, busca duplicados por nombre y mantiene solo el de mejor precio.
+    Lee todos los productos del consolidado, detecta duplicados entre proveedores
+    usando matching inteligente de specs, y genera el JSON público con el mejor precio.
     """
     if not os.path.exists(archivo_entrada):
-        print(f"❌ No se encontró el archivo completo: {archivo_entrada}")
+        print(f"❌ No se encontró: {archivo_entrada}")
         return False
-        
+
     try:
         with open(archivo_entrada, 'r', encoding='utf-8') as f:
             datos = json.load(f)
-            
+
         productos_lista = datos.get('productos', [])
         if not productos_lista:
             print("⚠️ No hay productos para consolidar")
             return False
-            
-        # Diccionario para agrupar por nombre normalizado
-        # Key: nombre_normalizado, Value: producto_info
-        mejores_productos = {}
-        duplicados_omitidos = 0
-        
-        for p in productos_lista:
-            nombre_orig = p.get('nombre', '')
-            # Usamos la categoría también para evitar falsos positivos si hay nombres genéricos
-            categoria = p.get('categoria', '')
-            precio = p.get('precio', 999999)
-            
-            # Generar clave de comparación
-            key = f"{normalizar_para_comparacion(nombre_orig)}"
-            
-            if key not in mejores_productos:
-                mejores_productos[key] = p
-            else:
-                # Si ya existe, comparar precios
-                if precio < mejores_productos[key]['precio']:
-                    mejores_productos[key] = p
-                    duplicados_omitidos += 1
-                else:
-                    duplicados_omitidos += 1
-        
-        # Crear estructura final para el JSON público
-        # El público NO debe tener precio_costo ni info de ganancia
+
+        print(f"🔍 Consolidando {len(productos_lista)} productos con matching inteligente...")
+
+        # Contar proveedores únicos
+        proveedores = set(p.get('proveedor', '?') for p in productos_lista)
+        print(f"   📦 Proveedores detectados: {', '.join(sorted(proveedores))}")
+
+        # Deduplicar usando matcher inteligente
+        productos_unicos = deduplicate_by_best_price(productos_lista, threshold=0.75)
+
+        duplicados_omitidos = len(productos_lista) - len(productos_unicos)
+
+        # Loguear productos que tenían alternativas más caras
+        for p in productos_unicos:
+            if p.get('_alternatives'):
+                alts = p['_alternatives']
+                alt_info = ', '.join(
+                    f"{a['proveedor']} ${a['precio_costo']}"
+                    for a in alts
+                )
+                print(f"   💰 Mejor precio: {p['nombre'][:50]} "
+                      f"← {p['proveedor']} ${p.get('precio_costo', '?')} "
+                      f"(descartado: {alt_info})")
+
+        # Construir JSON público (sin precio_costo ni info interna)
         productos_publicos = []
-        for key, p in mejores_productos.items():
+        for p in productos_unicos:
             prod_pub = {
                 "nombre": p.get('nombre'),
                 "precio": p.get('precio'),
                 "categoria": p.get('categoria'),
                 "proveedor": p.get('proveedor')
             }
-            # Opcional: Podríamos agregar un flag "es_mejor_precio": True si fuera útil el frontend
             productos_publicos.append(prod_pub)
-            
-        # Actualizar metadatos
+
+        # Metadatos
         metadatos = datos.get('metadatos', {}).copy()
-        metadatos["ultima_actualizacion_publica"] = datetime.now().strftime("%d/%m/%Y %H:%M")
-        metadatos["total_productos_publicos"] = len(productos_publicos)
-        metadatos["duplicados_precio_alto_omitidos"] = duplicados_omitidos
-        
+        metadatos.update({
+            "ultima_actualizacion_publica": datetime.now().strftime("%d/%m/%Y %H:%M"),
+            "total_productos_publicos": len(productos_publicos),
+            "duplicados_precio_alto_omitidos": duplicados_omitidos,
+        })
+
         estructura_final = {
             "metadatos": metadatos,
             "productos": productos_publicos
         }
-        
-        # Guardar JSON público
-        os.makedirs(os.path.dirname(archivo_salida), exist_ok=True)
+
+        os.makedirs(os.path.dirname(os.path.abspath(archivo_salida)), exist_ok=True)
         with open(archivo_salida, 'w', encoding='utf-8') as f:
             json.dump(estructura_final, f, indent=2, ensure_ascii=False)
-            
-        print(f"✅ Consolidación completada:")
+
+        print(f"\n✅ Consolidación completada:")
         print(f"   📊 Productos únicos (mejor precio): {len(productos_publicos)}")
-        print(f"   🗑️  Duplicados con precio mayor omitidos: {duplicados_omitidos}")
-        print(f"   📂 Archivo generado: {archivo_salida}")
-        
+        print(f"   🗑️  Duplicados caros omitidos: {duplicados_omitidos}")
+        print(f"   📂 Archivo: {archivo_salida}")
         return True
-        
+
     except Exception as e:
         print(f"❌ Error en consolidación: {e}")
         import traceback
         traceback.print_exc()
         return False
+
 
 if __name__ == "__main__":
     consolidar_mejor_precio()
