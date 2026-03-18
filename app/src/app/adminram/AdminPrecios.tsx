@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { DollarSign, Upload, Zap, AlertCircle, CheckCircle2, FileJson, FileText, Loader2, ShieldCheck, ArrowLeft, Search, CheckSquare, PlusCircle, Database, Building2 } from 'lucide-react'
+import { DollarSign, Upload, Zap, AlertCircle, CheckCircle2, FileJson, FileText, Loader2, ShieldCheck, ArrowLeft, Search, PlusCircle, Database } from 'lucide-react'
 import { parseImportData, searchMatches, processSync, getMissingProducts, triggerEnrichment, type ParsedItem } from './precios/actions'
 import { SearchableSelect } from '@/components/SearchableSelect'
 import { supabase } from '@/lib/supabase'

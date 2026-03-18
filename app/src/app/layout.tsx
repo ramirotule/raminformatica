@@ -1,8 +1,11 @@
 import type { Metadata } from 'next'
 import { Inter, Outfit } from 'next/font/google'
+import Script from 'next/script'
 import './globals.css'
 import { dict } from '@/lib/dict'
 import LayoutShell from '@/components/LayoutShell'
+
+const GA_ID = 'G-SL953TM4S3'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -104,6 +107,19 @@ export default function RootLayout({
         />
       </head>
       <body style={{ fontFamily: 'var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif' }}>
+        {/* Google Analytics 4 */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="ga4-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_ID}');
+          `}
+        </Script>
         <LayoutShell>
           {children}
         </LayoutShell>
