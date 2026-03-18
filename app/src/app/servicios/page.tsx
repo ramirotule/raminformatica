@@ -81,7 +81,7 @@ export default function ServiciosPage() {
     return (
         <main>
             {/* Hero Section */}
-            <section className="hero" style={{ minHeight: '40vh', display: 'flex', alignItems: 'center' }}>
+            <section className="hero" style={{ minHeight: '40vh', display: 'flex', alignItems: 'center', paddingTop: '40px' }}>
                 <div className="container hero-content">
                     <div className="hero-eyebrow">
                         <Zap size={13} />

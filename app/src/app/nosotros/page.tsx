@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 export default function NosotrosPage() {
     return (
         <main>
-            <section className="hero" style={{ minHeight: '30vh' }}>
+            <section className="hero" style={{ minHeight: '30vh', paddingTop: '40px' }}>
                 <div className="container hero-content">
                     <h1 className="hero-title">
                         <span>Quiénes somos</span>

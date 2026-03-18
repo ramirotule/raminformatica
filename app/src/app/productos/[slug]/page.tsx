@@ -95,7 +95,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-            <div className="section" style={{ paddingTop: '100px' }}>
+            <div className="section" style={{ paddingTop: 28 }}>
                 <div className="container">
                     <ProductDetailClient product={typedProduct} />
                 </div>
