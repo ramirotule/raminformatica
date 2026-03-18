@@ -54,6 +54,7 @@ CATEGORIA_MAP = {
     "ACCESORIOS": "Accesorios",
     "MOUSE": "Mouse",
     "TECLADO": "Teclados",
+    "GARMIN": "Smartwatch",
 }
 
 # Líneas que indican que son headers o separadores, no productos
@@ -81,6 +82,16 @@ class ProcesadorKadabra:
         for kw in HEADER_KEYWORDS:
             if kw in texto.split():
                 return None  # Es info general, no categoría de producto
+
+        # Multi-palabra primero (para evitar que "MAC" en "MACBOOK" matchee "MAC MINI")
+        if 'MAC MINI' in texto or 'MAC STUDIO' in texto:
+            return 'Desktop / PC de Escritorio'
+        if 'MAGIC KEYBOARD' in texto:
+            return 'Teclados'
+        if 'MAGIC MOUSE' in texto or 'MAGIC TRACKPAD' in texto:
+            return 'Mouse'
+        if 'AIR PODS' in texto:
+            return 'AirPods'
 
         for keyword, categoria in CATEGORIA_MAP.items():
             if re.search(r'\b' + re.escape(keyword) + r'\b', texto):
@@ -154,18 +165,23 @@ class ProcesadorKadabra:
         return nombre
 
     def formatear_nombre(self, nombre: str, categoria: str) -> str:
-        """Title case respetando excepciones técnicas."""
-        excepciones_upper = {"GB", "TB", "SSD", "RAM", "5G", "4G", "LTE", "DS", "M3", "M4", "M5"}
+        """Title case respetando excepciones técnicas (GB, TB, 5G, etc.)."""
+        excepciones_upper = {"GB", "TB", "SSD", "RAM", "5G", "4G", "LTE", "M3", "M4", "M5", "GPS", "USB-C", "USB"}
         palabras = nombre.split()
         resultado = []
         for pal in palabras:
-            pal_check = pal.upper().replace('/', '').replace('(', '').replace(')', '')
-            if any(ex in pal_check for ex in excepciones_upper):
-                resultado.append(pal.upper())
+            pal_up = pal.upper()
+            # Comparación exacta contra excepciones
+            pal_check = pal_up.replace('/', '').replace('(', '').replace(')', '')
+            if pal_check in excepciones_upper:
+                resultado.append(pal_up)
+            # Palabras con dígitos que terminan en unidad técnica: "256GB", "8/256GB", "20W", "USB-C"
+            elif re.search(r'\d', pal) and re.search(r'(?:GB|TB|MB|GHZ|MHZ|W|NM)$', pal_up):
+                resultado.append(pal_up)
             elif len(pal) > 1:
                 resultado.append(pal[0].upper() + pal[1:].lower())
             else:
-                resultado.append(pal.upper())
+                resultado.append(pal_up)
         return ' '.join(resultado)
 
     def recategorizar_por_nombre(self, nombre: str, categoria_actual: str) -> str:
@@ -189,7 +205,7 @@ class ProcesadorKadabra:
             return 'AirPods'
 
         # Smartwatch
-        if re.search(r'\bWATCH\b|\bSERIES\b|\bMILANESE\b', nu):
+        if re.search(r'\bWATCH\b|\bSERIES\b|\bMILANESE\b|\bGARMIN\b|\bFENIX\b|\bFOREATHLETE\b|\bFORErunner\b', nu):
             return 'Smartwatch'
 
         # Teclados
@@ -235,9 +251,20 @@ class ProcesadorKadabra:
                 continue
 
             # ── Detectar header de categoría ──
+            # Una línea es header si: matchea categoría, no tiene precio, Y cumple al menos uno de:
+            #   a) Empieza con emoji/símbolo (carácter no alfanumérico ASCII)
+            #   b) Es corta (< 45 chars) y no contiene "GB" ni "/" (no parece un producto)
             cat = self.normalizar_categoria(linea)
-            # Solo tratamos como categoría si la línea es corta (header) y no tiene precio
-            if cat and not self.extraer_precio_x1(linea) and len(linea) < 60:
+            primer_char_es_simbolo = linea and not linea[0].isascii() or (linea and not linea[0].isalnum())
+            parece_header = (
+                cat and
+                not self.extraer_precio_x1(linea) and
+                (
+                    primer_char_es_simbolo or
+                    (len(linea) < 45 and 'GB' not in linea.upper() and '/' not in linea)
+                )
+            )
+            if parece_header:
                 categoria_actual = cat
                 print(f"   📂 Categoría: {categoria_actual} (de: {linea[:50]})")
                 i += 1

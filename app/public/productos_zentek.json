@@ -1,315 +1,831 @@
 {
   "metadatos": {
-    "ultima_actualizacion": "16/03/2026 23:32",
-    "proveedor": "ZentekBA",
-    "total_productos": 43,
-    "categorias_incluidas": [
-      "Notebooks & Macbooks",
-      "Tablets & Ipads",
-      "RAY-BAN META"
-    ]
+    "ultima_actualizacion": "18/03/2026 01:30",
+    "proveedor": "Zentek",
+    "total_productos": 137
   },
   "productos": [
     {
-      "nombre": "Macbook Air 13” - M3 24GB 512GB SSD",
-      "precio": 1410,
-      "precio_costo": 1245.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA"
+      "nombre": "Iphone 14 256GB",
+      "precio": 605,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
     },
     {
-      "nombre": "Macbook Air 15” - M3 16GB 256GB SSD",
-      "precio": 1380,
-      "precio_costo": 1220.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA"
+      "nombre": "Iphone 14 512GB",
+      "precio": 635,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
     },
     {
-      "nombre": "Macbook Air 13” - M4 16GB 256GB SSD",
-      "precio": 1240,
-      "precio_costo": 1095.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA"
+      "nombre": "Iphone 15 128GB",
+      "precio": 720,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
     },
     {
-      "nombre": "Macbook Air 13” - M4 16GB 512GB SSD",
-      "precio": 1480,
-      "precio_costo": 1310.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA"
+      "nombre": "Iphone 15 256GB",
+      "precio": 835,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
     },
     {
-      "nombre": "Macbook Air 15” - M4 16GB 256GB SSD",
-      "precio": 1495,
-      "precio_costo": 1325.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA"
+      "nombre": "Iphone 16e 128GB",
+      "precio": 670,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
     },
     {
-      "nombre": "Macbook Air 15” - M4 16GB 512GB SSD",
-      "precio": 1835,
-      "precio_costo": 1630.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA"
+      "nombre": "Iphone 16 128GB",
+      "precio": 840,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
     },
     {
-      "nombre": "Macbook Pro 14” - M4 16GB 512GB SSD",
-      "precio": 1890,
-      "precio_costo": 1680.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA"
+      "nombre": "Iphone 17e 256GB",
+      "precio": 795,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
     },
     {
-      "nombre": "Macbook Pro 14” - M4 Pro 24GB 512GB SSD",
-      "precio": 2360,
-      "precio_costo": 2100.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA"
+      "nombre": "Iphone 17 256GB",
+      "precio": 1005,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
     },
     {
-      "nombre": "Macbook Pro 16” - M4 Pro 24GB 512GB SSD",
-      "precio": 3080,
-      "precio_costo": 2750.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA"
+      "nombre": "Iphone 17 Air 256GB",
+      "precio": 1105,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
     },
     {
-      "nombre": "Macbook Pro 16” - M4 Pro 48GB 512GB SSD",
-      "precio": 3415,
-      "precio_costo": 3050.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA"
+      "nombre": "Iphone 17 Pro 256GB",
+      "precio": 1435,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
     },
     {
-      "nombre": "Macbook Pro 16” - M4 Max 36GB 1TB SSD",
-      "precio": 4415,
-      "precio_costo": 3950.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA"
+      "nombre": "Iphone 17 Pro 512GB",
+      "precio": 1680,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
     },
     {
-      "nombre": "Macbook Pro 14” - M5 16GB 512GB SSD",
-      "precio": 1970,
-      "precio_costo": 1750.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA"
+      "nombre": "Iphone 17 Pro 1TB",
+      "precio": 1860,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
     },
     {
-      "nombre": "Macbook Pro 14” - M5 16GB 1TB SSD",
-      "precio": 2245,
-      "precio_costo": 2000.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA"
+      "nombre": "Iphone 17 Pro Max 256GB",
+      "precio": 1605,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
     },
     {
-      "nombre": "Macbook Pro 14” - M5 24GB 1TB SSD",
-      "precio": 2480,
-      "precio_costo": 2210.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA"
+      "nombre": "Iphone 17 Pro Max 512GB",
+      "precio": 1825,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Iphone 17 Pro Max 1TB",
+      "precio": 2045,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Iphone 17 Pro Max 2TB",
+      "precio": 2490,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung A07 4/64GB",
+      "precio": 175,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung A16 4/128GB",
+      "precio": 205,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung A17 4/128GB",
+      "precio": 230,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung A17 8/256GB 5G",
+      "precio": 320,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung A26 6/128GB 5G",
+      "precio": 310,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung A36 5G 8/128GB",
+      "precio": 335,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung A36 5G 8/256GB",
+      "precio": 370,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung A56 8/128GB 5G",
+      "precio": 420,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung A56 8/256GB 5G",
+      "precio": 465,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung A56 12/256GB 5G",
+      "precio": 480,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung S25 Fe 8/256GB",
+      "precio": 690,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung S25 Fe 8/512GB",
+      "precio": 735,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung S25 12 / 128 5G DS",
+      "precio": 780,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung S25 12 / 256 5G DS",
+      "precio": 810,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung S25 Plus 12GB / 256 5G DS",
+      "precio": 925,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung S25 Plus 12GB / 512 5G DS",
+      "precio": 1005,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung S25 Ultra 12GB / 256GB",
+      "precio": 1060,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung S25 Ultra 12GB / 512GB",
+      "precio": 1145,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung S25 Ultra 12GB / 1TB",
+      "precio": 1225,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung S26 12 / 256 5G DS",
+      "precio": 960,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung S26 12 / 512 5G DS",
+      "precio": 1090,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung S26 Plus 12GB / 256GB",
+      "precio": 1160,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung S26 Plus 12GB / 512GB",
+      "precio": 1290,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung S26 Ultra 12GB / 256GB",
+      "precio": 1385,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung S26 Ultra 12GB / 512GB",
+      "precio": 1515,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Samsung S26 Ultra 12GB / 1TB",
+      "precio": 1805,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Note 14 8/256GB",
+      "precio": 265,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Redmi 15 8+256GB",
+      "precio": 265,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Redmi 15c 4/256GB",
+      "precio": 195,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Redmi 15c 8/256GB",
+      "precio": 215,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Note 14 Pro 5G 8/256GB",
+      "precio": 375,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Note 14 Pro Plus 5G 8/256GB",
+      "precio": 435,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Note 14 Pro Plus 5G 12/512GB",
+      "precio": 495,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Note 15 4G 6/128GB",
+      "precio": 270,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Note 15 4G 8/256GB",
+      "precio": 290,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Note 15 Pro 4G 8/256GB",
+      "precio": 360,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Note 15 Pro 5G 8/256GB",
+      "precio": 420,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Note 15 Pro Plus 8/256GB",
+      "precio": 485,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Note 15 Pro Plus 12/512GB",
+      "precio": 545,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Poco C85 8+256GB",
+      "precio": 220,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Poco M7 8/256GB",
+      "precio": 230,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Poco M7 Pro 8/256GB",
+      "precio": 320,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Poco X7 Pro 5G 8/256GB",
+      "precio": 420,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Poco X7 Pro 5G 12/512GB",
+      "precio": 475,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Poco F7 Pro 5G 12/512GB",
+      "precio": 710,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Poco F7 Ultra 5G 12/256GB",
+      "precio": 705,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Mi 14t Pro 5G Leica 12/512",
+      "precio": 790,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Mi 15 5G 12/512",
+      "precio": 925,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Mi 15t 5G 12/512GB Slim",
+      "precio": 675,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Xiaomi Mi 15t Pro 5G Leica 12/512GB",
+      "precio": 1005,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Motorola G86 8+256GB 5G",
+      "precio": 330,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Motorola Razr 50 Ultra 5G 12/512GB",
+      "precio": 755,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Motorola Edge 60 Fusion 5G 12/256 GB",
+      "precio": 370,
+      "categoria": "Celulares",
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ipad A16 11\" 128GB (solo Wifi)",
       "precio": 470,
-      "precio_costo": 400.0,
       "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ipad A16 11\" 256GB (solo Wifi)",
       "precio": 580,
-      "precio_costo": 500.0,
       "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ipad Mini 7ma 8.3\" 128GB (solo Wifi)",
-      "precio": 620,
-      "precio_costo": 535.0,
+      "precio": 610,
       "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ipad Mini 7ma 8.3\" 256GB (solo Wifi)",
-      "precio": 730,
-      "precio_costo": 635.0,
+      "precio": 720,
       "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
-    },
-    {
-      "nombre": "Ipad Mini 7ma 8.3\" 512GB (solo Wifi)",
-      "precio": 995,
-      "precio_costo": 875.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ipad Air M3 11\" 7ma 128GB (solo Wifi)",
       "precio": 690,
-      "precio_costo": 600.0,
       "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ipad Air M3 11\" 7ma 256GB (solo Wifi)",
-      "precio": 860,
-      "precio_costo": 750.0,
+      "precio": 890,
       "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ipad Air M3 11\" 7ma 512GB (solo Wifi)",
-      "precio": 1170,
-      "precio_costo": 1030.0,
+      "precio": 1160,
       "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ipad Air M3 13\" 7ma 128GB (solo Wifi)",
       "precio": 915,
-      "precio_costo": 800.0,
       "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ipad Air M3 13\" 7ma 256GB (solo Wifi)",
       "precio": 1115,
-      "precio_costo": 980.0,
       "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ipad Pro M4 11\" 256GB (solo Wifi)",
-      "precio": 1060,
-      "precio_costo": 930.0,
+      "precio": 1135,
       "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ipad Pro M4 11\" 1TB (solo Wifi)",
       "precio": 1535,
-      "precio_costo": 1360.0,
       "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ipad Pro M4 13\" 256GB (solo Wifi)",
       "precio": 1415,
-      "precio_costo": 1250.0,
       "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ipad Pro M5 11\" 256GB (solo Wifi)",
       "precio": 1135,
-      "precio_costo": 1000.0,
       "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ipad Pro M5 11\" 512GB (solo Wifi)",
       "precio": 1420,
-      "precio_costo": 1255.0,
       "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ipad Pro M5 13\" 256GB (solo Wifi)",
       "precio": 1460,
-      "precio_costo": 1290.0,
       "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ipad Pro M5 13\" 512GB (solo Wifi)",
       "precio": 1725,
-      "precio_costo": 1530.0,
       "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ipad Pro M5 13\" 1TB",
       "precio": 2235,
-      "precio_costo": 1990.0,
       "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ipad Pro M5 13\" 2TB",
-      "precio": 2945,
-      "precio_costo": 2630.0,
+      "precio": 2960,
       "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ipad Pro M5 13\" 256GB + Cell",
-      "precio": 2005,
-      "precio_costo": 1780.0,
+      "precio": 2015,
       "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ipad Pro M5 13\" 512GB + Cell",
-      "precio": 2225,
-      "precio_costo": 1980.0,
+      "precio": 2235,
       "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "proveedor": "Zentek"
     },
     {
-      "nombre": "Apple Pencil (carga Via Usb-c)",
+      "nombre": "Apple Pencil (carga Via USB-C)",
       "precio": 155,
-      "precio_costo": 115.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "categoria": "Accesorios",
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Apple Pencil 2 (carga Inalámbrica)",
       "precio": 160,
-      "precio_costo": 120.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "categoria": "Accesorios",
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Nuevo - Apple Pencil Pro",
       "precio": 175,
-      "precio_costo": 135.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA"
+      "categoria": "Accesorios",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Magic Keyboard Folio Ipad A16",
+      "precio": 405,
+      "categoria": "Teclados",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Magic Keyboard Ipad Air M3 11\"",
+      "precio": 360,
+      "categoria": "Teclados",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Magic Keyboard Ipad Air M3 13\"",
+      "precio": 515,
+      "categoria": "Teclados",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Magic Keyboard Ipad Pro M4/m5 11\"",
+      "precio": 405,
+      "categoria": "Teclados",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Magic Keyboard Ipad Pro M4/m5 13\"",
+      "precio": 505,
+      "categoria": "Teclados",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Apple Series Se 2 40mm",
+      "precio": 290,
+      "categoria": "Smartwatch",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Apple Series Se 2 44mm",
+      "precio": 310,
+      "categoria": "Smartwatch",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Apple Series Se 3 40mm",
+      "precio": 330,
+      "categoria": "Smartwatch",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Apple Series Se 3 44mm",
+      "precio": 370,
+      "categoria": "Smartwatch",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Apple Series 11 42mm",
+      "precio": 425,
+      "categoria": "Smartwatch",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Apple Series 11 46mm",
+      "precio": 475,
+      "categoria": "Smartwatch",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Apple Series Ultra 2 49mm",
+      "precio": 815,
+      "categoria": "Smartwatch",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Apple Series Ultra 3",
+      "precio": 890,
+      "categoria": "Smartwatch",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Apple Series Ultra 3 Milanese",
+      "precio": 1080,
+      "categoria": "Smartwatch",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Airpods Pro 2 (USB-C)",
+      "precio": 295,
+      "categoria": "AirPods",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Airpods Pro 3 (USB-C)",
+      "precio": 305,
+      "categoria": "AirPods",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Airpods 4ta Gen S/cancelación",
+      "precio": 160,
+      "categoria": "AirPods",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Airpods 4ta Gen C/cancelación",
+      "precio": 210,
+      "categoria": "AirPods",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Airpods Max USB-C",
+      "precio": 625,
+      "categoria": "AirPods",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Airtag X1",
+      "precio": 105,
+      "categoria": "Accesorios",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Airtags Pack De 4 Unidades",
+      "precio": 130,
+      "categoria": "Accesorios",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Airtags X4 2da Gen",
+      "precio": 155,
+      "categoria": "Accesorios",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Macbook Air 13 - M3 24GB 512GB SSD",
+      "precio": 1410,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Macbook Air 15 - M3 16GB 256GB SSD",
+      "precio": 1380,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Macbook Air 13 - M4 16GB 256GB SSD",
+      "precio": 1270,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Macbook Air 13 - M4 16GB 512GB SSD",
+      "precio": 1470,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Macbook Air 15 - M4 16GB 256GB SSD",
+      "precio": 1480,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Macbook Air 15 - M4 16GB 512GB SSD",
+      "precio": 1690,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Macbook Pro 14 - M4 16GB 512GB SSD",
+      "precio": 1890,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Macbook Pro 14 - M4 Pro 24GB 512GB SSD",
+      "precio": 2480,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Macbook Pro 16 - M4 Pro 24GB 512GB SSD",
+      "precio": 3090,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Macbook Pro 16 - M4 Pro 48GB 512GB SSD",
+      "precio": 3415,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Macbook Pro 16 - M4 Max 36GB 1TB SSD",
+      "precio": 4415,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Macbook Pro 14 - M5 16GB 512GB SSD",
+      "precio": 1970,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Macbook Pro 14 - M5 16GB 1TB SSD",
+      "precio": 2245,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Mac Mini M4 16GB 256GB",
+      "precio": 835,
+      "categoria": "Desktop / PC de Escritorio",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Mac Mini M4 16GB 512GB",
+      "precio": 1070,
+      "categoria": "Desktop / PC de Escritorio",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Imac 24\" M4 16RAM 256SSD - 8/8",
+      "precio": 2030,
+      "categoria": "Desktop / PC de Escritorio",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Imac 24\" M4 16RAM 256SSD - 10/10",
+      "precio": 2290,
+      "categoria": "Desktop / PC de Escritorio",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Imac 24\" M4 16RAM 512SSD - 10/10",
+      "precio": 2525,
+      "categoria": "Desktop / PC de Escritorio",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Imac 24\" M4 24RAM 512SSD - 10/10",
+      "precio": 2760,
+      "categoria": "Desktop / PC de Escritorio",
+      "proveedor": "Zentek"
+    },
+    {
+      "nombre": "Imac 24\" M4 24RAM 1TB - 10/10",
+      "precio": 3315,
+      "categoria": "Desktop / PC de Escritorio",
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ray-ban | Meta Wayfarer - Gen 1",
       "precio": 460,
-      "precio_costo": 390.0,
-      "categoria": "RAY-BAN META",
-      "proveedor": "ZentekBA"
+      "categoria": "Lentes",
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ray-ban | Meta Wayfarer - Gen 2",
       "precio": 545,
-      "precio_costo": 470.0,
-      "categoria": "RAY-BAN META",
-      "proveedor": "ZentekBA"
+      "categoria": "Lentes",
+      "proveedor": "Zentek"
     },
     {
       "nombre": "Ray-ban | Meta Headliner - Gen 2",
       "precio": 545,
-      "precio_costo": 470.0,
-      "categoria": "RAY-BAN META",
-      "proveedor": "ZentekBA"
-    },
-    {
-      "nombre": "Macbook Neo 13\" Chip A18 Pro 8/256",
-      "precio": 960,
-      "precio_costo": 840.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA"
-    },
-    {
-      "nombre": "Macbook Neo 13\" Chip A18 Pro 8/512",
-      "precio": 1070,
-      "precio_costo": 940.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA"
+      "categoria": "Lentes",
+      "proveedor": "Zentek"
     }
   ]
 }

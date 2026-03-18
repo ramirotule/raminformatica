@@ -1,0 +1,501 @@
+{
+  "metadatos": {
+    "ultima_actualizacion": "18/03/2026 00:51",
+    "total_productos": 82,
+    "proveedor": "Kadabra"
+  },
+  "productos": [
+    {
+      "nombre": "Macbook Air M4 13\" 16gb, 256GB",
+      "precio": 1225,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Macbook Air M4 13\" 16GB 256GB Teclado Español",
+      "precio": 1405,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Macbook Air M4 13\" 16gb, 512GB",
+      "precio": 1460,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Macbook Air M4 15\" 16GB 256GB",
+      "precio": 1470,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Macbook Air M4 15\" 16gb, 512GB",
+      "precio": 1725,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Macbook Air M4 13\" 24gb, 512GB",
+      "precio": 1795,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Macbook Pro M5 14\" 16gb, 512GB",
+      "precio": 1960,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Macbook Pro M5 14\" 16gb, 1TB",
+      "precio": 2185,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Macbook Pro M5 14\" 24gb, 1TB",
+      "precio": 2470,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Macbook Pro M4 Pro 14\" 24gb, 512GB",
+      "precio": 2470,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Macbook Pro M4 Pro 16\" 24gb, 512GB",
+      "precio": 3110,
+      "categoria": "Notebooks & Macbooks",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Mac Mini M4 16gb, 256GB",
+      "precio": 790,
+      "categoria": "Desktop / PC de Escritorio",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Imac M4 24 16gb, 256GB (8c)",
+      "precio": 2040,
+      "categoria": "Desktop / PC de Escritorio",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Imac M4 24 16gb, 256GB (10c)",
+      "precio": 2265,
+      "categoria": "Desktop / PC de Escritorio",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Imac M4 24 16gb, 512GB (10c)",
+      "precio": 2470,
+      "categoria": "Desktop / PC de Escritorio",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Imac M4 24 24gb, 512GB (10c)",
+      "precio": 2770,
+      "categoria": "Desktop / PC de Escritorio",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Imac M4 24 24gb, 1TB (10c)",
+      "precio": 3385,
+      "categoria": "Desktop / PC de Escritorio",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Imac M4 24 32gb, 1TB (10c)",
+      "precio": 3665,
+      "categoria": "Desktop / PC de Escritorio",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Ipad 11\" A16 128GB",
+      "precio": 490,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Ipad 10.2 128GB",
+      "precio": 525,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Ipad 11\" A16 256GB",
+      "precio": 615,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Ipad 10.2 256GB",
+      "precio": 645,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Ipad Mini 7 128GB",
+      "precio": 660,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Ipad Mini 7 256GB",
+      "precio": 745,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Ipad Air M3 11 128GB",
+      "precio": 710,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Ipad Air M3 11\" 128GB",
+      "precio": 715,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Ipad Air M3 11\" 256GB",
+      "precio": 885,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Ipad Air M3 13\" 128GB",
+      "precio": 960,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Ipad Air M3 13\" 256",
+      "precio": 1140,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Ipad Pro M4 11\" 256GB",
+      "precio": 1130,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Ipad Pro M5 11\" 256",
+      "precio": 1155,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Ipad Pro M4 11\" 256GB Cellular/4g",
+      "precio": 1215,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Ipad Pro M5 11\" 512GB",
+      "precio": 1470,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Ipad Pro M5 13\" 256GB",
+      "precio": 1470,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Ipad Pro M4 11\" 1TB",
+      "precio": 1535,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Ipad Pro M4 13\" 512GB Cellular/4g",
+      "precio": 1570,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Ipad Pro M5 13\" 512GB",
+      "precio": 1820,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Ipad Pro M5 13\" 1TB",
+      "precio": 2490,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Ipad Pro M5 13\" 2TB",
+      "precio": 2995,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Watch Se 2 40mm Star, Mid Sport Band",
+      "precio": 295,
+      "categoria": "Smartwatch",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Serie Se 2 44mm +cell Mid",
+      "precio": 315,
+      "categoria": "Smartwatch",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Watch Se 2 44mm Star, Mid Sport Band",
+      "precio": 315,
+      "categoria": "Smartwatch",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Watch Se 3 40mm",
+      "precio": 360,
+      "categoria": "Smartwatch",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Watch Se 3 44mm",
+      "precio": 385,
+      "categoria": "Smartwatch",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Serie Se 3 44mm +cell Mid",
+      "precio": 385,
+      "categoria": "Smartwatch",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Watch Serie 11 42mm Consultar Color",
+      "precio": 475,
+      "categoria": "Smartwatch",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Watch Se 3 40mm +cell",
+      "precio": 490,
+      "categoria": "Smartwatch",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Watch Serie 11 46mm Consultar Color",
+      "precio": 505,
+      "categoria": "Smartwatch",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Watch Ultra 2 49mm +cel",
+      "precio": 765,
+      "categoria": "Smartwatch",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Watch Ultra 3 49mm +cel",
+      "precio": 920,
+      "categoria": "Smartwatch",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Airpods 4",
+      "precio": 185,
+      "categoria": "AirPods",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Airpods 4 Noise Cancelling",
+      "precio": 225,
+      "categoria": "AirPods",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Airpods Pro 2",
+      "precio": 265,
+      "categoria": "AirPods",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Airpods Pro 3",
+      "precio": 325,
+      "categoria": "AirPods",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Airpods Max USB-C",
+      "precio": 660,
+      "categoria": "AirPods",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Adaptador Original Apple 20W USB-C",
+      "precio": 105,
+      "categoria": "Cargadores",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Cargador 40W / 60W Max",
+      "precio": 145,
+      "categoria": "Cargadores",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Magic Mouse Black",
+      "precio": 160,
+      "categoria": "Mouse",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Apple Pencil 2nd Gen",
+      "precio": 160,
+      "categoria": "Accesorios",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Airtag X4",
+      "precio": 180,
+      "categoria": "Accesorios",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Apple Pencil Pro",
+      "precio": 185,
+      "categoria": "Accesorios",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Magic Mouse White",
+      "precio": 185,
+      "categoria": "Mouse",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Magic Trackpad White",
+      "precio": 220,
+      "categoria": "Mouse",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Magic Trackpad Black",
+      "precio": 230,
+      "categoria": "Mouse",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Magic Keyboard With Touch Id White",
+      "precio": 265,
+      "categoria": "Teclados",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Magic Keyboard Con Touch Id And Numeric Pad Black",
+      "precio": 355,
+      "categoria": "Teclados",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Magic Keyboard Ipad Pro 11\" (M4) White",
+      "precio": 385,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Magic Keyboard Ipad A16 White",
+      "precio": 415,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Magic Keyboard Ipad A16 White Español",
+      "precio": 435,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Magic Keyboard Ipad Pro 11\" (M4) Black",
+      "precio": 445,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Magic Keyboard Ipad Air 11\" Black",
+      "precio": 460,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Magic Keyboard Ipad Air 11\" White",
+      "precio": 460,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Magic Keyboard Ipad Pro 13\" (M4) White",
+      "precio": 505,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Magic Keyboard Ipad Air 13\" White",
+      "precio": 515,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Magic Keyboard Ipad Air 13\" White Español",
+      "precio": 525,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Magic Keyboard Ipad Pro 13\" (M4) Black",
+      "precio": 545,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Samsung Galaxy Watch 8 40mm Silver/black",
+      "precio": 315,
+      "categoria": "Smartwatch",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Samsung Galaxy Watch 8 44mm Silver",
+      "precio": 345,
+      "categoria": "Smartwatch",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Samsung Galaxy Watch 8 Classic 46mm White/black",
+      "precio": 405,
+      "categoria": "Smartwatch",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Samsung Galaxy Watch Ultra 47mm Titanium Gray/titanium Silver/titanium Blue (2025)",
+      "precio": 445,
+      "categoria": "Smartwatch",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Garmin Forerunner 165 Music Berry / Lilac",
+      "precio": 415,
+      "categoria": "Smartwatch",
+      "proveedor": "Kadabra"
+    },
+    {
+      "nombre": "Garmin Fenix 8 47mm Premium Multisport Slate Gray / Black Band",
+      "precio": 1070,
+      "categoria": "Smartwatch",
+      "proveedor": "Kadabra"
+    }
+  ]
+}
