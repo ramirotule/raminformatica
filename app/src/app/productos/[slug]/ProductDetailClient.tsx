@@ -431,7 +431,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     <div
                         onClick={e => e.stopPropagation()}
                         style={{
-                            background: 'var(--bg, #0f0f0f)',
+                            background: 'var(--bg-card)',
                             border: '1px solid var(--border)',
                             borderRadius: 'var(--radius-lg)',
                             padding: '28px 32px',
@@ -440,7 +440,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                             maxHeight: '80vh',
                             overflowY: 'auto',
                             position: 'relative',
-                            boxShadow: '0 32px 80px rgba(0,0,0,0.9)'
+                            boxShadow: 'var(--shadow-lg)'
                         }}
                     >
                         {/* Header */}
@@ -451,7 +451,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                             <button
                                 onClick={() => setSpecsOpen(false)}
                                 style={{
-                                    background: 'rgba(255,255,255,0.06)',
+                                    background: 'var(--bg-secondary)',
                                     border: '1px solid var(--border-light)',
                                     borderRadius: '50%',
                                     width: 32,

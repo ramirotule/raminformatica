@@ -24,7 +24,7 @@ npm run enrich-products:force    # Re-genera TODO aunque ya tenga datos
 | Supabase | Leer/escribir productos e imágenes | `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
 
 ## REGLAS DE NEGOCIO
-- Solo completar campos si están vacíos o null o bien la descripcio short_description no cumple con el formato que especifico para la misma.
+- Solo completar campos si están vacíos o null o bien la descripcion short_description no cumple con el formato que especifico para la misma.
 - Solo insertar imágenes si el producto no tiene ninguna
 - Nunca duplicar registros
 - Idempotente: ejecutar N veces = mismo resultado
