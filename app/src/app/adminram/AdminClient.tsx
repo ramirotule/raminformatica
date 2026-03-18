@@ -1118,14 +1118,14 @@ function AdminProductos() {
                                         Proveedor {sortField === 'providers.name' && (sortOrder === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
                                     </div>
                                 </th>
+                                <th style={{ userSelect: 'none' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                        Costo USD
+                                    </div>
+                                </th>
                                 <th onClick={() => handleSort('priceUSD')} style={{ cursor: 'pointer', userSelect: 'none' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                                         Precio USD {sortField === 'priceUSD' && (sortOrder === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
-                                    </div>
-                                </th>
-                                <th onClick={() => handleSort('condition')} style={{ cursor: 'pointer', userSelect: 'none' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                        Condición {sortField === 'condition' && (sortOrder === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
                                     </div>
                                 </th>
                                 <th onClick={() => handleSort('active')} style={{ cursor: 'pointer', userSelect: 'none' }}>
@@ -1189,13 +1189,11 @@ function AdminProductos() {
                                         <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{p.categories?.name}</td>
                                         <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{p.brands?.name}</td>
                                         <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{p.providers?.name || <span style={{ color: 'var(--text-muted)' }}>—</span>}</td>
+                                        <td style={{ fontWeight: 600, color: (p as any).cost_price ? 'var(--text-secondary)' : 'var(--text-muted)' }}>
+                                            {(p as any).cost_price ? formatUSD(Number((p as any).cost_price)) : <span style={{ color: 'var(--text-muted)' }}>—</span>}
+                                        </td>
                                         <td style={{ fontWeight: 700 }}>
                                             {priceUSD ? formatUSD(Number(priceUSD)) : <span style={{ color: 'var(--text-muted)' }}>—</span>}
-                                        </td>
-                                        <td>
-                                            <span className={`badge badge-${(p.condition || 'new') === 'new' ? 'new' : p.condition === 'oem' ? 'oem' : p.condition === 'refurbished' ? 'refurbished' : 'used'}`}>
-                                                {conditionLabel(p.condition || 'new')}
-                                            </span>
                                         </td>
                                         <td>
                                             <button

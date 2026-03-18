@@ -5,9 +5,17 @@ import { useCart } from '@/context/CartContext'
 import { useDolarBlue } from '@/hooks/useDolarBlue'
 import { formatUSD, formatARS, getPriceUSD, getPriceARS, conditionLabel } from '@/lib/utils'
 import type { ProductWithDetails, ProductImage } from '@/lib/database.types'
-import { ShoppingCart, ChevronLeft, Minus, Plus, ShieldCheck, Truck, X, ChevronRight, House } from 'lucide-react'
+import { ShoppingCart, ChevronLeft, Minus, Plus, ShieldCheck, Truck, X, ChevronRight, House, ChevronDown, CreditCard } from 'lucide-react'
 import Link from 'next/link'
 import AddedToCartModal from '@/components/AddedToCartModal'
+
+// Tabla de intereses por cuotas
+const CUOTAS_CONFIG = [
+    { cuotas: 3,  recargo: 0.1167 },
+    { cuotas: 6,  recargo: 0.1945 },
+    { cuotas: 9,  recargo: 0.2754 },
+    { cuotas: 12, recargo: 0.3377 },
+]
 
 interface ProductDetailClientProps {
     product: ProductWithDetails
@@ -25,9 +33,13 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
     const [lightboxIndex, setLightboxIndex] = useState(0)
     const [addedModalOpen, setAddedModalOpen] = useState(false)
 
+    const [cuotasOpen, setCuotasOpen] = useState(false)
+    const [specsOpen, setSpecsOpen] = useState(false)
+
     const variant = product.product_variants?.[0]
     const priceUSD = getPriceUSD(variant?.prices, product.price_usd)
     const priceARS = priceUSD && dolar ? getPriceARS(priceUSD, dolar.venta) : null
+    const priceARSTransfer = priceARS ? Math.round(priceARS * 1.03) : null
     const stock = variant?.inventory?.[0]?.qty_available ?? 0
 
     const handleAddToCart = () => {
@@ -125,43 +137,159 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                         <>
                             <div className="detail-price-usd">{formatUSD(priceUSD)}</div>
                             {priceARS !== null && (
-                                <div className="detail-price-ars">{formatARS(priceARS)} ARS</div>
+                                <div className="detail-price-ars">
+                                    {formatARS(priceARS)} ARS
+                                    <sup style={{ fontSize: '0.6em', color: 'var(--accent)', marginLeft: 2 }}>*</sup>
+                                </div>
                             )}
                         </>
                     ) : (
                         <div className="detail-price-usd">Consultar precio</div>
                     )}
+
+                    {/* Nota efectivo vs transferencia */}
+                    {priceARS !== null && priceARSTransfer !== null && (
+                        <div style={{
+                            marginTop: 10,
+                            padding: '10px 14px',
+                            borderRadius: 'var(--radius-md)',
+                            background: 'rgba(var(--accent-rgb, 99,102,241), 0.07)',
+                            border: '1px solid rgba(var(--accent-rgb, 99,102,241), 0.2)',
+                            fontSize: '0.82rem',
+                            lineHeight: '1.6',
+                            color: 'var(--text-secondary)'
+                        }}>
+                            <span style={{ color: 'var(--accent)', fontWeight: 700 }}>* Precio contado efectivo.</span>{' '}
+                            Transferencia bancaria o MercadoPago suma un 3%:{' '}
+                            <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
+                                {formatARS(priceARSTransfer)} ARS
+                            </span>
+                        </div>
+                    )}
+
+                    {/* Simulador de cuotas */}
+                    {priceARS !== null && (
+                        <div style={{ marginTop: 10 }}>
+                            <button
+                                onClick={() => setCuotasOpen(o => !o)}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 8,
+                                    width: '100%',
+                                    padding: '10px 14px',
+                                    borderRadius: 'var(--radius-md)',
+                                    background: 'rgba(255,255,255,0.04)',
+                                    border: '1px solid var(--border-light)',
+                                    cursor: 'pointer',
+                                    color: 'var(--text-primary)',
+                                    fontSize: '0.85rem',
+                                    fontWeight: 600,
+                                    transition: 'background 0.2s'
+                                }}
+                            >
+                                <CreditCard size={15} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+                                Simular pago en cuotas
+                                <ChevronDown
+                                    size={15}
+                                    style={{
+                                        marginLeft: 'auto',
+                                        transition: 'transform 0.25s',
+                                        transform: cuotasOpen ? 'rotate(180deg)' : 'rotate(0deg)'
+                                    }}
+                                />
+                            </button>
+
+                            {cuotasOpen && (
+                                <div style={{
+                                    marginTop: 4,
+                                    borderRadius: 'var(--radius-md)',
+                                    border: '1px solid var(--border-light)',
+                                    overflow: 'hidden',
+                                    animation: 'fadeIn 0.2s ease-out'
+                                }}>
+                                    {/* Encabezado tabla */}
+                                    <div style={{
+                                        display: 'grid',
+                                        gridTemplateColumns: '1.8fr 1fr',
+                                        padding: '8px 14px',
+                                        background: 'rgba(255,255,255,0.04)',
+                                        borderBottom: '1px solid var(--border-light)',
+                                        fontSize: '0.75rem',
+                                        fontWeight: 700,
+                                        color: 'var(--text-secondary)',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.04em',
+                                        textAlign: 'center'
+                                    }}>
+                                        <span>Cantidad de Cuotas</span>
+                                        <span>Valor por cuota</span>
+                                    </div>
+                                    {/* Filas */}
+                                    {CUOTAS_CONFIG.map(({ cuotas, recargo }) => {
+                                        const totalConRecargo = Math.round(priceARS * (1 + recargo))
+                                        const valorCuota = Math.round(totalConRecargo / cuotas)
+                                        return (
+                                            <div
+                                                key={cuotas}
+                                                style={{
+                                                    display: 'grid',
+                                                    gridTemplateColumns: '1.8fr 1fr',
+                                                    padding: '10px 14px',
+                                                    borderBottom: '1px solid var(--border-light)',
+                                                    fontSize: '0.85rem',
+                                                    alignItems: 'center',
+                                                    textAlign: 'center'
+                                                    
+                                                }}
+                                            >
+                                                <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>
+                                                    {cuotas}
+                                                </span>
+                                                <span style={{ color: 'var(--text-secondary)' }}>
+                                                    {formatARS(valorCuota)} por mes
+                                                </span>
+                                            </div>
+                                        )
+                                    })}
+                                    <div style={{
+                                        padding: '8px 14px',
+                                        fontSize: '0.72rem',
+                                        color: 'var(--text-secondary)',
+                                        opacity: 0.7
+                                    }}>
+                                        * Precios en pesos según cotización del día. Cuotas sujetas a intereses bancarios.
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     <p className="price-notice">* Precio sujeto a cambios sin previo aviso</p>
                 </div>
-                
-                {product.long_description && (
-                    <div style={{ 
-                        marginBottom: 32, 
-                        background: 'rgba(255, 255, 255, 0.02)', 
-                        padding: '16px 20px', 
-                        borderRadius: 'var(--radius-md)',
-                        border: '1px solid var(--border-light)'
-                    }}>
-                        <h4 style={{ 
-                            fontSize: '0.9rem', 
-                            fontWeight: 800, 
-                            marginBottom: 12, 
-                            color: 'var(--text-primary)',
+
+                {product.short_description && (
+                    <button
+                        onClick={() => setSpecsOpen(true)}
+                        style={{
                             display: 'flex',
                             alignItems: 'center',
-                            gap: 8
-                        }}>
-                            📦 Características principales
-                        </h4>
-                        <div style={{ 
-                            fontSize: '0.9rem', 
-                            lineHeight: '1.6', 
-                            color: 'var(--text-secondary)',
-                            whiteSpace: 'pre-wrap'
-                        }}>
-                            {product.long_description}
-                        </div>
-                    </div>
+                            gap: 8,
+                            width: '100%',
+                            marginBottom: 24,
+                            padding: '11px 16px',
+                            borderRadius: 'var(--radius-md)',
+                            background: 'rgba(255,255,255,0.04)',
+                            border: '1px solid var(--border-light)',
+                            cursor: 'pointer',
+                            color: 'var(--text-primary)',
+                            fontSize: '0.88rem',
+                            fontWeight: 600,
+                            transition: 'background 0.2s, border-color 0.2s'
+                        }}
+                    >
+                        📋 Ver especificaciones principales
+                    </button>
                 )}
 
 
@@ -217,15 +345,18 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     </div>
                 </div>
             </div>
-
             {/* ─── Descripción (Ancho completo debajo) ────────────────────── */}
-            <div style={{ 
-                gridColumn: '1 / -1', 
-                marginTop: 48, 
-                paddingTop: 48, 
-                borderTop: '1px solid var(--border)',
-                animation: 'fadeIn 0.6s ease-out forwards'
-            }}>
+            <div
+                id="descripcion-producto"
+                style={{ 
+                    gridColumn: '1 / -1', 
+                    marginTop: 48, 
+                    paddingTop: 48, 
+                    borderTop: '1px solid var(--border)',
+                    animation: 'fadeIn 0.6s ease-out forwards',
+                    scrollMarginTop: 185
+                }}
+            >
                 <h3 style={{ 
                     fontSize: '1.5rem', 
                     fontWeight: 800, 
@@ -242,9 +373,111 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     whiteSpace: 'pre-wrap', // Esto respeta los saltos de línea
                     maxWidth: '900px' // Opcional: para que no sea excesivamente ancho en pantallas gigantes
                 }}>
-                    {product.short_description || 'Sin descripción disponible.'}
+                    {product.long_description || 'Sin descripción disponible.'}
                 </div>
             </div>
+
+            {/* Specs Modal */}
+            {specsOpen && product.short_description && (
+                <div
+                    onClick={() => setSpecsOpen(false)}
+                    style={{
+                        position: 'fixed',
+                        inset: 0,
+                        zIndex: 1000,
+                        background: 'rgba(0,0,0,0.8)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '24px',
+                        backdropFilter: 'blur(6px)',
+                        animation: 'fadeIn 0.2s ease-out'
+                    }}
+                >
+                    <div
+                        onClick={e => e.stopPropagation()}
+                        style={{
+                            background: 'var(--bg, #0f0f0f)',
+                            border: '1px solid var(--border)',
+                            borderRadius: 'var(--radius-lg)',
+                            padding: '28px 32px',
+                            maxWidth: 560,
+                            width: '100%',
+                            maxHeight: '80vh',
+                            overflowY: 'auto',
+                            position: 'relative',
+                            boxShadow: '0 32px 80px rgba(0,0,0,0.9)'
+                        }}
+                    >
+                        {/* Header */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+                                📋 Especificaciones principales
+                            </h3>
+                            <button
+                                onClick={() => setSpecsOpen(false)}
+                                style={{
+                                    background: 'rgba(255,255,255,0.06)',
+                                    border: '1px solid var(--border-light)',
+                                    borderRadius: '50%',
+                                    width: 32,
+                                    height: 32,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: 'pointer',
+                                    color: 'var(--text-secondary)',
+                                    flexShrink: 0
+                                }}
+                            >
+                                <X size={16} />
+                            </button>
+                        </div>
+                        {/* Nombre del producto */}
+                        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: 16 }}>
+                            {product.name}
+                        </p>
+                        {/* Contenido */}
+                        <div style={{
+                            fontSize: '0.92rem',
+                            lineHeight: '1.75',
+                            color: 'var(--text-secondary)',
+                            whiteSpace: 'pre-wrap',
+                            borderTop: '1px solid var(--border-light)',
+                            paddingTop: 16,
+                            marginBottom: 24
+                        }}>
+                            {product.short_description}
+                        </div>
+                        {/* Botón ir a descripción */}
+                        <button
+                            onClick={() => {
+                                setSpecsOpen(false)
+                                setTimeout(() => {
+                                    document.getElementById('descripcion-producto')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                                }, 150)
+                            }}
+                            style={{
+                                width: '100%',
+                                padding: '12px 20px',
+                                borderRadius: 'var(--radius-md)',
+                                background: 'var(--accent)',
+                                border: 'none',
+                                color: '#fff',
+                                fontSize: '0.92rem',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: 8
+                            }}
+                        >
+                            Ver descripción completa ↓
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Lightbox Modal */}
             {lightboxOpen && images.length > 0 && (

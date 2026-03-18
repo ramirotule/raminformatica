@@ -22,19 +22,19 @@ class AutomatizadorWSP:
         self.proveedores = {
             "GcGroup": {
                 "archivo_salida": "output/lista_gcgroup.txt",
-                "filtro_inicio": ["lista de hoy"],  # Específico para GcGroup
+                "filtro_inicio": ["lista de hoy", "buen dia"],
                 "nombre_corto": "gcgroup",
                 "busqueda_alternativa": ["gc", "group", "gcgroup"]
             },
             "Kadabra Tecnología": {  # Simplificado
                 "archivo_salida": "output/lista_kadabra.txt", 
-                "filtro_inicio": ["lista", "precios", "iphone", "samsung"],
+                "filtro_inicio": ["lista", "precios", "iphone", "samsung", "kadabra"],
                 "nombre_corto": "kadabra",
                 "busqueda_alternativa": ["kadabra", "kadabra tecnologia", "kadabra tecnología"]
             },
             "Zentek BA": {
                 "archivo_salida": "output/lista_zentek.txt",
-                "filtro_inicio": ["lista de hoy"],  # Específico para Zentek BA
+                "filtro_inicio": ["lista", "precios", "zentek"],
                 "nombre_corto": "zentek",
                 "busqueda_alternativa": ["zentek", "zentekba", "zentek ba"]
             },
@@ -171,10 +171,15 @@ class AutomatizadorWSP:
             print(f"❌ Error configurando navegador: {e}")
             return False
     
-    def buscar_mensaje_objetivo_hoy(self):
-        """Buscar específicamente el mensaje con la fecha de hoy - MÉTODO OPTIMIZADO"""
+    def buscar_mensaje_objetivo_hoy(self, config=None):
+        """Buscar específicamente el mensaje con la fecha de hoy - MÉTODO FLEXIBLE Y OPTIMIZADO"""
         try:
-            print(f"🎯 Buscando mensaje: 'BUEN DIA TE DEJO LA LISTA DE HOY {self.fecha_hoy}'")
+            # Configuración de búsqueda basada en el proveedor
+            filtro_inicio = config.get("filtro_inicio", []) if config else ["LISTA DE HOY", "BUEN DIA"]
+            nombre_proveedor = config.get("nombre_corto", "proveedor") if config else "proveedor"
+            
+            print(f"🎯 Buscando mensaje de hoy para {nombre_proveedor}: {self.fecha_hoy}")
+            print(f"🔍 Usando filtros: {filtro_inicio}")
             
             # PASO 1: Ir al final del chat (mensajes más recientes) SIN scroll excesivo
             print("📍 Posicionándose al final del chat...")
@@ -206,252 +211,95 @@ class AutomatizadorWSP:
             except Exception as e:
                 print(f"   ⚠️ Error posicionándose al final: {e}")
             
-            # PASO 2: Buscar el elemento específico con la clase exacta que mencionaste
-            print("🔍 Buscando elemento con clase específica...")
+            # PASO 2: Buscar el elemento específico con la clase exacta de los mensajes de WhatsApp
+            print("🔍 Buscando elementos de mensaje...")
             selector_objetivo = '//div[@class="x9f619 x1hx0egp x1yrsyyn xizg8k xu9hqtb xwib8y2"]'
             
             elementos_encontrados = self.driver.find_elements(By.XPATH, selector_objetivo)
-            print(f"   📊 Encontrados {len(elementos_encontrados)} elementos con clase específica")
+            print(f"   📊 Encontrados {len(elementos_encontrados)} elementos de mensaje")
             
             # PASO 2.1: EXPANDIR MENSAJES LARGOS ANTES DE EXTRAER
-            print("📖 Expandiendo mensajes largos antes de extraer...")
+            print("📖 Expandiendo mensajes largos en el área visible...")
             self.expandir_mensaje_especifico()
             
             # Re-buscar elementos después de la expansión
             elementos_encontrados = self.driver.find_elements(By.XPATH, selector_objetivo)
             print(f"   📊 Después de expandir: {len(elementos_encontrados)} elementos")
             
-            # PASO 3: Buscar dentro de esos elementos el mensaje con la fecha de hoy
-            for i, elemento in enumerate(elementos_encontrados):
+            # Preparar fecha simplificada para matching alternativo (ej: 17/03)
+            # Extraer solo el número del día (ej: "17" de "MARTES 17 DE MARZO")
+            m_dia = re.search(r"\b(\d{1,2})\b", self.fecha_hoy)
+            dia_objetivo = m_dia.group(1) if m_dia else str(datetime.now().day)
+            mes_num = datetime.now().month
+            fecha_corta = f"{int(dia_objetivo)}/{mes_num:02d}" # ej: 17/03
+            fecha_normalizada = self.normalizar_texto(self.fecha_hoy)
+            
+            # PASO 3: Buscar dentro de esos elementos el mensaje que coincida
+            # Empezar desde el final (más reciente)
+            for i, elemento in enumerate(reversed(elementos_encontrados)):
                 try:
                     texto_elemento = elemento.text.strip()
-                    if not texto_elemento:
+                    if not texto_elemento or len(texto_elemento) < 100:
                         continue
                         
                     # Convertir a mayúsculas y normalizar (sin acentos) para comparación
                     texto_upper = texto_elemento.upper()
                     texto_normalizado = self.normalizar_texto(texto_upper)
-                    fecha_normalizada = self.normalizar_texto(self.fecha_hoy)
                     
-                    # EXCLUSIÓN: Ignorar completamente listas de colores
-                    if "LISTA DE MODELOS Y COLORES" in texto_normalizado:
-                        print(f"   ❌ Elemento {i+1} IGNORADO: Contiene 'LISTA DE MODELOS Y COLORES'")
+                    # EXCLUSIÓN: Ignorar listas de colores
+                    criterios_exclusion = ["LISTA DE MODELOS Y COLORES", "📱👇🏻📱", "DISPONIBILIDAD", "COLORES DISPONIBLES"]
+                    if any(ex in texto_normalizado for ex in criterios_exclusion):
                         continue
                     
-                    if "📱👇🏻📱" in texto_elemento:
-                        print(f"   ❌ Elemento {i+1} IGNORADO: Contiene emojis de lista de colores")
-                        continue
+                    # --- LÓGICA DE COINCIDENCIA ---
+                    # 1. ¿Contiene alguna palabra clave del filtro?
+                    match_keywords = any(kw.upper() in texto_normalizado for kw in filtro_inicio)
+                    if not match_keywords:
+                        # Fallback a palabras clave genéricas de listas de precios
+                        match_keywords = any(kw in texto_normalizado for kw in ["LISTA", "PRECIOS", "SAMSUNG", "IPHONE"])
                     
-                    # BÚSQUEDA: Mensaje con fecha de hoy (sin acentos para mayor flexibilidad)
-                    if (("BUEN DIA TE DEJO LA LISTA DE HOY" in texto_normalizado or 
-                         "LISTA DE HOY" in texto_normalizado) and 
-                        fecha_normalizada in texto_normalizado):
+                    # 2. ¿Contiene la fecha?
+                    # Probamos: Formato exacto ("17 DE MARZO"), formato corto ("17/03") o número de día con palabra "LISTA"
+                    match_fecha = (fecha_normalizada in texto_normalizado or 
+                                   fecha_corta in texto_normalizado or
+                                   (match_keywords and f" {int(dia_objetivo)} " in f" {texto_normalizado} "))
+                    
+                    if match_keywords and match_fecha:
+                        print(f"   🎯 ¡MENSAJE OBJETIVO ENCONTRADO! (Posición {len(elementos_encontrados)-i})")
+                        print(f"   📝 Longitud inicial: {len(texto_elemento)} caracteres")
                         
-                        print(f"   🎯 ¡MENSAJE OBJETIVO ENCONTRADO! (Elemento {i+1})")
-                        print(f"   📝 Longitud: {len(texto_elemento)} caracteres")
-                        print(f"   📝 Inicio: '{texto_elemento[:150]}...'")
-                        
-                        # VERIFICACIÓN DE COMPLETITUD
+                        # --- VERIFICACIÓN DE COMPLETITUD Y EXPANSIÓN AGRESIVA ---
                         if texto_elemento.endswith("…") or texto_elemento.endswith("...") or "Leer más" in texto_elemento:
                             print(f"   ⚠️ MENSAJE PARECE INCOMPLETO - Aplicando expansión agresiva...")
                             
-                            # ESTRATEGIA AGRESIVA: Expandir TODO en el área del mensaje
+                            # Expandir botones "Leer más"
+                            self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", elemento)
+                            time.sleep(2)
+                            
+                            # Buscar botones dentro del mensaje o cerca
                             try:
-                                self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", elemento)
-                                time.sleep(2)
-                                
-                                # Buscar TODOS los posibles botones "Leer más" en un área amplia
-                                selectores_expansion = [
-                                    './/span[contains(text(), "Leer más")]',
-                                    './/span[contains(text(), "Lee más")]',
-                                    './/span[contains(text(), "…")]',
-                                    './/span[contains(text(), "...")]',
-                                    './/*[contains(text(), "Read more")]',
-                                    './/div[@role="button"]',
-                                    './/*[contains(@class, "read-more")]'
-                                ]
-                                
-                                # También buscar en el contenedor padre y hermanos
-                                areas_busqueda = [elemento]
-                                try:
-                                    contenedor_padre = elemento.find_element(By.XPATH, '..')
-                                    areas_busqueda.append(contenedor_padre)
-                                    
-                                    # Y en el contenedor abuelo
-                                    contenedor_abuelo = contenedor_padre.find_element(By.XPATH, '..')
-                                    areas_busqueda.append(contenedor_abuelo)
-                                except:
-                                    pass
-                                
-                                total_botones_expandidos = 0
-                                
-                                for area in areas_busqueda:
-                                    for selector in selectores_expansion:
-                                        try:
-                                            botones = area.find_elements(By.XPATH, selector)
-                                            if botones:
-                                                print(f"     🎯 Encontrados {len(botones)} botones con '{selector}' en área")
-                                                
-                                                for j, boton in enumerate(botones):
-                                                    try:
-                                                        if boton.is_displayed() and boton.is_enabled():
-                                                            # Hacer scroll al botón específico
-                                                            self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", boton)
-                                                            time.sleep(1)
-                                                            
-                                                            # Múltiples métodos de clic
-                                                            click_exitoso = False
-                                                            
-                                                            # Método 1: JavaScript click
-                                                            try:
-                                                                self.driver.execute_script("arguments[0].click();", boton)
-                                                                click_exitoso = True
-                                                                print(f"       ✅ Botón {j+1} expandido con JS")
-                                                                time.sleep(3)  # Tiempo extendido para expansión
-                                                            except:
-                                                                pass
-                                                            
-                                                            # Método 2: Click directo
-                                                            if not click_exitoso:
-                                                                try:
-                                                                    boton.click()
-                                                                    click_exitoso = True
-                                                                    print(f"       ✅ Botón {j+1} expandido con click directo")
-                                                                    time.sleep(3)
-                                                                except:
-                                                                    pass
-                                                            
-                                                            # Método 3: Doble clic
-                                                            if not click_exitoso:
-                                                                try:
-                                                                    self.driver.execute_script("arguments[0].dispatchEvent(new MouseEvent('click', {bubbles: true}));", boton)
-                                                                    click_exitoso = True
-                                                                    print(f"       ✅ Botón {j+1} expandido con evento")
-                                                                    time.sleep(3)
-                                                                except:
-                                                                    pass
-                                                            
-                                                            if click_exitoso:
-                                                                total_botones_expandidos += 1
-                                                            
-                                                    except Exception as btn_error:
-                                                        continue
-                                        except:
-                                            continue
-                                
-                                print(f"   🎉 Total de botones expandidos en expansión agresiva: {total_botones_expandidos}")
-                                
-                                # Dar tiempo para que TODO se cargue
-                                time.sleep(5)
-                                
-                                # Re-extraer el texto después de la expansión agresiva
-                                tiempo_espera = 0
-                                max_espera = 15  # 15 segundos máximo
-                                
-                                while tiempo_espera < max_espera:
+                                botones = elemento.find_elements(By.XPATH, './/div[@role="button"] | .//span[contains(text(), "Leer más")]')
+                                for btn in botones:
                                     try:
-                                        texto_actualizado = elemento.text.strip()
-                                        if len(texto_actualizado) > len(texto_elemento) and not texto_actualizado.endswith("…"):
-                                            print(f"   🎉 ¡EXPANSIÓN EXITOSA! Texto expandido de {len(texto_elemento)} a {len(texto_actualizado)} caracteres")
-                                            texto_elemento = texto_actualizado
-                                            break
-                                        else:
-                                            time.sleep(1)
-                                            tiempo_espera += 1
-                                    except:
-                                        time.sleep(1)
-                                        tiempo_espera += 1
-                                
-                                if tiempo_espera >= max_espera:
-                                    print(f"   ⚠️ Tiempo de espera agotado, usando texto actual de {len(texto_elemento)} caracteres")
-                                    
-                            except Exception as e:
-                                print(f"   ⚠️ Error en expansión agresiva: {e}")
+                                        self.driver.execute_script("arguments[0].click();", btn)
+                                        print("     ✅ Botón de expansión clicado")
+                                        time.sleep(3)
+                                    except: pass
+                            except: pass
+                            
+                            # Re-extraer texto
+                            texto_elemento = elemento.text.strip()
+                            print(f"   📝 Longitud final: {len(texto_elemento)} caracteres")
                         
-                        # Guardar referencia al elemento
+                        # Guardar referencia
                         self.mensaje_objetivo_encontrado = True
                         self.elemento_mensaje_objetivo = elemento
-                        
                         return texto_elemento
                         
                 except Exception as e:
-                    print(f"   ⚠️ Error procesando elemento {i+1}: {e}")
                     continue
             
-            # PASO 4: Si no se encontró con la clase específica, búsqueda alternativa MÁS FLEXIBLE
-            print("🔄 Búsqueda alternativa: buscando mensaje más reciente del día...")
-            
-            # Buscar simplemente por "LISTA DE HOY" y el número del día (usar día seleccionado)
-            m = re.search(r"\b(\d{1,2})\b", self.fecha_hoy)
-            dia_numero = m.group(1).lstrip('0') if m else str(datetime.now().day)
-            selector_alternativo = f'//div[contains(text(), "LISTA DE HOY") and contains(text(), "{dia_numero}")]'
-            elementos_alternativos = self.driver.find_elements(By.XPATH, selector_alternativo)
-            
-            if elementos_alternativos:
-                print(f"   ✅ Encontrado en búsqueda alternativa!")
-                elemento_alternativo = elementos_alternativos[-1]  # Tomar el más reciente (último)
-                
-                # Buscar el contenedor padre que tenga todo el mensaje
-                contenedor_padre = elemento_alternativo
-                for nivel in range(10):  # Máximo 10 niveles hacia arriba
-                    try:
-                        contenedor_padre = contenedor_padre.find_element(By.XPATH, '..')
-                        texto_contenedor = contenedor_padre.text.strip()
-                        
-                        # Si el contenedor tiene suficiente contenido, usarlo
-                        if len(texto_contenedor) > 500:  # Mínimo para una lista
-                            print(f"   📦 Usando contenedor padre (nivel {nivel+1})")
-                            print(f"   📝 Longitud: {len(texto_contenedor)} caracteres")
-                            
-                            self.mensaje_objetivo_encontrado = True
-                            self.elemento_mensaje_objetivo = contenedor_padre
-                            
-                            return texto_contenedor
-                            
-                    except Exception as e:
-                        break
-            
-            # PASO 5: BÚSQUEDA EXHAUSTIVA - Si aún no se encontró completo
-            print("🔍 BÚSQUEDA EXHAUSTIVA: Buscando versión completa en todo el chat...")
-            
-            # Expandir TODOS los mensajes del día de hoy para asegurar completitud
-            self.expandir_todos_los_mensajes_hoy()
-            
-            # Re-buscar después de expansión exhaustiva
-            elementos_exhaustivos = self.driver.find_elements(By.XPATH, selector_objetivo)
-            
-            for i, elemento in enumerate(elementos_exhaustivos):
-                try:
-                    texto_elemento = elemento.text.strip()
-                    if not texto_elemento:
-                        continue
-                        
-                    texto_upper = texto_elemento.upper()
-                    texto_normalizado = self.normalizar_texto(texto_upper)
-                    fecha_normalizada = self.normalizar_texto(self.fecha_hoy)
-                    
-                    # Solo mensajes con la fecha de hoy y que contengan precios
-                    if (fecha_normalizada in texto_normalizado and 
-                        ("BUEN DIA TE DEJO LA LISTA DE HOY" in texto_normalizado or 
-                         "LISTA DE HOY" in texto_normalizado) and
-                        "$ " in texto_elemento):
-                        
-                        # Verificar si es más completo que versiones anteriores
-                        if not texto_elemento.endswith("…") and not texto_elemento.endswith("..."):
-                            print(f"   🎉 ¡VERSIÓN COMPLETA ENCONTRADA! (Búsqueda exhaustiva)")
-                            print(f"   📝 Longitud: {len(texto_elemento)} caracteres")
-                            
-                            self.mensaje_objetivo_encontrado = True
-                            self.elemento_mensaje_objetivo = elemento
-                            
-                            return texto_elemento
-                        else:
-                            print(f"   ⚠️ Versión encontrada pero aún incompleta: {len(texto_elemento)} chars")
-                            
-                except Exception as e:
-                    continue
-            
-            print("   ❌ No se encontró el mensaje objetivo")
+            print(f"   ❌ No se encontró mensaje de hoy para {nombre_proveedor}")
             return None
             
         except Exception as e:
@@ -1145,13 +993,13 @@ class AutomatizadorWSP:
                 
         return mensajes_filtrados
     
-    def verificar_chat_tiene_mensajes_hoy(self):
-        """Verificar específicamente si existe el mensaje objetivo de hoy - VERSIÓN REFACTORIZADA"""
+    def verificar_chat_tiene_mensajes_hoy(self, config):
+        """Verificar específicamente si existe el mensaje objetivo de hoy - VERSIÓN FLEXIBLE"""
         try:
             print("🔍 Verificación rápida: ¿Existe el mensaje de hoy?")
             
-            # Buscar directamente el mensaje objetivo
-            mensaje_encontrado = self.buscar_mensaje_objetivo_hoy()
+            # Buscar directamente el mensaje objetivo con la config del proveedor
+            mensaje_encontrado = self.buscar_mensaje_objetivo_hoy(config)
             
             if mensaje_encontrado:
                 print("   ✅ ¡Mensaje de hoy confirmado!")
@@ -1220,7 +1068,7 @@ class AutomatizadorWSP:
             print(f"❌ Error abriendo chat {nombre_proveedor}: {e}")
             return False
     
-    def extraer_mensaje_objetivo_optimizado(self):
+    def extraer_mensaje_objetivo_optimizado(self, config=None):
         """Extracción optimizada del mensaje objetivo - REFACTORIZADO"""
         try:
             print("📝 Extrayendo mensaje objetivo con método optimizado...")
@@ -1244,7 +1092,7 @@ class AutomatizadorWSP:
                     print("   🔄 Re-buscando mensaje objetivo...")
             
             # OPCIÓN 2: Buscar el mensaje objetivo desde cero
-            mensaje_encontrado = self.buscar_mensaje_objetivo_hoy()
+            mensaje_encontrado = self.buscar_mensaje_objetivo_hoy(config)
             
             if mensaje_encontrado:
                 print(f"   ✅ Mensaje objetivo extraído: {len(mensaje_encontrado)} caracteres")
@@ -1257,13 +1105,13 @@ class AutomatizadorWSP:
             print(f"❌ Error en extracción optimizada: {e}")
             return []
 
-    def extraer_mensajes_desde_ultima_etiqueta(self):
+    def extraer_mensajes_desde_ultima_etiqueta(self, config=None):
         """MÉTODO REFACTORIZADO: Extracción directa y optimizada del mensaje objetivo"""
         try:
             print("📝 Iniciando extracción optimizada del mensaje objetivo...")
             
             # EXTRACCIÓN DIRECTA: Usar el nuevo método optimizado
-            mensajes_extraidos = self.extraer_mensaje_objetivo_optimizado()
+            mensajes_extraidos = self.extraer_mensaje_objetivo_optimizado(config)
             
             if mensajes_extraidos:
                 print(f"📊 Mensaje extraído exitosamente: {len(mensajes_extraidos[0])} caracteres")
@@ -1604,7 +1452,7 @@ class AutomatizadorWSP:
             return False
         
         # NUEVA VERIFICACIÓN: Comprobar si hay mensaje objetivo de hoy
-        if not self.verificar_chat_tiene_mensajes_hoy():
+        if not self.verificar_chat_tiene_mensajes_hoy(config):
             print(f"⏭️  SALTANDO {nombre_proveedor}: No tiene mensaje objetivo de hoy")
             return False
         
@@ -1612,7 +1460,7 @@ class AutomatizadorWSP:
         
         # EXTRACCIÓN DIRECTA: Sin scroll excesivo hacia atrás
         print("📝 Extrayendo mensaje objetivo directamente...")
-        mensajes = self.extraer_mensajes_desde_ultima_etiqueta()
+        mensajes = self.extraer_mensajes_desde_ultima_etiqueta(config)
         if not mensajes:
             print(f"⚠️ No se encontraron mensajes para {nombre_proveedor}")
             return False
