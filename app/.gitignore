@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# JSONs generados por el automatizador (no versionar, cambian diariamente)
+/public/productos_ram.json
+/public/productos_gcgroup.json
+/public/productos_kadabra.json
+/public/productos_zentek.json

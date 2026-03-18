@@ -323,13 +323,14 @@ export async function searchMatches(items: ParsedItem[], providerId?: string) {
 
 /**
  * Obtiene productos a desactivar.
+ * Si se pasa providerId filtra por proveedor; si no, evalúa todos los productos activos.
  */
-export async function getMissingProducts(matchedIds: string[], providerId: string) {
-    if (!providerId) return [];
+export async function getMissingProducts(matchedIds: string[], providerId?: string) {
     const idsInList = matchedIds.filter(id => !!id);
 
-    let query = supabaseAdmin.from('products').select('id, name, descripcion_original, cost_price').eq('provider_id', providerId).eq('active', true);
-    if (idsInList.length > 0) query = query.not('id', 'in', `(${idsInList.join(',')})`);
+    let query = supabaseAdmin.from('products').select('id, name, descripcion_original, cost_price').eq('active', true);
+    if (providerId) query = (query as any).eq('provider_id', providerId);
+    if (idsInList.length > 0) query = (query as any).not('id', 'in', `(${idsInList.join(',')})`);
 
     const { data: missing } = await query;
     return missing?.map(p => ({
@@ -351,6 +352,7 @@ export async function processSync(items: ParsedItem[], providerId?: string) {
     let created = 0;
     let deactivated = 0;
     const errors: string[] = [];
+    const createdIds: string[] = [];
 
     const DEFAULT_CAT_NAME = "Sin Asignar";
     const DEFAULT_BRAND_NAME = "Sin Asignar";
@@ -470,6 +472,7 @@ export async function processSync(items: ParsedItem[], providerId?: string) {
                         await supabaseAdmin.from('inventory').insert({ variant_id: (v as any).id, qty_available: 10 });
                     }
 
+                    createdIds.push((newP as any).id);
                     created++;
                 } else if (item.status === 'deactivate' && item.matchId) {
                     await supabaseAdmin.from('products').update({ active: false }).eq('id', item.matchId);
@@ -517,9 +520,13 @@ export async function processSync(items: ParsedItem[], providerId?: string) {
         }
 
         // 4. Deactivaciones masivas (productos que NO están en la lista actual)
-        if (providerId && matchedIds.size > 0 && items.some(i => i.status !== 'deactivate')) {
+        // - Con providerId: solo desactiva productos de ese proveedor
+        // - Sin providerId (catálogo consolidado): desactiva TODOS los activos no matcheados
+        if (matchedIds.size > 0 && items.some(i => i.status !== 'deactivate')) {
             console.log("Checking for products to deactivate...");
-            const { data: actives } = await supabaseAdmin.from('products').select('id').eq('provider_id', providerId).eq('active', true);
+            let activeQuery = supabaseAdmin.from('products').select('id').eq('active', true);
+            if (providerId) activeQuery = (activeQuery as any).eq('provider_id', providerId);
+            const { data: actives } = await activeQuery;
             if (actives) {
                 const idsToDeactivate = actives.filter(p => !matchedIds.has(p.id)).map(p => p.id);
                 if (idsToDeactivate.length > 0) {
@@ -538,6 +545,7 @@ export async function processSync(items: ParsedItem[], providerId?: string) {
     return {
         success: errors.length < items.length || items.length === 0,
         message: `Completado. Act: ${updated}, Nuevos: ${created}, Des: ${deactivated}.`,
+        createdIds,
         errors: errors.length > 0 ? errors : undefined
     };
 }
@@ -622,5 +630,30 @@ export async function applyAllBestPrices() {
         return { success: true, message: `Se actualizaron ${count} productos con el mejor precio.` };
     } catch (err: any) {
         return { success: false, message: err.message };
+    }
+}
+
+/**
+ * Dispara el script de enriquecimiento en segundo plano.
+ * Lanza `npm run enrich-products` de forma desacoplada y retorna inmediatamente.
+ * Los productos sin short_description / imágenes serán procesados automáticamente.
+ */
+export async function triggerEnrichment(): Promise<{ started: boolean; message: string }> {
+    try {
+        const { spawn } = await import('child_process');
+        const path = await import('path');
+
+        const appDir = path.resolve(process.cwd());
+        const child = spawn('npm', ['run', 'enrich-products'], {
+            cwd: appDir,
+            detached: true,
+            stdio: 'ignore',
+            env: { ...process.env },
+        });
+        child.unref();
+
+        return { started: true, message: 'Enriquecimiento iniciado en segundo plano.' };
+    } catch (err: any) {
+        return { started: false, message: `No se pudo iniciar el enriquecimiento: ${err.message}` };
     }
 }

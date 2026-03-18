@@ -1,13 +1,11 @@
 {
   "metadatos": {
-    "ultima_actualizacion": "18/03/2026 01:30",
-    "total_productos": 529,
+    "ultima_actualizacion": "18/03/2026 01:38",
+    "total_productos": 392,
     "proveedor": "GcGroup",
     "productos_gcgroup": 173,
     "productos_kadabra": 82,
-    "productos_zentekba": 137,
-    "productos_Zentek": 137,
-    "productos_zentek": 137
+    "productos_Zentek": 137
   },
   "productos": [
     {
@@ -1227,190 +1225,6 @@
       "fecha_actualizacion": "18/03/2026 00:51"
     },
     {
-      "nombre": "Ipad A16 11\" 128GB (solo Wifi)",
-      "precio": 470,
-      "precio_costo": 400.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Ipad A16 11\" 256GB (solo Wifi)",
-      "precio": 580,
-      "precio_costo": 500.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Ipad Mini 7ma 8.3\" 128GB (solo Wifi)",
-      "precio": 610,
-      "precio_costo": 525.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Ipad Mini 7ma 8.3\" 256GB (solo Wifi)",
-      "precio": 720,
-      "precio_costo": 625.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Ipad Air M3 11\" 7ma 128GB (solo Wifi)",
-      "precio": 690,
-      "precio_costo": 600.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Ipad Air M3 11\" 7ma 256GB (solo Wifi)",
-      "precio": 890,
-      "precio_costo": 780.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Ipad Air M3 11\" 7ma 512GB (solo Wifi)",
-      "precio": 1160,
-      "precio_costo": 1020.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Ipad Air M3 13\" 7ma 128GB (solo Wifi)",
-      "precio": 915,
-      "precio_costo": 800.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Ipad Air M3 13\" 7ma 256GB (solo Wifi)",
-      "precio": 1115,
-      "precio_costo": 980.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Ipad Pro M4 11\" 256GB (solo Wifi)",
-      "precio": 1135,
-      "precio_costo": 1000.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Ipad Pro M4 11\" 1TB (solo Wifi)",
-      "precio": 1535,
-      "precio_costo": 1360.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Ipad Pro M4 13\" 256GB (solo Wifi)",
-      "precio": 1415,
-      "precio_costo": 1250.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Ipad Pro M5 11\" 256GB (solo Wifi)",
-      "precio": 1135,
-      "precio_costo": 1000.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Ipad Pro M5 11\" 512GB (solo Wifi)",
-      "precio": 1420,
-      "precio_costo": 1255.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Ipad Pro M5 13\" 256GB (solo Wifi)",
-      "precio": 1460,
-      "precio_costo": 1290.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Ipad Pro M5 13\" 512GB (solo Wifi)",
-      "precio": 1725,
-      "precio_costo": 1530.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Ipad Pro M5 13\" 1TB",
-      "precio": 2235,
-      "precio_costo": 1990.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Ipad Pro M5 13\" 2TB",
-      "precio": 2960,
-      "precio_costo": 2640.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Ipad Pro M5 13\" 256GB + Cell",
-      "precio": 2015,
-      "precio_costo": 1790.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Ipad Pro M5 13\" 512GB + Cell",
-      "precio": 2235,
-      "precio_costo": 1990.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Apple Pencil (carga Via Usb-c)",
-      "precio": 155,
-      "precio_costo": 115.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Apple Pencil 2 (carga Inalámbrica)",
-      "precio": 160,
-      "precio_costo": 120.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Nuevo - Apple Pencil Pro",
-      "precio": 175,
-      "precio_costo": 135.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
       "nombre": "Auricular Jbl Tune T520bt Black/white",
       "precio": 70,
       "precio_costo": 40.0,
@@ -1619,30 +1433,6 @@
       "fecha_actualizacion": "18/03/2026 00:51"
     },
     {
-      "nombre": "Airtag X1",
-      "precio": 105,
-      "precio_costo": 70.0,
-      "categoria": "Accesorios",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Airtags Pack De 4 Unidades",
-      "precio": 130,
-      "precio_costo": 95.0,
-      "categoria": "Accesorios",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Airtags X4 2da Gen",
-      "precio": 155,
-      "precio_costo": 115.0,
-      "categoria": "Accesorios",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
       "nombre": "Airpods 4",
       "precio": 175,
       "precio_costo": 135.0,
@@ -1705,46 +1495,6 @@
       "categoria": "AirPods",
       "proveedor": "Kadabra",
       "fecha_actualizacion": "18/03/2026 00:51"
-    },
-    {
-      "nombre": "AIRPODS Pro 2 (usb-c)",
-      "precio": 295,
-      "precio_costo": 245.0,
-      "categoria": "AirPods",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "AIRPODS Pro 3 (usb-c)",
-      "precio": 305,
-      "precio_costo": 250.0,
-      "categoria": "AirPods",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "AIRPODS 4ta Gen S/cancelación",
-      "precio": 160,
-      "precio_costo": 120.0,
-      "categoria": "AirPods",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "AIRPODS 4ta Gen C/cancelación",
-      "precio": 210,
-      "precio_costo": 165.0,
-      "categoria": "AirPods",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "AIRPODS Max Usb-c",
-      "precio": 625,
-      "precio_costo": 540.0,
-      "categoria": "AirPods",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
     },
     {
       "nombre": "Watch Se 3 Gps 40mm",
@@ -1915,78 +1665,6 @@
       "fecha_actualizacion": "18/03/2026 00:51"
     },
     {
-      "nombre": "Apple Series Se 2 40mm",
-      "precio": 290,
-      "precio_costo": 240.0,
-      "categoria": "Smartwatch",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Apple Series Se 2 44mm",
-      "precio": 310,
-      "precio_costo": 255.0,
-      "categoria": "Smartwatch",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Apple Series Se 3 40mm",
-      "precio": 330,
-      "precio_costo": 275.0,
-      "categoria": "Smartwatch",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Apple Series Se 3 44mm",
-      "precio": 370,
-      "precio_costo": 310.0,
-      "categoria": "Smartwatch",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Apple Series 11 42mm",
-      "precio": 425,
-      "precio_costo": 360.0,
-      "categoria": "Smartwatch",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Apple Series 11 46mm",
-      "precio": 475,
-      "precio_costo": 405.0,
-      "categoria": "Smartwatch",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Apple Series Ultra 2 49mm",
-      "precio": 815,
-      "precio_costo": 710.0,
-      "categoria": "Smartwatch",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Apple Series Ultra 3",
-      "precio": 890,
-      "precio_costo": 780.0,
-      "categoria": "Smartwatch",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Apple Series Ultra 3 Milanese",
-      "precio": 1080,
-      "precio_costo": 950.0,
-      "categoria": "Smartwatch",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
       "nombre": "Macbook Neo A18 13” 8/256 GB",
       "precio": 960,
       "precio_costo": 840.0,
@@ -2081,110 +1759,6 @@
       "categoria": "Notebooks & Macbooks",
       "proveedor": "Kadabra",
       "fecha_actualizacion": "18/03/2026 00:51"
-    },
-    {
-      "nombre": "Macbook Air 13” - M3 24GB 512GB SSD",
-      "precio": 1410,
-      "precio_costo": 1245.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Macbook Air 15” - M3 16GB 256GB SSD",
-      "precio": 1380,
-      "precio_costo": 1220.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Macbook Air 13” - M4 16GB 256GB SSD",
-      "precio": 1270,
-      "precio_costo": 1120.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Macbook Air 13” - M4 16GB 512GB SSD",
-      "precio": 1470,
-      "precio_costo": 1300.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Macbook Air 15” - M4 16GB 256GB SSD",
-      "precio": 1480,
-      "precio_costo": 1310.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Macbook Air 15” - M4 16GB 512GB SSD",
-      "precio": 1690,
-      "precio_costo": 1500.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Macbook Pro 14” - M4 16GB 512GB SSD",
-      "precio": 1890,
-      "precio_costo": 1680.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Macbook Pro 14” - M4 Pro 24GB 512GB SSD",
-      "precio": 2480,
-      "precio_costo": 2210.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Macbook Pro 16” - M4 Pro 24GB 512GB SSD",
-      "precio": 3090,
-      "precio_costo": 2760.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Macbook Pro 16” - M4 Pro 48GB 512GB SSD",
-      "precio": 3415,
-      "precio_costo": 3050.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Macbook Pro 16” - M4 Max 36GB 1TB SSD",
-      "precio": 4415,
-      "precio_costo": 3950.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Macbook Pro 14” - M5 16GB 512GB SSD",
-      "precio": 1970,
-      "precio_costo": 1750.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Macbook Pro 14” - M5 16GB 1TB SSD",
-      "precio": 2245,
-      "precio_costo": 2000.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
     },
     {
       "nombre": "85” Smart Tv Samsung Qled 4k Q7 Tizen Os",
@@ -2475,684 +2049,12 @@
       "fecha_actualizacion": "18/03/2026 00:51"
     },
     {
-      "nombre": "Magic Keyboard Folio Ipad A16",
-      "precio": 405,
-      "precio_costo": 340.0,
-      "categoria": "Teclados",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Magic Keyboard Ipad Air M3 11\"",
-      "precio": 360,
-      "precio_costo": 300.0,
-      "categoria": "Teclados",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Magic Keyboard Ipad Air M3 13\"",
-      "precio": 515,
-      "precio_costo": 440.0,
-      "categoria": "Teclados",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Magic Keyboard Ipad Pro M4/M5 11\"",
-      "precio": 405,
-      "precio_costo": 340.0,
-      "categoria": "Teclados",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Magic Keyboard Ipad Pro M4/M5 13\"",
-      "precio": 505,
-      "precio_costo": 430.0,
-      "categoria": "Teclados",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Iphone 14 256GB",
-      "precio": 605,
-      "precio_costo": 520.0,
-      "categoria": "PRODUCTOS",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Iphone 14 512GB",
-      "precio": 635,
-      "precio_costo": 550.0,
-      "categoria": "PRODUCTOS",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Iphone 15 128GB",
-      "precio": 720,
-      "precio_costo": 625.0,
-      "categoria": "PRODUCTOS",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Iphone 15 256GB",
-      "precio": 835,
-      "precio_costo": 730.0,
-      "categoria": "PRODUCTOS",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Iphone 16e 128GB",
-      "precio": 670,
-      "precio_costo": 580.0,
-      "categoria": "PRODUCTOS",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Iphone 16 128GB",
-      "precio": 840,
-      "precio_costo": 735.0,
-      "categoria": "PRODUCTOS",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Iphone 17e 256GB",
-      "precio": 795,
-      "precio_costo": 695.0,
-      "categoria": "PRODUCTOS",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Iphone 17 256GB",
-      "precio": 1005,
-      "precio_costo": 880.0,
-      "categoria": "PRODUCTOS",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Iphone 17 Air 256GB",
-      "precio": 1105,
-      "precio_costo": 970.0,
-      "categoria": "PRODUCTOS",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Iphone 17 Pro 256GB",
-      "precio": 1435,
-      "precio_costo": 1270.0,
-      "categoria": "PRODUCTOS",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Iphone 17 Pro 512GB",
-      "precio": 1680,
-      "precio_costo": 1490.0,
-      "categoria": "PRODUCTOS",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Iphone 17 Pro 1TB",
-      "precio": 1860,
-      "precio_costo": 1650.0,
-      "categoria": "PRODUCTOS",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Iphone 17 Pro Max 256GB",
-      "precio": 1605,
-      "precio_costo": 1420.0,
-      "categoria": "PRODUCTOS",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Iphone 17 Pro Max 512GB",
-      "precio": 1825,
-      "precio_costo": 1620.0,
-      "categoria": "PRODUCTOS",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Iphone 17 Pro Max 1TB",
-      "precio": 2045,
-      "precio_costo": 1820.0,
-      "categoria": "PRODUCTOS",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Iphone 17 Pro Max 2TB",
-      "precio": 2490,
-      "precio_costo": 2220.0,
-      "categoria": "PRODUCTOS",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "A07 4/64GB",
-      "precio": 175,
-      "precio_costo": 135.0,
-      "categoria": "RECORDATORIO",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "A16 4/128GB",
-      "precio": 205,
-      "precio_costo": 160.0,
-      "categoria": "RECORDATORIO",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "A17 4/128GB",
-      "precio": 230,
-      "precio_costo": 185.0,
-      "categoria": "RECORDATORIO",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "A17 8/256GB 5G",
-      "precio": 320,
-      "precio_costo": 265.0,
-      "categoria": "RECORDATORIO",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "A26 6/128GB 5G",
-      "precio": 310,
-      "precio_costo": 255.0,
-      "categoria": "RECORDATORIO",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "A36 5G 8/128GB",
-      "precio": 335,
-      "precio_costo": 280.0,
-      "categoria": "RECORDATORIO",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "A36 5G 8/256GB",
-      "precio": 370,
-      "precio_costo": 310.0,
-      "categoria": "RECORDATORIO",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "A56 8/128GB 5G",
-      "precio": 420,
-      "precio_costo": 355.0,
-      "categoria": "RECORDATORIO",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "A56 8/256GB 5G",
-      "precio": 465,
-      "precio_costo": 395.0,
-      "categoria": "RECORDATORIO",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "A56 12/256GB 5G",
-      "precio": 480,
-      "precio_costo": 410.0,
-      "categoria": "RECORDATORIO",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "S25 Fe 8/256GB",
-      "precio": 690,
-      "precio_costo": 600.0,
-      "categoria": "RECORDATORIO",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "S25 Fe 8/512GB",
-      "precio": 735,
-      "precio_costo": 640.0,
-      "categoria": "RECORDATORIO",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "S25 12 / 128 5G DS",
-      "precio": 780,
-      "precio_costo": 680.0,
-      "categoria": "RECORDATORIO",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "S25 12 / 256 5G DS",
-      "precio": 810,
-      "precio_costo": 705.0,
-      "categoria": "RECORDATORIO",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "S25 Plus 12GB / 256 5G DS",
-      "precio": 925,
-      "precio_costo": 810.0,
-      "categoria": "RECORDATORIO",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "S25 Plus 12GB / 512 5G DS",
-      "precio": 1005,
-      "precio_costo": 880.0,
-      "categoria": "RECORDATORIO",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "S25 Ultra 12GB / 256GB",
-      "precio": 1060,
-      "precio_costo": 930.0,
-      "categoria": "RECORDATORIO",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "S25 Ultra 12GB / 512GB",
-      "precio": 1145,
-      "precio_costo": 1010.0,
-      "categoria": "RECORDATORIO",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "S25 Ultra 12GB / 1TB",
-      "precio": 1225,
-      "precio_costo": 1080.0,
-      "categoria": "RECORDATORIO",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "S26 12 / 256 5G DS",
-      "precio": 960,
-      "precio_costo": 840.0,
-      "categoria": "LÍNEA S26",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "S26 12 / 512 5G DS",
-      "precio": 1090,
-      "precio_costo": 960.0,
-      "categoria": "LÍNEA S26",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "S26 Plus 12GB / 256GB",
-      "precio": 1160,
-      "precio_costo": 1020.0,
-      "categoria": "LÍNEA S26",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "S26 Plus 12GB / 512GB",
-      "precio": 1290,
-      "precio_costo": 1140.0,
-      "categoria": "LÍNEA S26",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "S26 Ultra 12GB / 256GB",
-      "precio": 1385,
-      "precio_costo": 1225.0,
-      "categoria": "LÍNEA S26",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "S26 Ultra 12GB / 512GB",
-      "precio": 1515,
-      "precio_costo": 1340.0,
-      "categoria": "LÍNEA S26",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "S26 Ultra 12GB / 1TB",
-      "precio": 1805,
-      "precio_costo": 1600.0,
-      "categoria": "LÍNEA S26",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Note 14 8/256GB",
-      "precio": 265,
-      "precio_costo": 215.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Redmi 15 8+256GB",
-      "precio": 265,
-      "precio_costo": 215.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Redmi 15c 4/256GB",
-      "precio": 195,
-      "precio_costo": 155.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Redmi 15c 8/256GB",
-      "precio": 215,
-      "precio_costo": 170.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Note 14 Pro 5G 8/256GB",
-      "precio": 375,
-      "precio_costo": 315.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Note 14 Pro Plus 5G 8/256GB",
-      "precio": 435,
-      "precio_costo": 370.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Note 14 Pro Plus 5G 12/512GB",
-      "precio": 495,
-      "precio_costo": 425.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Note 15 4G 6/128GB",
-      "precio": 270,
-      "precio_costo": 220.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Note 15 4G 8/256GB",
-      "precio": 290,
-      "precio_costo": 240.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Note 15 Pro 4G 8/256GB",
-      "precio": 360,
-      "precio_costo": 300.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Note 15 Pro 5G 8/256GB",
-      "precio": 420,
-      "precio_costo": 355.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Note 15 Pro Plus 8/256GB",
-      "precio": 485,
-      "precio_costo": 415.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Note 15 Pro Plus 12/512GB",
-      "precio": 545,
-      "precio_costo": 470.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Poco C85 8+256GB",
-      "precio": 220,
-      "precio_costo": 175.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Poco M7 8/256GB",
-      "precio": 230,
-      "precio_costo": 185.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Poco M7 Pro 8/256GB",
-      "precio": 320,
-      "precio_costo": 265.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Poco X7 Pro 5G 8/256GB",
-      "precio": 420,
-      "precio_costo": 355.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Poco X7 Pro 5G 12/512GB",
-      "precio": 475,
-      "precio_costo": 405.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Poco F7 Pro 5G 12/512GB",
-      "precio": 710,
-      "precio_costo": 615.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Poco F7 Ultra 5G 12/256GB",
-      "precio": 705,
-      "precio_costo": 610.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Mi 14t Pro 5G Leica 12/512",
-      "precio": 790,
-      "precio_costo": 690.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Mi 15 5G 12/512",
-      "precio": 925,
-      "precio_costo": 810.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Mi 15t 5G 12/512GB Slim",
-      "precio": 675,
-      "precio_costo": 585.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Xiaomi Mi 15t Pro 5G Leica 12/512GB",
-      "precio": 1005,
-      "precio_costo": 880.0,
-      "categoria": "CELULARES XIAOMI",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Motorola G86 8+256GB 5G",
-      "precio": 330,
-      "precio_costo": 275.0,
-      "categoria": "CELULARES MOTOROLA",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Motorola Razr 50 Ultra 5G 12/512GB",
-      "precio": 755,
-      "precio_costo": 655.0,
-      "categoria": "CELULARES MOTOROLA",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Motorola Edge 60 Fusion 5G 12/256 GB",
-      "precio": 370,
-      "precio_costo": 310.0,
-      "categoria": "CELULARES MOTOROLA",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Mac Mini M4 16GB 256GB",
-      "precio": 835,
-      "precio_costo": 730.0,
-      "categoria": "CHIP M4",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Mac Mini M4 16GB 512GB",
-      "precio": 1070,
-      "precio_costo": 940.0,
-      "categoria": "CHIP M4",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Imac 24\" M4 16RAM 256SSD - 8/8",
-      "precio": 2030,
-      "precio_costo": 1805.0,
-      "categoria": "CHIP M4",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Imac 24\" M4 16RAM 256SSD - 10/10",
-      "precio": 2290,
-      "precio_costo": 2040.0,
-      "categoria": "CHIP M4",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Imac 24\" M4 16RAM 512SSD - 10/10",
-      "precio": 2525,
-      "precio_costo": 2250.0,
-      "categoria": "CHIP M4",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Imac 24\" M4 24RAM 512SSD - 10/10",
-      "precio": 2760,
-      "precio_costo": 2460.0,
-      "categoria": "CHIP M4",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Imac 24\" M4 24RAM 1TB - 10/10",
-      "precio": 3315,
-      "precio_costo": 2960.0,
-      "categoria": "CHIP M4",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Ray-ban | Meta Wayfarer - Gen 1",
-      "precio": 460,
-      "precio_costo": 390.0,
-      "categoria": "CHIP M4",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Ray-ban | Meta Wayfarer - Gen 2",
-      "precio": 545,
-      "precio_costo": 470.0,
-      "categoria": "CHIP M4",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
-      "nombre": "Ray-ban | Meta Headliner - Gen 2",
-      "precio": 545,
-      "precio_costo": 470.0,
-      "categoria": "CHIP M4",
-      "proveedor": "ZentekBA",
-      "fecha_actualizacion": "18/03/2026 00:53"
-    },
-    {
       "nombre": "Iphone 14 256GB",
       "precio": 605,
       "precio_costo": 520.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Iphone 14 512GB",
@@ -3160,7 +2062,7 @@
       "precio_costo": 550.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Iphone 15 128GB",
@@ -3168,7 +2070,7 @@
       "precio_costo": 625.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Iphone 15 256GB",
@@ -3176,7 +2078,7 @@
       "precio_costo": 730.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Iphone 16e 128GB",
@@ -3184,7 +2086,7 @@
       "precio_costo": 580.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Iphone 16 128GB",
@@ -3192,7 +2094,7 @@
       "precio_costo": 735.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Iphone 17e 256GB",
@@ -3200,7 +2102,7 @@
       "precio_costo": 695.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Iphone 17 256GB",
@@ -3208,7 +2110,7 @@
       "precio_costo": 880.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Iphone 17 Air 256GB",
@@ -3216,7 +2118,7 @@
       "precio_costo": 970.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Iphone 17 Pro 256GB",
@@ -3224,7 +2126,7 @@
       "precio_costo": 1270.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Iphone 17 Pro 512GB",
@@ -3232,7 +2134,7 @@
       "precio_costo": 1490.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Iphone 17 Pro 1TB",
@@ -3240,7 +2142,7 @@
       "precio_costo": 1650.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Iphone 17 Pro Max 256GB",
@@ -3248,7 +2150,7 @@
       "precio_costo": 1420.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Iphone 17 Pro Max 512GB",
@@ -3256,7 +2158,7 @@
       "precio_costo": 1620.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Iphone 17 Pro Max 1TB",
@@ -3264,7 +2166,7 @@
       "precio_costo": 1820.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Iphone 17 Pro Max 2TB",
@@ -3272,7 +2174,7 @@
       "precio_costo": 2220.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung A07 4/64GB",
@@ -3280,7 +2182,7 @@
       "precio_costo": 135.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung A16 4/128GB",
@@ -3288,7 +2190,7 @@
       "precio_costo": 160.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung A17 4/128GB",
@@ -3296,7 +2198,7 @@
       "precio_costo": 185.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung A17 8/256GB 5G",
@@ -3304,7 +2206,7 @@
       "precio_costo": 265.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung A26 6/128GB 5G",
@@ -3312,7 +2214,7 @@
       "precio_costo": 255.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung A36 5G 8/128GB",
@@ -3320,7 +2222,7 @@
       "precio_costo": 280.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung A36 5G 8/256GB",
@@ -3328,7 +2230,7 @@
       "precio_costo": 310.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung A56 8/128GB 5G",
@@ -3336,7 +2238,7 @@
       "precio_costo": 355.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung A56 8/256GB 5G",
@@ -3344,7 +2246,7 @@
       "precio_costo": 395.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung A56 12/256GB 5G",
@@ -3352,7 +2254,7 @@
       "precio_costo": 410.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung S25 Fe 8/256GB",
@@ -3360,7 +2262,7 @@
       "precio_costo": 600.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung S25 Fe 8/512GB",
@@ -3368,7 +2270,7 @@
       "precio_costo": 640.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung S25 12 / 128 5G DS",
@@ -3376,7 +2278,7 @@
       "precio_costo": 680.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung S25 12 / 256 5G DS",
@@ -3384,7 +2286,7 @@
       "precio_costo": 705.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung S25 Plus 12GB / 256 5G DS",
@@ -3392,7 +2294,7 @@
       "precio_costo": 810.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung S25 Plus 12GB / 512 5G DS",
@@ -3400,7 +2302,7 @@
       "precio_costo": 880.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung S25 Ultra 12GB / 256GB",
@@ -3408,7 +2310,7 @@
       "precio_costo": 930.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung S25 Ultra 12GB / 512GB",
@@ -3416,7 +2318,7 @@
       "precio_costo": 1010.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung S25 Ultra 12GB / 1TB",
@@ -3424,7 +2326,7 @@
       "precio_costo": 1080.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung S26 12 / 256 5G DS",
@@ -3432,7 +2334,7 @@
       "precio_costo": 840.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung S26 12 / 512 5G DS",
@@ -3440,7 +2342,7 @@
       "precio_costo": 960.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung S26 Plus 12GB / 256GB",
@@ -3448,7 +2350,7 @@
       "precio_costo": 1020.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung S26 Plus 12GB / 512GB",
@@ -3456,7 +2358,7 @@
       "precio_costo": 1140.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung S26 Ultra 12GB / 256GB",
@@ -3464,7 +2366,7 @@
       "precio_costo": 1225.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung S26 Ultra 12GB / 512GB",
@@ -3472,7 +2374,7 @@
       "precio_costo": 1340.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Samsung S26 Ultra 12GB / 1TB",
@@ -3480,7 +2382,7 @@
       "precio_costo": 1600.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Note 14 8/256GB",
@@ -3488,7 +2390,7 @@
       "precio_costo": 215.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Redmi 15 8+256GB",
@@ -3496,7 +2398,7 @@
       "precio_costo": 215.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Redmi 15c 4/256GB",
@@ -3504,7 +2406,7 @@
       "precio_costo": 155.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Redmi 15c 8/256GB",
@@ -3512,7 +2414,7 @@
       "precio_costo": 170.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Note 14 Pro 5G 8/256GB",
@@ -3520,7 +2422,7 @@
       "precio_costo": 315.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Note 14 Pro Plus 5G 8/256GB",
@@ -3528,7 +2430,7 @@
       "precio_costo": 370.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Note 14 Pro Plus 5G 12/512GB",
@@ -3536,7 +2438,7 @@
       "precio_costo": 425.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Note 15 4G 6/128GB",
@@ -3544,7 +2446,7 @@
       "precio_costo": 220.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Note 15 4G 8/256GB",
@@ -3552,7 +2454,7 @@
       "precio_costo": 240.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Note 15 Pro 4G 8/256GB",
@@ -3560,7 +2462,7 @@
       "precio_costo": 300.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Note 15 Pro 5G 8/256GB",
@@ -3568,7 +2470,7 @@
       "precio_costo": 355.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Note 15 Pro Plus 8/256GB",
@@ -3576,7 +2478,7 @@
       "precio_costo": 415.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Note 15 Pro Plus 12/512GB",
@@ -3584,7 +2486,7 @@
       "precio_costo": 470.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Poco C85 8+256GB",
@@ -3592,7 +2494,7 @@
       "precio_costo": 175.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Poco M7 8/256GB",
@@ -3600,7 +2502,7 @@
       "precio_costo": 185.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Poco M7 Pro 8/256GB",
@@ -3608,7 +2510,7 @@
       "precio_costo": 265.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Poco X7 Pro 5G 8/256GB",
@@ -3616,7 +2518,7 @@
       "precio_costo": 355.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Poco X7 Pro 5G 12/512GB",
@@ -3624,7 +2526,7 @@
       "precio_costo": 405.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Poco F7 Pro 5G 12/512GB",
@@ -3632,7 +2534,7 @@
       "precio_costo": 615.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Poco F7 Ultra 5G 12/256GB",
@@ -3640,7 +2542,7 @@
       "precio_costo": 610.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Mi 14t Pro 5G Leica 12/512",
@@ -3648,7 +2550,7 @@
       "precio_costo": 690.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Mi 15 5G 12/512",
@@ -3656,7 +2558,7 @@
       "precio_costo": 810.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Mi 15t 5G 12/512GB Slim",
@@ -3664,7 +2566,7 @@
       "precio_costo": 585.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Xiaomi Mi 15t Pro 5G Leica 12/512GB",
@@ -3672,7 +2574,7 @@
       "precio_costo": 880.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Motorola G86 8+256GB 5G",
@@ -3680,7 +2582,7 @@
       "precio_costo": 275.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Motorola Razr 50 Ultra 5G 12/512GB",
@@ -3688,7 +2590,7 @@
       "precio_costo": 655.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Motorola Edge 60 Fusion 5G 12/256 GB",
@@ -3696,7 +2598,7 @@
       "precio_costo": 310.0,
       "categoria": "Celulares",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ipad A16 11\" 128GB (solo Wifi)",
@@ -3704,7 +2606,7 @@
       "precio_costo": 400.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ipad A16 11\" 256GB (solo Wifi)",
@@ -3712,7 +2614,7 @@
       "precio_costo": 500.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ipad Mini 7ma 8.3\" 128GB (solo Wifi)",
@@ -3720,7 +2622,7 @@
       "precio_costo": 525.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ipad Mini 7ma 8.3\" 256GB (solo Wifi)",
@@ -3728,7 +2630,7 @@
       "precio_costo": 625.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ipad Air M3 11\" 7ma 128GB (solo Wifi)",
@@ -3736,7 +2638,7 @@
       "precio_costo": 600.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ipad Air M3 11\" 7ma 256GB (solo Wifi)",
@@ -3744,7 +2646,7 @@
       "precio_costo": 780.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ipad Air M3 11\" 7ma 512GB (solo Wifi)",
@@ -3752,7 +2654,7 @@
       "precio_costo": 1020.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ipad Air M3 13\" 7ma 128GB (solo Wifi)",
@@ -3760,7 +2662,7 @@
       "precio_costo": 800.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ipad Air M3 13\" 7ma 256GB (solo Wifi)",
@@ -3768,7 +2670,7 @@
       "precio_costo": 980.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ipad Pro M4 11\" 256GB (solo Wifi)",
@@ -3776,7 +2678,7 @@
       "precio_costo": 1000.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ipad Pro M4 11\" 1TB (solo Wifi)",
@@ -3784,7 +2686,7 @@
       "precio_costo": 1360.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ipad Pro M4 13\" 256GB (solo Wifi)",
@@ -3792,7 +2694,7 @@
       "precio_costo": 1250.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ipad Pro M5 11\" 256GB (solo Wifi)",
@@ -3800,7 +2702,7 @@
       "precio_costo": 1000.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ipad Pro M5 11\" 512GB (solo Wifi)",
@@ -3808,7 +2710,7 @@
       "precio_costo": 1255.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ipad Pro M5 13\" 256GB (solo Wifi)",
@@ -3816,7 +2718,7 @@
       "precio_costo": 1290.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ipad Pro M5 13\" 512GB (solo Wifi)",
@@ -3824,7 +2726,7 @@
       "precio_costo": 1530.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ipad Pro M5 13\" 1TB",
@@ -3832,7 +2734,7 @@
       "precio_costo": 1990.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ipad Pro M5 13\" 2TB",
@@ -3840,7 +2742,7 @@
       "precio_costo": 2640.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ipad Pro M5 13\" 256GB + Cell",
@@ -3848,7 +2750,7 @@
       "precio_costo": 1790.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ipad Pro M5 13\" 512GB + Cell",
@@ -3856,7 +2758,7 @@
       "precio_costo": 1990.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Apple Pencil (carga Via USB-C)",
@@ -3864,7 +2766,7 @@
       "precio_costo": 115.0,
       "categoria": "Accesorios",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Apple Pencil 2 (carga Inalámbrica)",
@@ -3872,7 +2774,7 @@
       "precio_costo": 120.0,
       "categoria": "Accesorios",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Nuevo - Apple Pencil Pro",
@@ -3880,7 +2782,7 @@
       "precio_costo": 135.0,
       "categoria": "Accesorios",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Magic Keyboard Folio Ipad A16",
@@ -3888,7 +2790,7 @@
       "precio_costo": 340.0,
       "categoria": "Teclados",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Magic Keyboard Ipad Air M3 11\"",
@@ -3896,7 +2798,7 @@
       "precio_costo": 300.0,
       "categoria": "Teclados",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Magic Keyboard Ipad Air M3 13\"",
@@ -3904,7 +2806,7 @@
       "precio_costo": 440.0,
       "categoria": "Teclados",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Magic Keyboard Ipad Pro M4/m5 11\"",
@@ -3912,7 +2814,7 @@
       "precio_costo": 340.0,
       "categoria": "Teclados",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Magic Keyboard Ipad Pro M4/m5 13\"",
@@ -3920,7 +2822,7 @@
       "precio_costo": 430.0,
       "categoria": "Teclados",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Apple Series Se 2 40mm",
@@ -3928,7 +2830,7 @@
       "precio_costo": 240.0,
       "categoria": "Smartwatch",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Apple Series Se 2 44mm",
@@ -3936,7 +2838,7 @@
       "precio_costo": 255.0,
       "categoria": "Smartwatch",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Apple Series Se 3 40mm",
@@ -3944,7 +2846,7 @@
       "precio_costo": 275.0,
       "categoria": "Smartwatch",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Apple Series Se 3 44mm",
@@ -3952,7 +2854,7 @@
       "precio_costo": 310.0,
       "categoria": "Smartwatch",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Apple Series 11 42mm",
@@ -3960,7 +2862,7 @@
       "precio_costo": 360.0,
       "categoria": "Smartwatch",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Apple Series 11 46mm",
@@ -3968,7 +2870,7 @@
       "precio_costo": 405.0,
       "categoria": "Smartwatch",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Apple Series Ultra 2 49mm",
@@ -3976,7 +2878,7 @@
       "precio_costo": 710.0,
       "categoria": "Smartwatch",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Apple Series Ultra 3",
@@ -3984,7 +2886,7 @@
       "precio_costo": 780.0,
       "categoria": "Smartwatch",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Apple Series Ultra 3 Milanese",
@@ -3992,7 +2894,7 @@
       "precio_costo": 950.0,
       "categoria": "Smartwatch",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Airpods Pro 2 (USB-C)",
@@ -4000,7 +2902,7 @@
       "precio_costo": 245.0,
       "categoria": "AirPods",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Airpods Pro 3 (USB-C)",
@@ -4008,7 +2910,7 @@
       "precio_costo": 250.0,
       "categoria": "AirPods",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Airpods 4ta Gen S/cancelación",
@@ -4016,7 +2918,7 @@
       "precio_costo": 120.0,
       "categoria": "AirPods",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Airpods 4ta Gen C/cancelación",
@@ -4024,7 +2926,7 @@
       "precio_costo": 165.0,
       "categoria": "AirPods",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Airpods Max USB-C",
@@ -4032,7 +2934,7 @@
       "precio_costo": 540.0,
       "categoria": "AirPods",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Airtag X1",
@@ -4040,7 +2942,7 @@
       "precio_costo": 70.0,
       "categoria": "Accesorios",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Airtags Pack De 4 Unidades",
@@ -4048,7 +2950,7 @@
       "precio_costo": 95.0,
       "categoria": "Accesorios",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Airtags X4 2da Gen",
@@ -4056,7 +2958,7 @@
       "precio_costo": 115.0,
       "categoria": "Accesorios",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Macbook Air 13 - M3 24GB 512GB SSD",
@@ -4064,7 +2966,7 @@
       "precio_costo": 1245.0,
       "categoria": "Notebooks & Macbooks",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Macbook Air 15 - M3 16GB 256GB SSD",
@@ -4072,7 +2974,7 @@
       "precio_costo": 1220.0,
       "categoria": "Notebooks & Macbooks",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Macbook Air 13 - M4 16GB 256GB SSD",
@@ -4080,7 +2982,7 @@
       "precio_costo": 1120.0,
       "categoria": "Notebooks & Macbooks",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Macbook Air 13 - M4 16GB 512GB SSD",
@@ -4088,7 +2990,7 @@
       "precio_costo": 1300.0,
       "categoria": "Notebooks & Macbooks",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Macbook Air 15 - M4 16GB 256GB SSD",
@@ -4096,7 +2998,7 @@
       "precio_costo": 1310.0,
       "categoria": "Notebooks & Macbooks",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Macbook Air 15 - M4 16GB 512GB SSD",
@@ -4104,7 +3006,7 @@
       "precio_costo": 1500.0,
       "categoria": "Notebooks & Macbooks",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Macbook Pro 14 - M4 16GB 512GB SSD",
@@ -4112,7 +3014,7 @@
       "precio_costo": 1680.0,
       "categoria": "Notebooks & Macbooks",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Macbook Pro 14 - M4 Pro 24GB 512GB SSD",
@@ -4120,7 +3022,7 @@
       "precio_costo": 2210.0,
       "categoria": "Notebooks & Macbooks",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Macbook Pro 16 - M4 Pro 24GB 512GB SSD",
@@ -4128,7 +3030,7 @@
       "precio_costo": 2760.0,
       "categoria": "Notebooks & Macbooks",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Macbook Pro 16 - M4 Pro 48GB 512GB SSD",
@@ -4136,7 +3038,7 @@
       "precio_costo": 3050.0,
       "categoria": "Notebooks & Macbooks",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Macbook Pro 16 - M4 Max 36GB 1TB SSD",
@@ -4144,7 +3046,7 @@
       "precio_costo": 3950.0,
       "categoria": "Notebooks & Macbooks",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Macbook Pro 14 - M5 16GB 512GB SSD",
@@ -4152,7 +3054,7 @@
       "precio_costo": 1750.0,
       "categoria": "Notebooks & Macbooks",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Macbook Pro 14 - M5 16GB 1TB SSD",
@@ -4160,7 +3062,7 @@
       "precio_costo": 2000.0,
       "categoria": "Notebooks & Macbooks",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Mac Mini M4 16GB 256GB",
@@ -4168,7 +3070,7 @@
       "precio_costo": 730.0,
       "categoria": "Desktop / PC de Escritorio",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Mac Mini M4 16GB 512GB",
@@ -4176,7 +3078,7 @@
       "precio_costo": 940.0,
       "categoria": "Desktop / PC de Escritorio",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Imac 24\" M4 16RAM 256SSD - 8/8",
@@ -4184,7 +3086,7 @@
       "precio_costo": 1805.0,
       "categoria": "Desktop / PC de Escritorio",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Imac 24\" M4 16RAM 256SSD - 10/10",
@@ -4192,7 +3094,7 @@
       "precio_costo": 2040.0,
       "categoria": "Desktop / PC de Escritorio",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Imac 24\" M4 16RAM 512SSD - 10/10",
@@ -4200,7 +3102,7 @@
       "precio_costo": 2250.0,
       "categoria": "Desktop / PC de Escritorio",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Imac 24\" M4 24RAM 512SSD - 10/10",
@@ -4208,7 +3110,7 @@
       "precio_costo": 2460.0,
       "categoria": "Desktop / PC de Escritorio",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Imac 24\" M4 24RAM 1TB - 10/10",
@@ -4216,7 +3118,7 @@
       "precio_costo": 2960.0,
       "categoria": "Desktop / PC de Escritorio",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ray-ban | Meta Wayfarer - Gen 1",
@@ -4224,7 +3126,7 @@
       "precio_costo": 390.0,
       "categoria": "Lentes",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ray-ban | Meta Wayfarer - Gen 2",
@@ -4232,7 +3134,7 @@
       "precio_costo": 470.0,
       "categoria": "Lentes",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     },
     {
       "nombre": "Ray-ban | Meta Headliner - Gen 2",
@@ -4240,7 +3142,7 @@
       "precio_costo": 470.0,
       "categoria": "Lentes",
       "proveedor": "Zentek",
-      "fecha_actualizacion": "18/03/2026 01:30"
+      "fecha_actualizacion": "18/03/2026 01:38"
     }
   ]
 }

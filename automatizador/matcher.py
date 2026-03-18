@@ -322,16 +322,17 @@ def deduplicate_by_best_price(products: list, threshold: float = 0.78) -> list:
         if len(group_products) == 1:
             result.append(group_products[0])
         else:
-            best = min(group_products,
-                       key=lambda p: p.get('precio_costo', p.get('precio', 999999)))
-            best = dict(best)
+            best_orig = min(group_products,
+                            key=lambda p: p.get('precio_costo', p.get('precio', 999999)))
+            alternatives = [p for p in group_products if p is not best_orig]
+            best = dict(best_orig)
             best['_alternatives'] = [
                 {
                     'proveedor': p['proveedor'],
                     'precio_costo': p.get('precio_costo', p.get('precio')),
                     'nombre': p['nombre']
                 }
-                for p in group_products if p is not best
+                for p in alternatives
             ]
             result.append(best)
 

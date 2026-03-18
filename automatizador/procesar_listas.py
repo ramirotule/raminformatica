@@ -279,7 +279,7 @@ def main():
     # Lista de scripts de proveedores a ejecutar
     scripts_proveedores = [
         "procesar_gcgroup.py",
-        "procesar_zentekba.py",
+        "procesar_zentek.py",
         "procesar_kadabra.py"
     ]
     

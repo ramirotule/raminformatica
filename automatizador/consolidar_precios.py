@@ -59,12 +59,13 @@ def consolidar_mejor_precio(
                       f"← {p['proveedor']} ${p.get('precio_costo', '?')} "
                       f"(descartado: {alt_info})")
 
-        # Construir JSON público (sin precio_costo ni info interna)
+        # Construir JSON público
         productos_publicos = []
         for p in productos_unicos:
             prod_pub = {
                 "nombre": p.get('nombre'),
                 "precio": p.get('precio'),
+                "precio_costo": p.get('precio_costo'),
                 "categoria": p.get('categoria'),
                 "proveedor": p.get('proveedor')
             }

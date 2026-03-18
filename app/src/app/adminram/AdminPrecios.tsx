@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { DollarSign, Upload, Zap, AlertCircle, CheckCircle2, FileJson, FileText, Loader2, ShieldCheck, ArrowLeft, Search, CheckSquare, PlusCircle, Database, Building2 } from 'lucide-react'
-import { parseImportData, searchMatches, processSync, getMissingProducts, type ParsedItem } from './precios/actions'
+import { parseImportData, searchMatches, processSync, getMissingProducts, triggerEnrichment, type ParsedItem } from './precios/actions'
 import { SearchableSelect } from '@/components/SearchableSelect'
 import { supabase } from '@/lib/supabase'
 
@@ -10,12 +10,14 @@ export default function AdminPrecios() {
     const [view, setView] = useState<'input' | 'preview'>('input')
     const [provider, setProvider] = useState<'gcgroup' | 'zentek'>('gcgroup')
     const [databaseProviderId, setDatabaseProviderId] = useState<string>('')
+    const [isCatalogSync, setIsCatalogSync] = useState(false) // true cuando se importa productos_ram.json completo
     const [input, setInput] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [isSyncing, setIsSyncing] = useState(false)
     const [parsedItems, setParsedItems] = useState<ParsedItem[]>([])
     const [selectedIndices, setSelectedIndices] = useState<Set<number>>(new Set())
     const [result, setResult] = useState<{ success: boolean; message: string; errors?: string[] } | null>(null)
+    const [enrichStatus, setEnrichStatus] = useState<string | null>(null)
     const [providers, setProviders] = useState<any[]>([])
 
     useEffect(() => {
@@ -52,18 +54,20 @@ export default function AdminPrecios() {
     const handleAutoLoad = async (fileName: string) => {
         setIsLoading(true)
         setResult(null)
+        const isFullCatalog = fileName === 'productos_ram.json'
+        setIsCatalogSync(isFullCatalog)
         try {
             const res = await fetch(`/${fileName}`)
             if (!res.ok) throw new Error("No se pudo cargar el archivo automático.")
             const data = await res.json()
             setInput(JSON.stringify(data, null, 2))
-            
+
             if (fileName.includes('zentek')) {
                 setProvider('zentek')
             } else {
                 setProvider('gcgroup')
             }
-            
+
             // Trigger automatic parse after loading
             const parseRes = await parseImportData(JSON.stringify(data), fileName.includes('zentek') ? 'zentek' : 'gcgroup')
             if (parseRes.success) {
@@ -116,14 +120,18 @@ export default function AdminPrecios() {
                     }
                 })
 
-                // NUEVO: Ver faltantes (desactivaciones)
-                if (databaseProviderId) {
+                // Ver faltantes (desactivaciones)
+                // - Catálogo completo: evalúa TODOS los activos sin filtro de proveedor
+                // - Por proveedor: solo evalúa los de ese proveedor
+                if (isCatalogSync || databaseProviderId) {
                     const matchedIds = res.items.map(it => it.matchId).filter(id => !!id) as string[]
-                    const missing = await getMissingProducts(matchedIds, databaseProviderId)
+                    const missing = await getMissingProducts(
+                        matchedIds,
+                        isCatalogSync ? undefined : databaseProviderId
+                    )
                     if (missing.length > 0) {
                         const currentCount = newItems.length
                         newItems = [...newItems, ...missing]
-                        // También seleccionamos los que se van a desactivar porque "coinciden" en que faltan al 100%
                         for (let k = currentCount; k < newItems.length; k++) {
                             nextIndices.add(k)
                         }
@@ -149,7 +157,7 @@ export default function AdminPrecios() {
             alert('No hay items seleccionados');
             return;
         }
-        if (!databaseProviderId) {
+        if (!isCatalogSync && !databaseProviderId) {
             alert('Falta seleccionar el proveedor en el desplegable azul');
             setResult({ success: false, message: 'Debes seleccionar un proveedor de la base de datos antes de sincronizar.' })
             return
@@ -162,12 +170,18 @@ export default function AdminPrecios() {
             const itemsToSync = parsedItems.filter((_, i) => selectedIndices.has(i))
             console.log('Items a enviar al servidor:', itemsToSync.length);
 
-            const res = await processSync(itemsToSync, databaseProviderId)
+            const res = await processSync(itemsToSync, isCatalogSync ? undefined : databaseProviderId)
             console.log('Respuesta del servidor:', res);
 
             setResult(res)
-            if (res.success) {
-                console.log('Sincronización exitosa');
+            if (res.success && res.createdIds && res.createdIds.length > 0) {
+                setEnrichStatus(`⏳ Enriqueciendo ${res.createdIds.length} nuevos productos...`)
+                triggerEnrichment().then(e => {
+                    setEnrichStatus(e.started
+                        ? `✅ Enriquecimiento iniciado (${res.createdIds!.length} productos)`
+                        : `⚠️ ${e.message}`
+                    )
+                })
             }
         } catch (err: any) {
             console.error('Error fatal en handleFinalSync:', err);
@@ -225,14 +239,35 @@ export default function AdminPrecios() {
                         <button onClick={() => setView('input')} className="btn btn-ghost btn-sm" style={{ gap: 8 }}>
                             <ArrowLeft size={16} /> Volver
                         </button>
-                        <div style={{ width: 250 }}>
-                            <SearchableSelect
-                                value={databaseProviderId}
-                                onChange={(val) => setDatabaseProviderId(val)}
-                                options={providers.map(p => ({ value: p.id, label: p.name }))}
-                                placeholder="Elegir proveedor..."
-                            />
-                        </div>
+                        {isCatalogSync ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderRadius: 20, background: 'rgba(52,199,89,0.1)', border: '1px solid rgba(52,199,89,0.3)' }}>
+                                <Database size={14} color="var(--green-dark)" />
+                                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--green-dark)' }}>Catálogo Completo</span>
+                            </div>
+                        ) : (
+                            <div style={{ width: 250 }}>
+                                <SearchableSelect
+                                    value={databaseProviderId}
+                                    onChange={(val) => setDatabaseProviderId(val)}
+                                    options={providers.map(p => ({ value: p.id, label: p.name }))}
+                                    placeholder="Elegir proveedor..."
+                                />
+                            </div>
+                        )}
+                        {parsedItems.length > 0 && (
+                            <div style={{ display: 'flex', gap: 8, fontSize: '0.75rem' }}>
+                                {(() => {
+                                    const matched = parsedItems.filter(i => i.status === 'matched').length
+                                    const newP = parsedItems.filter(i => i.status === 'new').length
+                                    const deact = parsedItems.filter(i => i.status === 'deactivate').length
+                                    return <>
+                                        {matched > 0 && <span style={{ padding: '3px 8px', borderRadius: 8, background: 'rgba(52,199,89,0.1)', color: 'var(--green-dark)', fontWeight: 600 }}>↑ {matched} actualizar</span>}
+                                        {newP > 0 && <span style={{ padding: '3px 8px', borderRadius: 8, background: 'rgba(0,122,255,0.1)', color: '#007AFF', fontWeight: 600 }}>+ {newP} nuevos</span>}
+                                        {deact > 0 && <span style={{ padding: '3px 8px', borderRadius: 8, background: 'rgba(255,59,48,0.1)', color: 'var(--red)', fontWeight: 600 }}>✕ {deact} desactivar</span>}
+                                    </>
+                                })()}
+                            </div>
+                        )}
                     </div>
                     <div style={{ display: 'flex', gap: 12 }}>
                         <button
@@ -257,7 +292,7 @@ export default function AdminPrecios() {
 
                 {result && (
                     <div id="result-banner" style={{
-                        padding: 16, borderRadius: 12, marginBottom: 20,
+                        padding: 16, borderRadius: 12, marginBottom: enrichStatus ? 8 : 20,
                         background: result.success ? 'rgba(52, 199, 89, 0.1)' : 'rgba(255, 59, 48, 0.1)',
                         border: `1px solid ${result.success ? 'var(--green)' : 'var(--red)'}`,
                         display: 'flex', flexDirection: 'column', gap: 8
@@ -273,10 +308,19 @@ export default function AdminPrecios() {
                         )}
                     </div>
                 )}
+                {enrichStatus && (
+                    <div style={{
+                        padding: '10px 16px', borderRadius: 12, marginBottom: 20,
+                        background: 'rgba(90, 120, 255, 0.08)', border: '1px solid rgba(90, 120, 255, 0.2)',
+                        fontSize: '0.85rem', color: 'var(--text-secondary)'
+                    }}>
+                        {enrichStatus}
+                    </div>
+                )}
 
                 <div className="table-wrap" style={{ maxHeight: '70vh', overflowY: 'auto', borderRadius: 16 }}>
                     <table style={{ borderCollapse: 'separate', borderSpacing: '0 4px' }}>
-                        <thead style={{ position: 'sticky', top: 0, background: 'var(--bg)', zIndex: 10 }}>
+                        <thead style={{ position: 'sticky', top: 0, background: 'var(--bg-card)', zIndex: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>
                             <tr>
                                 <th style={{ width: 40 }}><input type="checkbox" checked={selectedIndices.size === parsedItems.length} onChange={toggleSelectAll} /></th>
                                 <th>Producto / Coincidencia</th>

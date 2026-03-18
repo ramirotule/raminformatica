@@ -8,7 +8,7 @@ Sos el agente encargado de todo el flujo de actualización de precios: parseo de
 |---------|-----|
 | `automatizador/matcher.py` | Motor de matching (specs estructuradas, pesos) |
 | `automatizador/procesar_gcgroup.py` | Parser GCGroup → formato `► CATEGORIA` + `PRODUCTO - $ PRECIO` |
-| `automatizador/procesar_zentekba.py` | Parser ZentekBA → formato `▶️ MARCA ◀️` + `PRODUCTO $PRECIO` |
+| `automatizador/procesar_zentek.py` | Parser Zentek → formato `▶️ MARCA ◀️` + `PRODUCTO $PRECIO` |
 | `automatizador/procesar_kadabra.py` | Parser Kadabra → formato `EMOJI PRODUCTO` + `X1 $PRECIO / X3 $... / X5 $...` |
 | `automatizador/consolidar_precios.py` | Deduplicación multi-proveedor usando matcher.py |
 | `app/src/app/adminram/precios/actions.ts` | Sync a Supabase vía panel admin (botón "Sincronizar") |
@@ -18,7 +18,30 @@ Sos el agente encargado de todo el flujo de actualización de precios: parseo de
 1. Ramiro pega el texto del proveedor en `automatizador/output/lista_[proveedor].txt`
 2. Se ejecuta el procesador correspondiente → genera JSON en `app/public/`
 3. Se ejecuta `consolidar_precios.py` → genera `app/public/productos_ram.json` con mejor precio
-4. Ramiro presiona "Sincronizar" en el admin → `actions.ts` actualiza Supabase
+4. Panel admin carga "💎 Todos (Mejor Precio)" → `actions.ts` actualiza Supabase
+5. Si hay productos nuevos creados → `triggerEnrichment()` se dispara automáticamente en segundo plano
+
+## LÓGICA DE SINCRONIZACIÓN (catálogo consolidado)
+
+Al importar `productos_ram.json` desde el panel admin se activa el **modo catálogo** (`isCatalogSync = true`):
+
+| Situación | Acción |
+|-----------|--------|
+| Producto en JSON ✅ + en web ✅ (match ≥ 85%) | Actualiza `precio_costo` y `precio_venta` |
+| Producto en JSON ✅ + no en web ❌ | Lo crea con variante + precio + stock (qty=10) |
+| Producto activo en web ✅ + no en JSON ❌ | Lo desactiva (`active = false`) |
+
+**Importante**: en modo catálogo la desactivación evalúa TODOS los productos activos (no filtra por proveedor).
+En modo proveedor individual sí filtra por `provider_id`.
+
+## ENRIQUECIMIENTO AUTOMÁTICO DE NUEVOS PRODUCTOS
+
+Cuando `processSync` crea productos nuevos, devuelve `createdIds[]`.
+El admin llama automáticamente a `triggerEnrichment()` (server action en `actions.ts`) que lanza
+`npm run enrich-products` como subproceso desacoplado (`detached: true`).
+El script es idempotente — solo procesa productos sin `short_description` o sin imágenes.
+**En Vercel/producción**: el subprocess detached no funciona en serverless. Alternativa: usar
+`npm run enrich-products` manualmente post-deploy o configurar un Vercel Cron Job.
 
 ## REGLAS DE NEGOCIO
 
@@ -46,7 +69,7 @@ iPhone 16 128GB - $ 750
 iPhone 16 256GB - $ 820
 ```
 
-### ZentekBA
+### Zentek
 ```
 ▶️ SAMSUNG ◀️
 Samsung Galaxy S25 8/256 $680

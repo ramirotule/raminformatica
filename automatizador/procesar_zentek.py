@@ -333,8 +333,9 @@ class ProcesadorZentek:
                 except Exception as e:
                     print(f"⚠️ Error cargando consolidado: {e}")
 
-            # Quitar productos anteriores de Zentek
-            otros = [p for p in estructura_completa.get('productos', []) if p.get('proveedor') != 'Zentek']
+            # Quitar productos anteriores de Zentek (cualquier variante del nombre)
+            otros = [p for p in estructura_completa.get('productos', [])
+                     if p.get('proveedor', '').lower().replace(' ', '') not in ('zentek', 'zentekba')]
             nuevos = [
                 {
                     "nombre": p['producto'],

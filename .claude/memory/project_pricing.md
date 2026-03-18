@@ -4,7 +4,7 @@ description: Arquitectura, estado actual y decisiones del sistema de actualizaci
 type: project
 ---
 
-Sistema de precios implementado para RAM Informática con 3 proveedores: GCGroup, ZentekBA, Kadabra.
+Sistema de precios implementado para RAM Informática con 3 proveedores: GCGroup, Zentek, Kadabra.
 
 **Why:** Automatizar la conversión de listas de WhatsApp a precios en Supabase, con deduplicación inteligente para siempre mantener activo el proveedor más barato cuando hay superposición.
 
@@ -14,7 +14,7 @@ Sistema de precios implementado para RAM Informática con 3 proveedores: GCGroup
 
 - ✅ `matcher.py` implementado con specs estructuradas + pesos (modelo 40%, storage 25%, RAM 15%, pantalla 10%, marca 10%)
 - ✅ `procesar_gcgroup.py` — funciona, formato `► CATEGORIA` + `PRODUCTO - $ PRECIO`
-- ✅ `procesar_zentekba.py` — funciona, formato `▶️ MARCA ◀️` + `PRODUCTO $PRECIO`
+- ✅ `procesar_zentek.py` — funciona, formato `▶️ MARCA ◀️` + `PRODUCTO $PRECIO`
 - ✅ `procesar_kadabra.py` — reescrito para formato real: `EMOJI PRODUCTO` + `X1 $PRECIO / X3 / X5`
 - ✅ `consolidar_precios.py` — actualizado para usar matcher.py (antes usaba normalización básica)
 - ✅ `actions.ts` — matching Jaro-Winkler reemplazado por extractSpecs + getSpecsSimilarity
