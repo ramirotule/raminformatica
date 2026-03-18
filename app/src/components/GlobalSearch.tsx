@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase'
 import type { ProductWithDetails } from '@/lib/database.types'
 import { dict } from '@/lib/dict'
 import { getPriceUSD, formatUSD } from '@/lib/utils'
+import { trackSearch } from '@/lib/analytics'
 
 export default function GlobalSearch() {
     const { searchQuery, setSearchQuery } = useSearch()
@@ -41,6 +42,7 @@ export default function GlobalSearch() {
         }
 
         const timer = setTimeout(async () => {
+            trackSearch(query)
             setLoading(true)
             try {
                 // Ahora buscamos coincidencias parciales en nombre, descripción Y la nueva columna tags_index

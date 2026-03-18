@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useCart } from '@/context/CartContext'
+import { trackViewItem, trackAddToCart } from '@/lib/analytics'
 import { useDolarBlue } from '@/hooks/useDolarBlue'
 import { formatUSD, formatARS, getPriceUSD, getPriceARS, conditionLabel } from '@/lib/utils'
 import type { ProductWithDetails, ProductImage } from '@/lib/database.types'
@@ -42,6 +43,18 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
     const priceARSTransfer = priceARS ? Math.round(priceARS * 1.03) : null
     const stock = variant?.inventory?.[0]?.qty_available ?? 0
 
+    // Evento view_item al cargar la página de producto
+    useEffect(() => {
+        trackViewItem({
+            id: product.id,
+            name: product.name,
+            category: (product as any).categories?.name,
+            brand: (product as any).brands?.name,
+            price: priceUSD ?? undefined,
+        })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [product.id])
+
     const handleAddToCart = () => {
         if (!variant) return
         addToCart({
@@ -51,6 +64,14 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             quantity,
             image: mainImage,
             variantId: variant.id
+        })
+        trackAddToCart({
+            id: product.id,
+            name: product.name,
+            category: (product as any).categories?.name,
+            brand: (product as any).brands?.name,
+            price: priceUSD ?? undefined,
+            quantity,
         })
         setAddedModalOpen(true)
     }

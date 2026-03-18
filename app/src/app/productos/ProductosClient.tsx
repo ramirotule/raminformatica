@@ -18,6 +18,7 @@ interface ProductosClientProps {
 type SortOption = 'reciente' | 'precio-asc' | 'precio-desc' | 'nombre'
 
 import { useSearch } from '@/context/SearchContext'
+import { trackSearch, trackFilterApply } from '@/lib/analytics'
 
 export default function ProductosClient({ products, categories, brands }: ProductosClientProps) {
     const searchParams = useSearchParams()
@@ -148,7 +149,7 @@ export default function ProductosClient({ products, categories, brands }: Produc
                         <SearchableSelect
                             id="filter-category"
                             value={selectedCategory}
-                            onChange={(v) => setSelectedCategory(v)}
+                            onChange={(v) => { setSelectedCategory(v); if (v) trackFilterApply('categoria', v) }}
                             options={[
                                 { value: '', label: 'Todas las categorías' },
                                 ...categories.map(cat => ({ value: cat.slug, label: cat.name }))
@@ -163,7 +164,7 @@ export default function ProductosClient({ products, categories, brands }: Produc
                         <SearchableSelect
                             id="filter-brand"
                             value={selectedBrand}
-                            onChange={(v) => setSelectedBrand(v)}
+                            onChange={(v) => { setSelectedBrand(v); if (v) trackFilterApply('marca', v) }}
                             options={[
                                 { value: '', label: 'Todas las marcas' },
                                 ...brands.map(brand => ({ value: brand.slug, label: brand.name }))
@@ -178,7 +179,7 @@ export default function ProductosClient({ products, categories, brands }: Produc
                         <SearchableSelect
                             id="filter-condition"
                             value={selectedCondition}
-                            onChange={(v) => setSelectedCondition(v)}
+                            onChange={(v) => { setSelectedCondition(v); if (v) trackFilterApply('condicion', v) }}
                             options={[
                                 { value: '', label: 'Todas' },
                                 { value: 'new', label: 'Nuevo' },

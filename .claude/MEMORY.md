@@ -9,5 +9,8 @@
 ## Proyecto
 - [Estado del pricing](memory/project_pricing.md) — arquitectura multi-proveedor, matcher, decisiones técnicas
 
+## Proyecto
+- [Estado de analytics](memory/project_analytics.md) — GA4 implementado, eventos activos, pendientes
+
 ## Referencias
 - [APIs y credenciales](memory/reference_apis.md) — qué funciona, qué está bloqueado, dónde están las keys

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { X, Bell, ChevronRight } from 'lucide-react'
 import { dict } from '@/lib/dict'
 import { phone } from '@/const/phone'
+import { trackWhatsappClick } from '@/lib/analytics'
 
 export default function PromoModal() {
     const [isOpen, setIsOpen] = useState(false)
@@ -39,7 +40,8 @@ export default function PromoModal() {
         }
     ]
 
-    const handleWhatsApp = (msg: string) => {
+    const handleWhatsApp = (msg: string, slideId?: string) => {
+        trackWhatsappClick('promo_modal', slideId)
         const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`
         window.open(url, '_blank')
         handleClose()
@@ -110,7 +112,7 @@ export default function PromoModal() {
                         {slide.desc}
                     </p>
 
-                    <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', height: 48 }} onClick={() => handleWhatsApp(slide.whatsapp)}>
+                    <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', height: 48 }} onClick={() => handleWhatsApp(slide.whatsapp, slide.id)}>
                         {slide.btnText}
                         <ChevronRight size={18} style={{ marginLeft: 6 }} />
                     </button>

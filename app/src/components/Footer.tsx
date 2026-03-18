@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { dict } from '@/lib/dict'
 import { MapPin, Clock, Phone, Instagram, Facebook } from 'lucide-react'
+import { trackWhatsappClick } from '@/lib/analytics'
 import { useTheme } from '@/context/ThemeContext'
 import { phone } from '@/const/phone'
 
@@ -89,7 +90,7 @@ export default function Footer() {
                             <li>
                                 <img src="/whatsapp-logo.png" alt="" style={{ width: 16, height: 16, flexShrink: 0, marginTop: 2 }} />
                                 <div>
-                                    <a href={`https://wa.me/${phone}`} target="_blank" rel="noopener noreferrer">
+                                    <a href={`https://wa.me/${phone}`} target="_blank" rel="noopener noreferrer" onClick={() => trackWhatsappClick('footer')}>
                                         WhatsApp (Ramiro)
                                     </a>
                                 </div>
