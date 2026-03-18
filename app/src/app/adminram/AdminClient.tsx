@@ -63,7 +63,7 @@ function Sidebar({ active, onChange }: { active: AdminSection; onChange: (s: Adm
         { id: 'categorias', label: dict.admin.categorias, icon: <Tag size={16} /> },
         { id: 'marcas', label: dict.admin.marcas, icon: <Building2 size={16} /> },
         { id: 'proveedores', label: 'Proveedores', icon: <Warehouse size={16} /> },
-        { id: 'precios', label: 'Sincronizar Precios', icon: <RefreshCw size={16} /> },
+        { id: 'precios', label: 'Actualizar Precios', icon: <RefreshCw size={16} /> },
         { id: 'comparador', label: 'Comparador', icon: <TrendingUp size={16} /> },
         { id: 'novedades', label: 'Novedades', icon: <Bell size={16} /> },
     ]
@@ -448,6 +448,8 @@ function AdminProductos() {
     const [bulkRenameReplace, setBulkRenameReplace] = useState('')
     const [bulkTagsOpen, setBulkTagsOpen] = useState(false)
     const [bulkTagsForm, setBulkTagsForm] = useState('')
+    const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false)
+    const [singleDeleteConfirm, setSingleDeleteConfirm] = useState<{ id: string; name: string } | null>(null)
 
     type SortField = 'name' | 'categories.name' | 'brands.name' | 'providers.name' | 'priceUSD' | 'condition' | 'active'
     const [sortField, setSortField] = useState<SortField>('name')
@@ -619,9 +621,13 @@ function AdminProductos() {
         load()
     }
 
-    async function bulkDelete() {
+    function bulkDelete() {
         if (!selectedIds.size) return
-        if (!confirm(`¿Eliminar masivamente ${selectedIds.size} producto(s)? Esta acción no se puede deshacer.`)) return
+        setBulkDeleteConfirm(true)
+    }
+
+    async function executeBulkDelete() {
+        setBulkDeleteConfirm(false)
         await (supabase as any).from('products').delete().in('id', Array.from(selectedIds))
         showAlert('success', 'Productos eliminados masivamente.')
         setSelectedIds(new Set())
@@ -989,10 +995,15 @@ function AdminProductos() {
     }
 
     async function handleDelete(id: string, name: string) {
-        if (!confirm(`¿Eliminar "${name}"? Esta acción no se puede deshacer.`)) return
-        const { error } = await (supabase as any).from('products').delete().eq('id', id)
+        setSingleDeleteConfirm({ id, name })
+    }
+
+    async function executeSingleDelete() {
+        if (!singleDeleteConfirm) return
+        const { error } = await (supabase as any).from('products').delete().eq('id', singleDeleteConfirm.id)
         if (error) showAlert('error', error.message)
         else { showAlert('success', 'Producto eliminado.'); load() }
+        setSingleDeleteConfirm(null)
     }
 
     async function toggleActive(p: ProductWithDetails) {
@@ -1085,7 +1096,7 @@ function AdminProductos() {
             {loading ? (
                 <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 40 }}>Cargando...</div>
             ) : (
-                <div className="table-wrap">
+                <div className="table-wrap" style={{ maxHeight: '75vh', overflowY: 'auto' }}>
                     <table>
                         <thead>
                             <tr>
@@ -1875,6 +1886,42 @@ function AdminProductos() {
                     </div>
                 </div>
             )}
+            {bulkDeleteConfirm && (
+                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setBulkDeleteConfirm(false)}>
+                    <div className="modal" style={{ maxWidth: 440 }}>
+                        <div className="modal-title">
+                            <span>Confirmar Eliminación Masiva</span>
+                            <button onClick={() => setBulkDeleteConfirm(false)} className="btn btn-ghost btn-sm"><X size={16} /></button>
+                        </div>
+                        <div style={{ padding: '10px 0 20px 0' }}>
+                            <p style={{ marginBottom: 12 }}>Vas a eliminar <strong>{selectedIds.size} producto(s)</strong> seleccionado(s).</p>
+                            <p style={{ color: 'var(--red)', fontWeight: 500, fontSize: '0.9rem' }}>Esta acción no se puede deshacer.</p>
+                        </div>
+                        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+                            <button className="btn btn-ghost" onClick={() => setBulkDeleteConfirm(false)}>Cancelar</button>
+                            <button className="btn btn-danger" onClick={executeBulkDelete}><Trash2 size={15} /> Confirmar Eliminación</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {singleDeleteConfirm && (
+                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setSingleDeleteConfirm(null)}>
+                    <div className="modal" style={{ maxWidth: 440 }}>
+                        <div className="modal-title">
+                            <span>Confirmar Eliminación</span>
+                            <button onClick={() => setSingleDeleteConfirm(null)} className="btn btn-ghost btn-sm"><X size={16} /></button>
+                        </div>
+                        <div style={{ padding: '10px 0 20px 0' }}>
+                            <p>¿Estás seguro de que deseás eliminar <strong>"{singleDeleteConfirm.name}"</strong>?</p>
+                            <p style={{ color: 'var(--red)', fontWeight: 500, fontSize: '0.9rem', marginTop: 8 }}>Esta acción no se puede deshacer.</p>
+                        </div>
+                        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+                            <button className="btn btn-ghost" onClick={() => setSingleDeleteConfirm(null)}>Cancelar</button>
+                            <button className="btn btn-danger" onClick={executeSingleDelete}><Trash2 size={15} /> Confirmar Eliminación</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
@@ -1890,6 +1937,32 @@ function AdminCategorias() {
     const [editId, setEditId] = useState<string | null>(null)
     const [modalOpen, setModalOpen] = useState(false)
     const [deleteConfirm, setDeleteConfirm] = useState<{ id: string, name: string, count: number } | null>(null)
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+
+    const toggleSelectAll = (items: any[]) => {
+        if (selectedIds.size === items.length) setSelectedIds(new Set())
+        else setSelectedIds(new Set(items.map(i => i.id)))
+    }
+    const toggleSelectOne = (id: string) => {
+        const next = new Set(selectedIds)
+        next.has(id) ? next.delete(id) : next.add(id)
+        setSelectedIds(next)
+    }
+    const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false)
+
+    const bulkDelete = () => setBulkDeleteConfirm(true)
+
+    const executeBulkDelete = async () => {
+        setIsSaving(true)
+        setBulkDeleteConfirm(false)
+        for (const id of Array.from(selectedIds)) {
+            await (supabase as any).from('categories').delete().eq('id', id)
+        }
+        setSelectedIds(new Set())
+        showAlert('success', `${selectedIds.size} categoría(s) eliminada(s).`)
+        setIsSaving(false)
+        load()
+    }
 
     const [sortField, setSortField] = useState<'name' | 'slug'>('name')
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
@@ -1995,12 +2068,9 @@ function AdminCategorias() {
         const { id, count } = deleteConfirm
 
         if (count > 0) {
-            const { error: productsError } = await (supabase as any).from('products').delete().eq('category_id', id)
-            if (productsError) {
-                showAlert('error', productsError.message)
-                setDeleteConfirm(null)
-                return
-            }
+            showAlert('error', `No se puede eliminar: la categoría tiene ${count} producto(s) asociado(s). Reasignálos antes de borrarla.`)
+            setDeleteConfirm(null)
+            return
         }
 
         const { error } = await (supabase as any).from('categories').delete().eq('id', id)
@@ -2018,12 +2088,20 @@ function AdminCategorias() {
                 </button>
             </div>
 
+            {selectedIds.size > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'var(--primary-light)', borderRadius: 8, marginBottom: 16, border: '1px solid var(--primary)', flexWrap: 'wrap' }}>
+                    <span style={{ fontWeight: 600, color: 'var(--primary-dark)', fontSize: '0.9rem' }}>{selectedIds.size} seleccionada(s)</span>
+                    <button className="btn btn-danger btn-sm" onClick={bulkDelete}><Trash2 size={14} /> Eliminar</button>
+                </div>
+            )}
+
             {alert && <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
 
             {loading ? <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 40 }}>Cargando...</div> : (
-                <div className="table-wrap">
+                <div className="table-wrap" style={{ maxHeight: '75vh', overflowY: 'auto' }}>
                     <table>
                         <thead><tr>
+                            <th style={{ width: 40 }}><input type="checkbox" checked={selectedIds.size === sortedItems.length && sortedItems.length > 0} onChange={() => toggleSelectAll(sortedItems)} style={{ accentColor: 'var(--primary)', width: 16, height: 16, cursor: 'pointer' }} /></th>
                             <th>Icono</th>
                             <th onClick={() => handleSort('name')} style={{ cursor: 'pointer', userSelect: 'none' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -2040,7 +2118,8 @@ function AdminCategorias() {
                         </tr></thead>
                         <tbody>
                             {sortedItems.map((c) => (
-                                <tr key={c.id}>
+                                <tr key={c.id} style={{ background: selectedIds.has(c.id) ? 'var(--bg-secondary)' : 'transparent' }}>
+                                    <td><input type="checkbox" checked={selectedIds.has(c.id)} onChange={() => toggleSelectOne(c.id)} style={{ accentColor: 'var(--primary)', width: 16, height: 16, cursor: 'pointer' }} /></td>
                                     <td style={{ fontSize: '1.5rem' }}>
                                         {c.icon_url && c.icon_url.startsWith('http') ? (
                                             <img src={c.icon_url} alt={c.name} style={{ width: 32, height: 32, objectFit: 'contain' }} />
@@ -2129,7 +2208,7 @@ function AdminCategorias() {
                 <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setDeleteConfirm(null)}>
                     <div className="modal" style={{ maxWidth: 450 }}>
                         <div className="modal-title">
-                            <span>Confirmar Eliminación</span>
+                            <span>{deleteConfirm.count > 0 ? 'No se puede eliminar' : 'Confirmar Eliminación'}</span>
                             <button onClick={() => setDeleteConfirm(null)} className="btn btn-ghost btn-sm"><X size={16} /></button>
                         </div>
                         <div style={{ padding: '10px 0 20px 0' }}>
@@ -2139,16 +2218,40 @@ function AdminCategorias() {
                                         La categoría <strong>"{deleteConfirm.name}"</strong> tiene <strong>{deleteConfirm.count} producto(s)</strong> asociado(s).
                                     </p>
                                     <p style={{ color: 'var(--red)', fontWeight: 500 }}>
-                                        Si la eliminas, también se eliminarán todos los productos que pertenecen a ella.
+                                        Reasigná o eliminá esos productos antes de borrar la categoría.
                                     </p>
                                 </div>
                             ) : (
-                                <p>¿Estás seguro de que deseas eliminar la categoría <strong>"{deleteConfirm.name}"</strong>?</p>
+                                <p>¿Estás seguro de que deseás eliminar la categoría <strong>"{deleteConfirm.name}"</strong>?</p>
                             )}
                         </div>
                         <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                            <button className="btn btn-ghost" onClick={() => setDeleteConfirm(null)}>Cancelar</button>
-                            <button className="btn btn-danger" onClick={executeDelete}><Trash2 size={15} /> Confirmar Eliminación</button>
+                            {deleteConfirm.count > 0 ? (
+                                <button className="btn btn-primary" onClick={() => setDeleteConfirm(null)}>Entendido</button>
+                            ) : (
+                                <>
+                                    <button className="btn btn-ghost" onClick={() => setDeleteConfirm(null)}>Cancelar</button>
+                                    <button className="btn btn-danger" onClick={executeDelete}><Trash2 size={15} /> Confirmar Eliminación</button>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+            {bulkDeleteConfirm && (
+                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setBulkDeleteConfirm(false)}>
+                    <div className="modal" style={{ maxWidth: 440 }}>
+                        <div className="modal-title">
+                            <span>Confirmar Eliminación</span>
+                            <button onClick={() => setBulkDeleteConfirm(false)} className="btn btn-ghost btn-sm"><X size={16} /></button>
+                        </div>
+                        <div style={{ padding: '10px 0 20px 0' }}>
+                            <p style={{ marginBottom: 12 }}>Vas a eliminar <strong>{selectedIds.size} categoría(s)</strong> seleccionada(s).</p>
+                            <p style={{ color: 'var(--red)', fontWeight: 500, fontSize: '0.9rem' }}>Esta acción no se puede deshacer.</p>
+                        </div>
+                        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+                            <button className="btn btn-ghost" onClick={() => setBulkDeleteConfirm(false)}>Cancelar</button>
+                            <button className="btn btn-danger" onClick={executeBulkDelete}><Trash2 size={15} /> Confirmar Eliminación</button>
                         </div>
                     </div>
                 </div>
@@ -2176,6 +2279,39 @@ function AdminMarcas() {
     const [editId, setEditId] = useState<string | null>(null)
     const [modalOpen, setModalOpen] = useState(false)
     const [deleteConfirm, setDeleteConfirm] = useState<{ id: string, name: string, count: number } | null>(null)
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+
+    const toggleSelectAll = (items: any[]) => {
+        if (selectedIds.size === items.length) setSelectedIds(new Set())
+        else setSelectedIds(new Set(items.map(i => i.id)))
+    }
+    const toggleSelectOne = (id: string) => {
+        const next = new Set(selectedIds)
+        next.has(id) ? next.delete(id) : next.add(id)
+        setSelectedIds(next)
+    }
+    const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false)
+
+    const bulkDelete = () => setBulkDeleteConfirm(true)
+
+    const executeBulkDelete = async () => {
+        setIsSaving(true)
+        setBulkDeleteConfirm(false)
+        let blocked = 0
+        for (const id of Array.from(selectedIds)) {
+            const { count } = await (supabase as any)
+                .from('products').select('*', { count: 'exact', head: true }).eq('brand_id', id)
+            if ((count ?? 0) > 0) { blocked++; continue }
+            await (supabase as any).from('brands').delete().eq('id', id)
+        }
+        setSelectedIds(new Set())
+        if (blocked > 0)
+            showAlert('error', `${blocked} marca(s) no se eliminaron porque tienen productos asociados.`)
+        else
+            showAlert('success', `${selectedIds.size} marca(s) eliminada(s).`)
+        setIsSaving(false)
+        load()
+    }
 
     const [sortField, setSortField] = useState<'name' | 'slug' | 'created_at'>('name')
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
@@ -2272,12 +2408,9 @@ function AdminMarcas() {
         const { id, count } = deleteConfirm
 
         if (count > 0) {
-            const { error: productsError } = await (supabase as any).from('products').delete().eq('brand_id', id)
-            if (productsError) {
-                showAlert('error', productsError.message)
-                setDeleteConfirm(null)
-                return
-            }
+            showAlert('error', `No se puede eliminar: la marca tiene ${count} producto(s) asociado(s). Reasignálos antes de borrarla.`)
+            setDeleteConfirm(null)
+            return
         }
 
         const { error } = await (supabase as any).from('brands').delete().eq('id', id)
@@ -2295,12 +2428,20 @@ function AdminMarcas() {
                 </button>
             </div>
 
+            {selectedIds.size > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'var(--primary-light)', borderRadius: 8, marginBottom: 16, border: '1px solid var(--primary)', flexWrap: 'wrap' }}>
+                    <span style={{ fontWeight: 600, color: 'var(--primary-dark)', fontSize: '0.9rem' }}>{selectedIds.size} seleccionada(s)</span>
+                    <button className="btn btn-danger btn-sm" onClick={bulkDelete}><Trash2 size={14} /> Eliminar</button>
+                </div>
+            )}
+
             {alert && <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
 
             {loading ? <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 40 }}>Cargando...</div> : (
-                <div className="table-wrap">
+                <div className="table-wrap" style={{ maxHeight: '75vh', overflowY: 'auto' }}>
                     <table>
                         <thead><tr>
+                            <th style={{ width: 40 }}><input type="checkbox" checked={selectedIds.size === sortedItems.length && sortedItems.length > 0} onChange={() => toggleSelectAll(sortedItems)} style={{ accentColor: 'var(--primary)', width: 16, height: 16, cursor: 'pointer' }} /></th>
                             <th style={{ width: 60 }}>Logo</th>
                             <th onClick={() => handleSort('name')} style={{ cursor: 'pointer', userSelect: 'none' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -2321,7 +2462,8 @@ function AdminMarcas() {
                         </tr></thead>
                         <tbody>
                             {sortedItems.map((b) => (
-                                <tr key={b.id}>
+                                <tr key={b.id} style={{ background: selectedIds.has(b.id) ? 'var(--bg-secondary)' : 'transparent' }}>
+                                    <td><input type="checkbox" checked={selectedIds.has(b.id)} onChange={() => toggleSelectOne(b.id)} style={{ accentColor: 'var(--primary)', width: 16, height: 16, cursor: 'pointer' }} /></td>
                                     <td>
                                         {b.logo_url && (
                                             <img src={b.logo_url} alt={b.name} style={{ width: 32, height: 32, objectFit: 'contain' }} />
@@ -2391,7 +2533,7 @@ function AdminMarcas() {
                 <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setDeleteConfirm(null)}>
                     <div className="modal" style={{ maxWidth: 450 }}>
                         <div className="modal-title">
-                            <span>Confirmar Eliminación</span>
+                            <span>{deleteConfirm.count > 0 ? 'No se puede eliminar' : 'Confirmar Eliminación'}</span>
                             <button onClick={() => setDeleteConfirm(null)} className="btn btn-ghost btn-sm"><X size={16} /></button>
                         </div>
                         <div style={{ padding: '10px 0 20px 0' }}>
@@ -2401,16 +2543,42 @@ function AdminMarcas() {
                                         La marca <strong>"{deleteConfirm.name}"</strong> tiene <strong>{deleteConfirm.count} producto(s)</strong> asociado(s).
                                     </p>
                                     <p style={{ color: 'var(--red)', fontWeight: 500 }}>
-                                        Si la eliminas, también se eliminarán todos los productos que pertenecen a ella.
+                                        Reasigná o eliminá esos productos antes de borrar la marca.
                                     </p>
                                 </div>
                             ) : (
-                                <p>¿Estás seguro de que deseas eliminar la marca <strong>"{deleteConfirm.name}"</strong>?</p>
+                                <p>¿Estás seguro de que deseás eliminar la marca <strong>"{deleteConfirm.name}"</strong>?</p>
                             )}
                         </div>
                         <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                            <button className="btn btn-ghost" onClick={() => setDeleteConfirm(null)}>Cancelar</button>
-                            <button className="btn btn-danger" onClick={executeDelete}><Trash2 size={15} /> Confirmar Eliminación</button>
+                            {deleteConfirm.count > 0 ? (
+                                <button className="btn btn-primary" onClick={() => setDeleteConfirm(null)}>Entendido</button>
+                            ) : (
+                                <>
+                                    <button className="btn btn-ghost" onClick={() => setDeleteConfirm(null)}>Cancelar</button>
+                                    <button className="btn btn-danger" onClick={executeDelete}><Trash2 size={15} /> Confirmar Eliminación</button>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+            {bulkDeleteConfirm && (
+                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setBulkDeleteConfirm(false)}>
+                    <div className="modal" style={{ maxWidth: 440 }}>
+                        <div className="modal-title">
+                            <span>Confirmar Eliminación</span>
+                            <button onClick={() => setBulkDeleteConfirm(false)} className="btn btn-ghost btn-sm"><X size={16} /></button>
+                        </div>
+                        <div style={{ padding: '10px 0 20px 0' }}>
+                            <p style={{ marginBottom: 12 }}>Vas a eliminar <strong>{selectedIds.size} marca(s)</strong> seleccionada(s).</p>
+                            <p style={{ color: 'var(--red)', fontWeight: 500, fontSize: '0.9rem' }}>
+                                Esta acción no se puede deshacer. Los productos asociados a estas marcas pueden verse afectados.
+                            </p>
+                        </div>
+                        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+                            <button className="btn btn-ghost" onClick={() => setBulkDeleteConfirm(false)}>Cancelar</button>
+                            <button className="btn btn-danger" onClick={executeBulkDelete}><Trash2 size={15} /> Confirmar Eliminación</button>
                         </div>
                     </div>
                 </div>
@@ -2994,8 +3162,45 @@ function AdminProveedores() {
     const [modalOpen, setModalOpen] = useState(false)
     const [editId, setEditId] = useState<string | null>(null)
     const [isSaving, setIsSaving] = useState(false)
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
 
     const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', notes: '', active: true })
+
+    const toggleSelectAll = (items: any[]) => {
+        if (selectedIds.size === items.length) setSelectedIds(new Set())
+        else setSelectedIds(new Set(items.map(i => i.id)))
+    }
+    const toggleSelectOne = (id: string) => {
+        const next = new Set(selectedIds)
+        next.has(id) ? next.delete(id) : next.add(id)
+        setSelectedIds(next)
+    }
+    const bulkStatus = async (active: boolean) => {
+        setIsSaving(true)
+        for (const id of Array.from(selectedIds)) {
+            await (supabase as any).from('providers').update({ active, updated_at: new Date().toISOString() }).eq('id', id)
+        }
+        setSelectedIds(new Set())
+        showAlert('success', `${selectedIds.size} proveedor(es) ${active ? 'activado(s)' : 'desactivado(s)'}.`)
+        setIsSaving(false)
+        load()
+    }
+    const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false)
+    const [singleDeleteConfirm, setSingleDeleteConfirm] = useState<{ id: string; name: string } | null>(null)
+
+    const bulkDelete = () => setBulkDeleteConfirm(true)
+
+    const executeBulkDelete = async () => {
+        setIsSaving(true)
+        setBulkDeleteConfirm(false)
+        for (const id of Array.from(selectedIds)) {
+            await (supabase as any).from('providers').delete().eq('id', id)
+        }
+        setSelectedIds(new Set())
+        showAlert('success', `${selectedIds.size} proveedor(es) eliminado(s).`)
+        setIsSaving(false)
+        load()
+    }
 
     const [sortField, setSortField] = useState<'name' | 'email' | 'created_at'>('name')
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
@@ -3037,10 +3242,15 @@ function AdminProveedores() {
     }
 
     async function handleDelete(id: string, name: string) {
-        if (!confirm(`¿Eliminar al proveedor "${name}"?`)) return
-        const { error } = await (supabase as any).from('providers').delete().eq('id', id)
+        setSingleDeleteConfirm({ id, name })
+    }
+
+    async function executeSingleDelete() {
+        if (!singleDeleteConfirm) return
+        const { error } = await (supabase as any).from('providers').delete().eq('id', singleDeleteConfirm.id)
         if (error) showAlert('error', error.message)
         else { showAlert('success', 'Proveedor eliminado.'); load() }
+        setSingleDeleteConfirm(null)
     }
 
     const sortedItems = [...items].sort((a: any, b: any) => {
@@ -3060,13 +3270,23 @@ function AdminProveedores() {
                 </button>
             </div>
 
+            {selectedIds.size > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'var(--primary-light)', borderRadius: 8, marginBottom: 16, border: '1px solid var(--primary)', flexWrap: 'wrap' }}>
+                    <span style={{ fontWeight: 600, color: 'var(--primary-dark)', fontSize: '0.9rem' }}>{selectedIds.size} seleccionado(s)</span>
+                    <button className="btn btn-sm btn-primary" onClick={() => bulkStatus(true)}>Activar</button>
+                    <button className="btn btn-sm btn-ghost" style={{ background: 'rgba(0,0,0,0.05)', border: '1px solid var(--border)' }} onClick={() => bulkStatus(false)}>Pausar</button>
+                    <button className="btn btn-danger btn-sm" onClick={bulkDelete}><Trash2 size={14} /> Eliminar</button>
+                </div>
+            )}
+
             {alert && <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
 
             {loading ? <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 40 }}>Cargando...</div> : (
-                <div className="table-wrap">
+                <div className="table-wrap" style={{ maxHeight: '75vh', overflowY: 'auto' }}>
                     <table>
                         <thead>
                             <tr>
+                                <th style={{ width: 40 }}><input type="checkbox" checked={selectedIds.size === sortedItems.length && sortedItems.length > 0} onChange={() => toggleSelectAll(sortedItems)} style={{ accentColor: 'var(--primary)', width: 16, height: 16, cursor: 'pointer' }} /></th>
                                 <th onClick={() => { setSortField('name'); setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc') }} style={{ cursor: 'pointer' }}>Nombre</th>
                                 <th onClick={() => { setSortField('email'); setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc') }} style={{ cursor: 'pointer' }}>Email / Contacto</th>
                                 <th>Teléfono</th>
@@ -3076,14 +3296,26 @@ function AdminProveedores() {
                         </thead>
                         <tbody>
                             {sortedItems.map((p) => (
-                                <tr key={p.id}>
+                                <tr key={p.id} style={{ background: selectedIds.has(p.id) ? 'var(--bg-secondary)' : 'transparent' }}>
+                                    <td><input type="checkbox" checked={selectedIds.has(p.id)} onChange={() => toggleSelectOne(p.id)} style={{ accentColor: 'var(--primary)', width: 16, height: 16, cursor: 'pointer' }} /></td>
                                     <td style={{ fontWeight: 600 }}>{p.name}</td>
                                     <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{p.email || '—'}</td>
                                     <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{p.phone || '—'}</td>
                                     <td>
-                                        <span className={`badge ${p.active ? 'badge-new' : 'badge-used'}`}>
+                                        <button
+                                            onClick={async () => {
+                                                await (supabase as any).from('providers').update({ active: !p.active, updated_at: new Date().toISOString() }).eq('id', p.id)
+                                                load()
+                                            }}
+                                            style={{
+                                                background: p.active ? 'rgba(52,199,89,0.15)' : 'rgba(255,59,48,0.1)',
+                                                border: `1px solid ${p.active ? 'rgba(52,199,89,0.3)' : 'rgba(255,59,48,0.25)'}`,
+                                                color: p.active ? 'var(--green)' : 'var(--red)',
+                                                borderRadius: 100, padding: '3px 10px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer',
+                                            }}
+                                        >
                                             {p.active ? 'Activo' : 'Inactivo'}
-                                        </span>
+                                        </button>
                                     </td>
                                     <td>
                                         <div style={{ display: 'flex', gap: 6 }}>
@@ -3140,6 +3372,42 @@ function AdminProveedores() {
                             <button className="btn btn-primary" onClick={handleSave} disabled={isSaving}>
                                 {isSaving ? <Loader2 className="animate-spin" size={15} /> : <Check size={15} />} Guardar Proveedor
                             </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {bulkDeleteConfirm && (
+                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setBulkDeleteConfirm(false)}>
+                    <div className="modal" style={{ maxWidth: 440 }}>
+                        <div className="modal-title">
+                            <span>Confirmar Eliminación</span>
+                            <button onClick={() => setBulkDeleteConfirm(false)} className="btn btn-ghost btn-sm"><X size={16} /></button>
+                        </div>
+                        <div style={{ padding: '10px 0 20px 0' }}>
+                            <p style={{ marginBottom: 12 }}>Vas a eliminar <strong>{selectedIds.size} proveedor(es)</strong> seleccionado(s).</p>
+                            <p style={{ color: 'var(--red)', fontWeight: 500, fontSize: '0.9rem' }}>Esta acción no se puede deshacer.</p>
+                        </div>
+                        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+                            <button className="btn btn-ghost" onClick={() => setBulkDeleteConfirm(false)}>Cancelar</button>
+                            <button className="btn btn-danger" onClick={executeBulkDelete}><Trash2 size={15} /> Confirmar Eliminación</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {singleDeleteConfirm && (
+                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setSingleDeleteConfirm(null)}>
+                    <div className="modal" style={{ maxWidth: 440 }}>
+                        <div className="modal-title">
+                            <span>Confirmar Eliminación</span>
+                            <button onClick={() => setSingleDeleteConfirm(null)} className="btn btn-ghost btn-sm"><X size={16} /></button>
+                        </div>
+                        <div style={{ padding: '10px 0 20px 0' }}>
+                            <p>¿Estás seguro de que deseás eliminar al proveedor <strong>"{singleDeleteConfirm.name}"</strong>?</p>
+                            <p style={{ color: 'var(--red)', fontWeight: 500, fontSize: '0.9rem', marginTop: 8 }}>Esta acción no se puede deshacer.</p>
+                        </div>
+                        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+                            <button className="btn btn-ghost" onClick={() => setSingleDeleteConfirm(null)}>Cancelar</button>
+                            <button className="btn btn-danger" onClick={executeSingleDelete}><Trash2 size={15} /> Confirmar Eliminación</button>
                         </div>
                     </div>
                 </div>

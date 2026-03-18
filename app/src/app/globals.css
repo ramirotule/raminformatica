@@ -191,10 +191,8 @@ img {
   top: 0;
   inset-inline: 0;
   z-index: 100;
-  background: var(--bg-glass);
+  background: var(--bg-card);
   border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
   transition: var(--transition);
 }
 
@@ -1203,6 +1201,8 @@ thead {
   background: var(--bg-secondary);
   position: sticky;
   top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
 thead th {
