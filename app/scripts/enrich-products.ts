@@ -27,6 +27,7 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env.local') })
 const SUPABASE_URL  = process.env.NEXT_PUBLIC_SUPABASE_URL
 const SUPABASE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 const GEMINI_KEY    = process.env.GOOGLE_GENERATIVE_AI_API_KEY
+const GOOGLE_CSE_ID = process.env.GOOGLE_CSE_ID
 
 if (!SUPABASE_URL || !SUPABASE_KEY) {
   console.error('❌ Faltan NEXT_PUBLIC_SUPABASE_URL o SUPABASE_KEY en .env.local')
@@ -34,6 +35,10 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
 }
 if (!GEMINI_KEY) {
   console.error('❌ Falta GOOGLE_GENERATIVE_AI_API_KEY en .env.local')
+  process.exit(1)
+}
+if (!GOOGLE_CSE_ID) {
+  console.error('❌ Falta GOOGLE_CSE_ID en .env.local')
   process.exit(1)
 }
 
@@ -54,10 +59,6 @@ interface ProductRow {
   categories:        { name: string; slug: string } | null
   brands:            { name: string } | null
   product_images:    { id: string }[]
-}
-
-interface MLItem {
-  pictures: { secure_url: string }[]
 }
 
 // ─── Category detection ───────────────────────────────────────────────────────
@@ -184,36 +185,40 @@ Envolvé el resultado en: <long_description>…</long_description>
   return { short: null, long: null }
 }
 
-// ─── MercadoLibre images ──────────────────────────────────────────────────────
+// ─── Google Image Search ──────────────────────────────────────────────────────
 
-async function fetchMLImages(query: string, maxImages = 5): Promise<string[]> {
+interface GoogleImageResult {
+  items?: { link: string; image?: { thumbnailLink: string } }[]
+}
+
+async function fetchProductImages(query: string, maxImages = 5): Promise<string[]> {
   const urls: string[] = []
   try {
-    const searchRes = await fetch(
-      `https://api.mercadolibre.com/sites/MLA/search?q=${encodeURIComponent(query)}&limit=3`
-    )
-    if (!searchRes.ok) return urls
+    const params = new URLSearchParams({
+      key:        GEMINI_KEY!,   // reutilizamos la misma Google API key
+      cx:         GOOGLE_CSE_ID!,
+      q:          query,
+      searchType: 'image',
+      num:        String(maxImages),
+      imgType:    'photo',
+      imgSize:    'large',
+      safe:       'active',
+    })
 
-    const { results } = await searchRes.json() as { results: { id: string }[] }
-    if (!results?.length) return urls
+    const res = await fetch(`https://www.googleapis.com/customsearch/v1?${params}`)
+    if (!res.ok) {
+      const err = await res.json() as { error?: { message: string } }
+      console.error(`  ⚠️  Google CSE error: ${err.error?.message ?? res.status}`)
+      return urls
+    }
 
-    for (let i = 0; i < Math.min(2, results.length) && urls.length < maxImages; i++) {
-      try {
-        const itemRes = await fetch(`https://api.mercadolibre.com/items/${results[i].id}`)
-        if (!itemRes.ok) continue
-
-        const item = await itemRes.json() as MLItem
-        for (const pic of item.pictures ?? []) {
-          if (urls.length >= maxImages) break
-          // Prefer original quality
-          const highRes = pic.secure_url.replace(/-[A-Z]\.jpg$/, '-O.jpg')
-          urls.push(highRes)
-        }
-        await new Promise(r => setTimeout(r, 300))
-      } catch { /* skip item */ }
+    const data = await res.json() as GoogleImageResult
+    for (const item of data.items ?? []) {
+      if (urls.length >= maxImages) break
+      if (item.link) urls.push(item.link)
     }
   } catch (err) {
-    console.error(`  ⚠️  Error buscando en ML: ${(err as Error).message}`)
+    console.error(`  ⚠️  Error buscando imágenes: ${(err as Error).message}`)
   }
   return urls
 }
@@ -320,7 +325,7 @@ async function main() {
         const query = nameAlreadyHasBrand || !brand ? p.name : `${brand} ${p.name}`
         console.log(`  🔎 Buscando imágenes: "${query}"`)
 
-        const urls = await fetchMLImages(query)
+        const urls = await fetchProductImages(query)
         console.log(`  🖼️  Imágenes encontradas: ${urls.length}`)
 
         if (urls.length > 0) {

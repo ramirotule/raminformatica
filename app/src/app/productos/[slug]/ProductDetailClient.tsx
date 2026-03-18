@@ -137,9 +137,23 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                         <>
                             <div className="detail-price-usd">{formatUSD(priceUSD)}</div>
                             {priceARS !== null && (
-                                <div className="detail-price-ars">
-                                    {formatARS(priceARS)} ARS
-                                    <sup style={{ fontSize: '0.6em', color: 'var(--accent)', marginLeft: 2 }}>*</sup>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                                    <div className="detail-price-ars">{formatARS(priceARS)}</div>
+                                    <span style={{
+                                        fontSize: '0.75rem',
+                                        fontWeight: 700,
+                                        color: 'var(--accent)',
+                                        background: 'rgba(var(--accent-rgb, 34,197,94), 0.1)',
+                                        border: '1px solid rgba(var(--accent-rgb, 34,197,94), 0.25)',
+                                        borderRadius: 99,
+                                        padding: '4px 10px',
+                                        whiteSpace: 'nowrap',
+                                        lineHeight: 1,
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                    }}>
+                                        Precio contado efectivo
+                                    </span>
                                 </div>
                             )}
                         </>
@@ -147,7 +161,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                         <div className="detail-price-usd">Consultar precio</div>
                     )}
 
-                    {/* Nota efectivo vs transferencia */}
+                    {/* Nota transferencia */}
                     {priceARS !== null && priceARSTransfer !== null && (
                         <div style={{
                             marginTop: 10,
@@ -159,7 +173,6 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                             lineHeight: '1.6',
                             color: 'var(--text-secondary)'
                         }}>
-                            <span style={{ color: 'var(--accent)', fontWeight: 700 }}>* Precio contado efectivo.</span>{' '}
                             Transferencia bancaria o MercadoPago suma un 3%:{' '}
                             <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
                                 {formatARS(priceARSTransfer)} ARS
