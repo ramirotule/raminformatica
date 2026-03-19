@@ -305,7 +305,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     <p className="price-notice">* Precio sujeto a cambios sin previo aviso</p>
                 </div>
 
-                {product.short_description && (
+                {product.long_description && (
                     <button
                         onClick={() => setSpecsOpen(true)}
                         style={{
@@ -410,12 +410,12 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     whiteSpace: 'pre-wrap', // Esto respeta los saltos de línea
                     maxWidth: '900px' // Opcional: para que no sea excesivamente ancho en pantallas gigantes
                 }}>
-                    {product.long_description || 'Sin descripción disponible.'}
+                    {product.short_description || 'Sin descripción disponible.'}
                 </div>
             </div>
 
             {/* Specs Modal */}
-            {specsOpen && product.short_description && (
+            {specsOpen && product.long_description && (
                 <div
                     onClick={() => setSpecsOpen(false)}
                     style={{
@@ -484,7 +484,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                             paddingTop: 16,
                             marginBottom: 24
                         }}>
-                            {product.short_description}
+                            {product.long_description}
                         </div>
                         {/* Botón ir a descripción */}
                         <button
