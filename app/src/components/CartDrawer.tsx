@@ -88,15 +88,15 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                                         </div>
                                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
                                             <div className="qty-selector" style={{ padding: '2px 4px' }}>
-                                                <button className="qty-btn" style={{ width: 28, height: 28 }} onClick={() => updateQuantity(item.variantId, item.quantity - 1)}>
+                                                <button className="qty-btn" style={{ width: 28, height: 28 }} onClick={() => updateQuantity(item.variantId ?? item.id, item.quantity - 1)}>
                                                     <Minus size={12} />
                                                 </button>
                                                 <span className="qty-value" style={{ fontSize: '0.9rem', minWidth: 20 }}>{item.quantity}</span>
-                                                <button className="qty-btn" style={{ width: 28, height: 28 }} onClick={() => updateQuantity(item.variantId, item.quantity + 1)}>
+                                                <button className="qty-btn" style={{ width: 28, height: 28 }} onClick={() => updateQuantity(item.variantId ?? item.id, item.quantity + 1)}>
                                                     <Plus size={12} />
                                                 </button>
                                             </div>
-                                            <button onClick={() => removeFromCart(item.variantId)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+                                            <button onClick={() => removeFromCart(item.variantId ?? item.id)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
                                                 <Trash2 size={18} />
                                             </button>
                                         </div>

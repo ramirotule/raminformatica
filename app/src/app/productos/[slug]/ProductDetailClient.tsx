@@ -65,15 +65,18 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             image: mainImage,
             variantId: variant.id
         })
-        trackAddToCart({
-            id: product.id,
-            name: product.name,
-            category: (product as any).categories?.name,
-            brand: (product as any).brands?.name,
-            price: priceUSD ?? undefined,
-            quantity,
-        })
         setAddedModalOpen(true)
+        // Analytics no debe bloquear el flujo del carrito
+        try {
+            trackAddToCart({
+                id: product.id,
+                name: product.name,
+                category: (product as any).categories?.name,
+                brand: (product as any).brands?.name,
+                price: priceUSD ?? undefined,
+                quantity,
+            })
+        } catch {}
     }
 
     const openLightbox = (imgUrl: string) => {

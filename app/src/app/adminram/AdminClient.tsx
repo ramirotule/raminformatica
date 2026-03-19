@@ -3347,7 +3347,7 @@ function AdminProveedores() {
                                 <input className="form-input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
                             </div>
                             <div className="form-group">
-                                <label className="form-label">Email</label>
+                                <label className="form-label">Contacto / Email</label>
                                 <input className="form-input" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
                             </div>
                             <div className="form-group">

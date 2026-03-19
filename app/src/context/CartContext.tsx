@@ -8,7 +8,7 @@ interface CartItem {
     priceUSD: number
     quantity: number
     image?: string
-    variantId: string
+    variantId?: string
 }
 
 interface CartContextType {
@@ -47,11 +47,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const [isDrawerOpen, setDrawerOpen] = useState(false)
 
     const addToCart = (newItem: CartItem) => {
+        const key = newItem.variantId ?? newItem.id
         setCart((prev) => {
-            const existing = prev.find((item) => item.variantId === newItem.variantId)
+            const existing = prev.find((item) => (item.variantId ?? item.id) === key)
             if (existing) {
                 return prev.map((item) =>
-                    item.variantId === newItem.variantId
+                    (item.variantId ?? item.id) === key
                         ? { ...item, quantity: item.quantity + newItem.quantity }
                         : item
                 )
@@ -60,18 +61,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         })
     }
 
-    const removeFromCart = (variantId: string) => {
-        setCart((prev) => prev.filter((item) => item.variantId !== variantId))
+    const removeFromCart = (id: string) => {
+        setCart((prev) => prev.filter((item) => (item.variantId ?? item.id) !== id))
     }
 
-    const updateQuantity = (variantId: string, quantity: number) => {
+    const updateQuantity = (id: string, quantity: number) => {
         if (quantity <= 0) {
-            removeFromCart(variantId)
+            removeFromCart(id)
             return
         }
         setCart((prev) =>
             prev.map((item) =>
-                item.variantId === variantId ? { ...item, quantity } : item
+                (item.variantId ?? item.id) === id ? { ...item, quantity } : item
             )
         )
     }
