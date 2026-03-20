@@ -77,23 +77,13 @@ export default async function CategoriaSlugPage({ params }: Props) {
     return (
         <div className="section">
             <div className="container">
-                <div style={{ marginTop: 40, marginBottom: 48, textAlign: 'center' }}>
-                    <h1 className="hero-title" style={{ fontSize: '3.5rem', marginBottom: 16 }}>
-                        <span>{category.name}</span>
-                    </h1>
-                    <p className="hero-desc" style={{ maxWidth: 700, marginInline: 'auto' }}>
-                        {category.description || `Explorá nuestra selección de ${category.name} en Santa Rosa, La Pampa. Los mejores precios y atención personalizada.`}
-                    </p>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: 12 }}>
-                        {dict.productos.resultados(products.length)} disponibles en stock
-                    </p>
-                </div>
-
-                <Suspense fallback={<div>Cargando productos...</div>}>
+                <Suspense fallback={<div style={{ textAlign: 'center', padding: '100px 0' }}>Cargando productos...</div>}>
                     <ProductosClient
                         products={products}
                         categories={categories as Category[]}
                         brands={brands as Brand[]}
+                        title={category.name}
+                        description={category.description || ''}
                     />
                 </Suspense>
             </div>

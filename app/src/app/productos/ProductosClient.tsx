@@ -13,6 +13,8 @@ interface ProductosClientProps {
     products: ProductWithDetails[]
     categories: Category[]
     brands: Brand[]
+    title?: string
+    description?: string
 }
 
 type SortOption = 'reciente' | 'precio-asc' | 'precio-desc' | 'nombre'
@@ -20,7 +22,13 @@ type SortOption = 'reciente' | 'precio-asc' | 'precio-desc' | 'nombre'
 import { useSearch } from '@/context/SearchContext'
 import { trackSearch, trackFilterApply } from '@/lib/analytics'
 
-export default function ProductosClient({ products, categories, brands }: ProductosClientProps) {
+export default function ProductosClient({ 
+    products, 
+    categories, 
+    brands,
+    title,
+    description 
+}: ProductosClientProps) {
     const searchParams = useSearchParams()
     const {
         searchQuery: search,
@@ -172,10 +180,35 @@ export default function ProductosClient({ products, categories, brands }: Produc
 
     return (
         <div>
-            {/* Resultados count */}
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: 20 }}>
-                {dict.productos.resultados(filtered.length)}
-            </p>
+            {/* ─── Encabezado Reactivo ─── */}
+            <div style={{ marginBottom: 48, textAlign: 'center' }}>
+                <h1 className="hero-title" style={{ fontSize: 'clamp(2.5rem, 8vw, 3.5rem)', marginBottom: 16 }}>
+                    <span>{title || dict.nav.productos}</span>
+                </h1>
+                
+                {hasFilters ? (
+                    <p style={{ 
+                        fontSize: '1.25rem', 
+                        fontWeight: 700, 
+                        color: 'var(--text-primary)',
+                        marginInline: 'auto',
+                        maxWidth: 700
+                    }}>
+                        {filtered.length} {filtered.length === 1 ? 'producto coincide' : 'productos coinciden'} con tu búsqueda
+                    </p>
+                ) : (
+                    <div style={{ maxWidth: 600, marginInline: 'auto' }}>
+                        {description && (
+                            <p className="hero-desc" style={{ marginBottom: 8, opacity: 0.9 }}>
+                                {description}
+                            </p>
+                        )}
+                        <p className="hero-desc" style={{ opacity: 0.8 }}>
+                            {dict.productos.resultados(products.length)} disponibles para vos
+                        </p>
+                    </div>
+                )}
+            </div>
 
             {/* ─── Filtros expandidos ─────────────────────────── */}
             {showFilters && (

@@ -148,7 +148,7 @@ export default function WeeklyNews({ isHero = false }: { isHero?: boolean }) {
                                         borderRadius: 24,
                                         border: '1px solid var(--border)',
                                         overflow: 'hidden',
-                                        boxShadow: '0 40px 80px -20px rgba(0,0,0,0.6)',
+                                        boxShadow: 'var(--shadow-lg)',
                                         position: 'relative'
                                     }}>
                                         <div style={{ width: '100%', position: 'relative', background: '#000', overflow: 'hidden', cursor: (currentItem as any).link_url ? 'pointer' : 'grab' }}>
@@ -191,23 +191,27 @@ export default function WeeklyNews({ isHero = false }: { isHero?: boolean }) {
                                     onClick={prevStep}
                                     className="carousel-nav-btn" 
                                     style={{ 
-                                        width: 44, 
-                                        height: 44, 
+                                        width: 50, 
+                                        height: 50, 
+                                        flexShrink: 0,
                                         background: 'var(--bg-card)', 
                                         borderRadius: '50%',
-                                        border: '1px solid var(--border)',
-                                        color: 'white',
+                                        border: '1px solid var(--border-light)',
+                                        color: 'var(--text-primary)',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                         cursor: 'pointer',
-                                        transition: 'all 0.3s ease'
+                                        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                                        boxShadow: 'var(--shadow-card)',
+                                        position: 'relative',
+                                        zIndex: 2
                                     }}
                                 >
-                                    <ChevronLeft size={20} />
+                                    <ChevronLeft size={24} />
                                 </button>
 
-                                <div style={{ display: 'flex', gap: 10 }}>
+                                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                                     {news.map((_, i) => (
                                         <button
                                             key={i}
@@ -216,12 +220,13 @@ export default function WeeklyNews({ isHero = false }: { isHero?: boolean }) {
                                                 setIndex(i)
                                             }}
                                             style={{
-                                                width: i === index ? 32 : 8,
-                                                height: 8,
+                                                width: i === index ? 36 : 10,
+                                                height: 10,
                                                 borderRadius: 10,
-                                                background: i === index ? 'var(--green)' : 'rgba(255,255,255,0.1)',
+                                                background: i === index ? 'var(--green)' : 'var(--text-muted)',
+                                                opacity: i === index ? 1 : 0.25,
                                                 border: 'none',
-                                                transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+                                                transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
                                                 cursor: 'pointer'
                                             }}
                                         />
@@ -232,20 +237,24 @@ export default function WeeklyNews({ isHero = false }: { isHero?: boolean }) {
                                     onClick={nextStep}
                                     className="carousel-nav-btn" 
                                     style={{ 
-                                        width: 44, 
-                                        height: 44, 
+                                        width: 50, 
+                                        height: 50, 
+                                        flexShrink: 0,
                                         background: 'var(--bg-card)', 
                                         borderRadius: '50%',
-                                        border: '1px solid var(--border)',
-                                        color: 'white',
+                                        border: '1px solid var(--border-light)',
+                                        color: 'var(--text-primary)',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                         cursor: 'pointer',
-                                        transition: 'all 0.3s ease'
+                                        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                                        boxShadow: 'var(--shadow-card)',
+                                        position: 'relative',
+                                        zIndex: 2
                                     }}
                                 >
-                                    <ChevronRight size={20} />
+                                    <ChevronRight size={24} />
                                 </button>
                             </div>
                         )}
@@ -255,9 +264,14 @@ export default function WeeklyNews({ isHero = false }: { isHero?: boolean }) {
 
             <style jsx>{`
                 .carousel-nav-btn:hover {
-                    transform: scale(1.1);
+                    transform: scale(1.15) translateY(-2px);
                     background: var(--green) !important;
                     border-color: var(--green) !important;
+                    color: white !important;
+                    box-shadow: 0 10px 20px rgba(52, 199, 89, 0.3) !important;
+                }
+                .carousel-nav-btn:active {
+                    transform: scale(0.95);
                 }
             `}</style>
         </section>

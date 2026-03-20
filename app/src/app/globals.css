@@ -483,6 +483,53 @@ img {
   margin-inline: auto;
 }
 
+/* ─── Hero Layout Refinement ───────────────────────────────────────────────── */
+.hero-grid-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+  align-items: center;
+}
+
+@media (min-width: 1024px) {
+  .hero-grid-layout {
+    grid-template-columns: 1fr 1fr; /* Volvemos al balance 50/50 */
+    gap: 40px;
+  }
+}
+
+.hero-content-left {
+  position: relative;
+  z-index: 2;
+  /* Lo dejamos mas sutil */
+  padding-top: 20px;
+  margin-left: 0; 
+}
+
+.hero-slide-right {
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  transform: scale(1);
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.15));
+}
+
+[data-theme="light"] .hero-slide-right {
+  filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.08));
+}
+
+@media (max-width: 1023px) {
+  .hero-content-left {
+    margin-left: 0;
+    padding-top: 0;
+    text-align: center;
+  }
+  .hero-slide-right {
+    transform: scale(1);
+    transform-origin: center;
+  }
+}
+
 .hero-actions {
   display: flex;
   gap: 12px;

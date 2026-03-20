@@ -284,32 +284,39 @@ export default function HomeClient({ products, slides, brandLogos }: HomeClientP
             {/* ─── HERO TEXT ──────────────────────────────────── */}
             <section className="hero" style={{ 
                 minHeight: '80vh', 
-                padding: '120px 0 60px', 
+                padding: '160px 0 60px', 
                 background: 'var(--bg-primary)',
                 display: 'flex',
                 alignItems: 'center',
                 overflow: 'hidden'
             }}>
-                <div className="container" style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
-                    gap: 60, 
-                    alignItems: 'center' 
-                }}>
+                <div className="container hero-grid-layout">
                     {/* Left Column: Hero Text */}
-                    <div className="hero-content" style={{ textAlign: 'left', padding: 0 }}>
+                    <div className="hero-content-left">
                         <div className="hero-eyebrow" style={{ justifyContent: 'flex-start' }}>
                             <Zap size={13} />
                             <span>Toda la Tecnología que buscas</span>
                         </div>
 
-                        <h1 className="hero-title" style={{ fontSize: 'clamp(2.5rem, 4vw, 4.5rem)' }}>
+                        <h1 className="hero-title" style={{ 
+                            fontSize: 'clamp(2.2rem, 3.8vw, 4.2rem)',
+                            lineHeight: 1.1,
+                            marginBottom: 24,
+                            textAlign: 'left'
+                        }}>
                             <span>{dict.hero.titulo}</span>
                             <br />
                             {dict.hero.subtitulo}
                         </h1>
 
-                        <p className="hero-desc" style={{ fontSize: '1.2rem', maxWidth: '100%', marginBottom: 40 }}>
+                        <p className="hero-desc" style={{ 
+                            fontSize: '1.15rem', 
+                            maxWidth: '100%', 
+                            marginBottom: 44, 
+                            opacity: 0.92,
+                            textAlign: 'left',
+                            marginInline: 0 
+                        }}>
                             {dict.hero.descripcion}
                         </p>
 
@@ -325,7 +332,7 @@ export default function HomeClient({ products, slides, brandLogos }: HomeClientP
                     </div>
 
                     {/* Right Column: WeeklyNews Component */}
-                    <div style={{ width: '100%', position: 'relative' }}>
+                    <div className="hero-slide-right">
                         <WeeklyNews isHero />
                     </div>
                 </div>

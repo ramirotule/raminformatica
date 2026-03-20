@@ -48,15 +48,7 @@ export default async function ProductosPage() {
     return (
         <div className="section">
             <div className="container">
-                <div style={{ marginBottom: 48, textAlign: 'center' }}>
-                    <h1 className="hero-title" style={{ fontSize: '3rem', marginBottom: 16 }}>
-                        <span>{dict.nav.productos}</span>
-                    </h1>
-                    <p className="hero-desc" style={{ maxWidth: 600, marginInline: 'auto' }}>
-                        {dict.productos.resultados(products.length)} disponibles
-                    </p>
-                </div>
-                <Suspense fallback={<div>Cargando productos...</div>}>
+                <Suspense fallback={<div style={{ textAlign: 'center', padding: '100px 0' }}>Cargando productos...</div>}>
                     <ProductosClient
                         products={products}
                         categories={categories as Category[]}
