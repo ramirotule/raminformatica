@@ -1,14 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { DollarSign, Upload, Zap, AlertCircle, CheckCircle2, FileJson, FileText, Loader2, ShieldCheck, ArrowLeft, Search, PlusCircle, Database } from 'lucide-react'
-import { parseImportData, searchMatches, processSync, getMissingProducts, triggerEnrichment, type ParsedItem } from './precios/actions'
+import { DollarSign, Upload, Zap, AlertCircle, CheckCircle2, FileJson, FileText, Loader2, ShieldCheck, ArrowLeft, Search, PlusCircle, Database, Pencil, Trash2 } from 'lucide-react'
+import { parseImportData, searchMatches, processSync, getMissingProducts, triggerEnrichment, recalculateAllPrices, getRecalculatePreview, type ParsedItem } from './precios/actions'
 import { SearchableSelect } from '@/components/SearchableSelect'
 import { supabase } from '@/lib/supabase'
 
 export default function AdminPrecios() {
     const [view, setView] = useState<'input' | 'preview'>('input')
-    const [provider, setProvider] = useState<'gcgroup' | 'zentek'>('gcgroup')
+    const [provider, setProvider] = useState<'gcgroup' | 'zentek' | 'kadabra' | 'tecnoduo'>('gcgroup')
     const [databaseProviderId, setDatabaseProviderId] = useState<string>('')
     const [isCatalogSync, setIsCatalogSync] = useState(false) // true cuando se importa productos_ram.json completo
     const [input, setInput] = useState('')
@@ -19,14 +19,41 @@ export default function AdminPrecios() {
     const [result, setResult] = useState<{ success: boolean; message: string; errors?: string[] } | null>(null)
     const [enrichStatus, setEnrichStatus] = useState<string | null>(null)
     const [providers, setProviders] = useState<any[]>([])
+    const [categories, setCategories] = useState<any[]>([])
+    const [editingItem, setEditingItem] = useState<{ idx: number; name: string; cost: number; sale: number; category: string } | null>(null)
+    const [bulkPreview, setBulkPreview] = useState<any[] | null>(null)
+    const [searchTerm, setSearchTerm] = useState('')
 
     useEffect(() => {
         async function fetchProviders() {
             const { data } = await supabase.from('providers').select('id, name').eq('active', true).order('name')
             if (data) setProviders(data)
         }
+        async function fetchCategories() {
+            const { data } = await supabase.from('categories').select('id, name').order('name')
+            if (data) setCategories(data)
+        }
         fetchProviders()
+        fetchCategories()
     }, [])
+
+    useEffect(() => {
+        if (providers.length > 0) {
+            // Find a direct match first
+            let match = providers.find(p => p.name.toLowerCase().replace(/\s+/g, '') === provider.toLowerCase().replace(/\s+/g, ''))
+            
+            // If no direct match, try partial match
+            if (!match) {
+                match = providers.find(p => p.name.toLowerCase().replace(/\s+/g, '').includes(provider.toLowerCase().replace(/\s+/g, '')))
+            }
+            
+            if (match) {
+                setDatabaseProviderId(match.id)
+            } else {
+                setDatabaseProviderId('')
+            }
+        }
+    }, [provider, providers])
 
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
@@ -64,12 +91,20 @@ export default function AdminPrecios() {
 
             if (fileName.includes('zentek')) {
                 setProvider('zentek')
+            } else if (fileName.includes('kadabra')) {
+                setProvider('kadabra')
+            } else if (fileName.includes('tecnoduo')) {
+                setProvider('tecnoduo')
             } else {
                 setProvider('gcgroup')
             }
 
             // Trigger automatic parse after loading
-            const parseRes = await parseImportData(JSON.stringify(data), fileName.includes('zentek') ? 'zentek' : 'gcgroup')
+            const p = fileName.includes('zentek') ? 'zentek' : 
+                      fileName.includes('kadabra') ? 'kadabra' : 
+                      fileName.includes('tecnoduo') ? 'tecnoduo' : 'gcgroup';
+            
+            const parseRes = await parseImportData(JSON.stringify(data), p as any)
             if (parseRes.success) {
                 setParsedItems(parseRes.items)
                 setSelectedIndices(new Set(parseRes.items.map((_, i) => i)))
@@ -98,6 +133,35 @@ export default function AdminPrecios() {
             setResult({ success: false, message: 'Ocurrió un error al procesar el texto.' })
         } finally {
             setIsLoading(false)
+        }
+    }
+
+    const handleIntegrateToDB = async () => {
+        if (selectedIndices.size === 0) {
+            alert('No hay items seleccionados');
+            return;
+        }
+        if (!databaseProviderId) {
+            alert('Falta seleccionar el proveedor en el desplegable azul');
+            setResult({ success: false, message: 'Debes seleccionar un proveedor de la base de datos antes de integrar.' })
+            return
+        }
+
+        setIsSyncing(true)
+        setResult(null)
+
+        try {
+            const { integrateProviderCosts } = await import('./precios/actions');
+            const itemsToSync = parsedItems.filter((_, i) => selectedIndices.has(i));
+            
+            const res = await integrateProviderCosts(itemsToSync, databaseProviderId);
+            setResult(res);
+        } catch (err: any) {
+            console.error('Error integrating:', err);
+            setResult({ success: false, message: 'Error durante la integración: ' + err.message })
+        } finally {
+            setIsSyncing(false)
+            window.scrollTo({ top: 0, behavior: 'smooth' })
         }
     }
 
@@ -149,10 +213,6 @@ export default function AdminPrecios() {
     }
 
     const handleFinalSync = async () => {
-        console.log('Iniciando handleFinalSync...');
-        console.log('Seleccionados:', selectedIndices.size);
-        console.log('Provider ID:', databaseProviderId);
-
         if (selectedIndices.size === 0) {
             alert('No hay items seleccionados');
             return;
@@ -168,10 +228,7 @@ export default function AdminPrecios() {
 
         try {
             const itemsToSync = parsedItems.filter((_, i) => selectedIndices.has(i))
-            console.log('Items a enviar al servidor:', itemsToSync.length);
-
             const res = await processSync(itemsToSync, isCatalogSync ? undefined : databaseProviderId)
-            console.log('Respuesta del servidor:', res);
 
             setResult(res)
             if (res.success && res.createdIds && res.createdIds.length > 0) {
@@ -185,11 +242,41 @@ export default function AdminPrecios() {
             }
         } catch (err: any) {
             console.error('Error fatal en handleFinalSync:', err);
-            alert('Error crítico: ' + err.message);
             setResult({ success: false, message: 'Error durante la sincronización final: ' + err.message })
         } finally {
             setIsSyncing(false)
             window.scrollTo({ top: 0, behavior: 'smooth' })
+        }
+    }
+
+    const handleShowRecalculatePreview = async () => {
+        setIsSyncing(true)
+        setResult(null)
+        try {
+            const res = await getRecalculatePreview()
+            if (res.success) {
+                setBulkPreview(res.preview || [])
+            } else {
+                setResult({ success: false, message: res.message || 'No se pudo obtener la previsualización' })
+            }
+        } catch (err: any) {
+            setResult({ success: false, message: 'Error al obtener preview: ' + err.message })
+        } finally {
+            setIsSyncing(false)
+        }
+    }
+
+    const handleConfirmBulkRecalculate = async () => {
+        setIsSyncing(true)
+        setResult(null)
+        setBulkPreview(null)
+        try {
+            const res = await recalculateAllPrices()
+            setResult({ ...res, message: res.message || '' })
+        } catch (err: any) {
+            setResult({ success: false, message: 'Error al recalcular: ' + err.message })
+        } finally {
+            setIsSyncing(false)
         }
     }
 
@@ -208,6 +295,42 @@ export default function AdminPrecios() {
         setSelectedIndices(next)
     }
 
+    const deleteItem = (idx: number) => {
+        setParsedItems(prev => prev.filter((_, i) => i !== idx))
+        const next = new Set<number>()
+        selectedIndices.forEach(val => {
+            if (val < idx) next.add(val)
+            if (val > idx) next.add(val - 1)
+        })
+        setSelectedIndices(next)
+    }
+
+    const openEditModal = (idx: number, item: ParsedItem) => {
+        setEditingItem({
+            idx,
+            name: item.name,
+            cost: item.cost,
+            sale: item.finalPrice,
+            category: item.categoryName || ''
+        })
+    }
+
+    const saveEdit = () => {
+        if (!editingItem) return
+        setParsedItems(prev => prev.map((item, i) => 
+            i === editingItem.idx 
+                ? { 
+                    ...item, 
+                    name: editingItem.name, 
+                    cost: editingItem.cost, 
+                    categoryName: editingItem.category, 
+                    finalPrice: editingItem.sale 
+                }
+                : item
+        ))
+        setEditingItem(null)
+    }
+
     const getSimilarityColor = (score?: number) => {
         if (!score) return 'var(--text-muted)'
         if (score > 95) return 'var(--green)'
@@ -215,6 +338,71 @@ export default function AdminPrecios() {
         if (score > 60) return 'var(--orange)'
         return 'var(--red)'
     }
+
+    const bulkPreviewModal = bulkPreview && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1200 }}>
+            <div className="card shadow-2xl animate-scale-in" style={{ width: '900px', maxHeight: '85vh', padding: 32, borderRadius: 24, background: 'var(--bg-card)', border: '1px solid var(--border)', boxShadow: '0 25px 50px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', gap: 24 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div>
+                        <h3 style={{ fontWeight: 900, fontSize: '1.6rem', marginBottom: 6 }}>Previsualización de Precios</h3>
+                        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                            Se detectaron <b>{bulkPreview.length}</b> productos con costo. Solo los que tienen cambios relevantes en el redondeo serán actualizados.
+                        </p>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                        {(() => {
+                            const changed = bulkPreview.filter(p => p.changed).length
+                            return <span style={{ padding: '6px 12px', borderRadius: 10, background: 'rgba(52,199,89,0.1)', color: 'var(--green)', fontWeight: 800, fontSize: '0.8rem' }}>
+                                {changed} Productos por cambiar
+                            </span>
+                        })()}
+                    </div>
+                </div>
+                
+                <div style={{ flex: 1, overflowY: 'auto', borderRadius: 16, border: '1px solid var(--border)', background: 'var(--bg-secondary)' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <thead style={{ position: 'sticky', top: 0, background: 'var(--bg-secondary)', zIndex: 5 }}>
+                            <tr>
+                                <th style={{ textAlign: 'left', padding: '12px 16px' }}>Producto</th>
+                                <th style={{ textAlign: 'center', padding: '12px 16px' }}>Costo</th>
+                                <th style={{ textAlign: 'center', padding: '12px 16px' }}>Precio Actual</th>
+                                <th style={{ textAlign: 'center', padding: '12px 16px' }}>Nuevo (Ceil)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {bulkPreview.map((p, i) => (
+                                <tr key={i} style={{ borderTop: '1px solid var(--border)', background: p.changed ? 'rgba(52,199,89,0.03)' : 'transparent' }}>
+                                    <td style={{ padding: '12px 16px', fontSize: '0.85rem' }}>{p.name}</td>
+                                    <td style={{ padding: '12px 16px', textAlign: 'center', fontFamily: 'monospace' }}>${p.cost}</td>
+                                    <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--text-muted)' }}>${p.oldPrice}</td>
+                                    <td style={{ padding: '12px 16px', textAlign: 'center' }}>
+                                        <span style={{ 
+                                            fontWeight: p.changed ? 900 : 400,
+                                            color: p.changed ? 'var(--green)' : 'inherit',
+                                            fontSize: p.changed ? '1.05rem' : '0.9rem'
+                                        }}>
+                                            ${p.newPrice}
+                                        </span>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style={{ display: 'flex', gap: 16, marginTop: 8 }}>
+                    <button onClick={() => setBulkPreview(null)} className="btn btn-ghost" style={{ flex: 1 }}>Cerrar Preview</button>
+                    <button 
+                        onClick={handleConfirmBulkRecalculate} 
+                        className="btn btn-primary" 
+                        style={{ flex: 2, fontWeight: 900, background: 'var(--green)', borderColor: 'var(--green)', boxShadow: '0 10px 25px rgba(52, 199, 89, 0.4)' }}
+                    >
+                        Confirmar y Actualizar Precios ({bulkPreview.filter(p => p.changed).length})
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
 
     if (view === 'preview') {
         return (
@@ -239,21 +427,15 @@ export default function AdminPrecios() {
                         <button onClick={() => setView('input')} className="btn btn-ghost btn-sm" style={{ gap: 8 }}>
                             <ArrowLeft size={16} /> Volver
                         </button>
-                        {isCatalogSync ? (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderRadius: 20, background: 'rgba(52,199,89,0.1)', border: '1px solid rgba(52,199,89,0.3)' }}>
-                                <Database size={14} color="var(--green-dark)" />
-                                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--green-dark)' }}>Catálogo Completo</span>
-                            </div>
-                        ) : (
-                            <div style={{ width: 250 }}>
-                                <SearchableSelect
-                                    value={databaseProviderId}
-                                    onChange={(val) => setDatabaseProviderId(val)}
-                                    options={providers.map(p => ({ value: p.id, label: p.name }))}
-                                    placeholder="Elegir proveedor..."
-                                />
-                            </div>
-                        )}
+                        <div style={{ 
+                            display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', 
+                            borderRadius: 12, background: 'rgba(0,122,255,0.08)', border: '1px solid rgba(0,122,255,0.2)' 
+                        }}>
+                            <Database size={14} color="#007AFF" />
+                            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#007AFF' }}>
+                                Proveedor a cargar: <span style={{ textTransform: 'uppercase' }}>{providers.find(p => p.id === databaseProviderId)?.name || provider}</span>
+                            </span>
+                        </div>
                         {parsedItems.length > 0 && (
                             <div style={{ display: 'flex', gap: 8, fontSize: '0.75rem' }}>
                                 {(() => {
@@ -261,15 +443,37 @@ export default function AdminPrecios() {
                                     const newP = parsedItems.filter(i => i.status === 'new').length
                                     const deact = parsedItems.filter(i => i.status === 'deactivate').length
                                     return <>
-                                        {matched > 0 && <span style={{ padding: '3px 8px', borderRadius: 8, background: 'rgba(52,199,89,0.1)', color: 'var(--green-dark)', fontWeight: 600 }}>↑ {matched} actualizar</span>}
-                                        {newP > 0 && <span style={{ padding: '3px 8px', borderRadius: 8, background: 'rgba(0,122,255,0.1)', color: '#007AFF', fontWeight: 600 }}>+ {newP} nuevos</span>}
+                                        {matched > 0 && <span style={{ padding: '3px 8px', borderRadius: 8, background: 'rgba(0,122,255,0.1)', color: '#007AFF', fontWeight: 600 }}>↑ {matched} actualizar</span>}
+                                        {newP > 0 && <span style={{ padding: '3px 8px', borderRadius: 8, background: 'rgba(52,199,89,0.1)', color: 'var(--green-dark)', fontWeight: 600 }}>+ {newP} nuevos</span>}
                                         {deact > 0 && <span style={{ padding: '3px 8px', borderRadius: 8, background: 'rgba(255,59,48,0.1)', color: 'var(--red)', fontWeight: 600 }}>✕ {deact} desactivar</span>}
                                     </>
                                 })()}
                             </div>
                         )}
                     </div>
-                    <div style={{ display: 'flex', gap: 12 }}>
+                    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                        <div style={{ position: 'relative', width: 240 }}>
+                            <Search size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
+                            <input 
+                                type="text" 
+                                placeholder="Buscar en listado..." 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                style={{ 
+                                    padding: '8px 12px 8px 36px', 
+                                    borderRadius: 12, 
+                                    background: 'rgba(255,255,255,0.03)', 
+                                    border: '1px solid var(--border)',
+                                    color: 'white',
+                                    fontSize: '0.85rem',
+                                    width: '100%',
+                                    outline: 'none',
+                                    transition: 'all 0.2s'
+                                }}
+                                onFocus={(e) => e.target.style.borderColor = 'var(--blue)'}
+                                onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+                            />
+                        </div>
                         <button
                             onClick={handleSearchMatches}
                             disabled={isLoading}
@@ -280,12 +484,12 @@ export default function AdminPrecios() {
                             Detección Inteligente
                         </button>
                         <button
-                            onClick={handleFinalSync}
+                            onClick={handleIntegrateToDB}
                             className="btn btn-primary"
                             style={{ gap: 8, padding: '0 24px' }}
                         >
-                            {isSyncing ? <Loader2 className="animate-spin" size={16} /> : <Zap size={16} />}
-                            Sincronizar ({selectedIndices.size})
+                            {isSyncing ? <Loader2 className="animate-spin" size={16} /> : <Database size={16} />}
+                            Integrar a DB ({selectedIndices.size})
                         </button>
                     </div>
                 </div>
@@ -321,90 +525,167 @@ export default function AdminPrecios() {
                 <div className="table-wrap" style={{ maxHeight: '70vh', overflowY: 'auto', borderRadius: 16 }}>
                     <table style={{ borderCollapse: 'separate', borderSpacing: '0 4px' }}>
                         <thead style={{ position: 'sticky', top: 0, background: 'var(--bg-card)', zIndex: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>
-                            <tr>
-                                <th style={{ width: 40 }}><input type="checkbox" checked={selectedIndices.size === parsedItems.length} onChange={toggleSelectAll} /></th>
+                             <tr>
+                                <th style={{ width: 40 }}><input type="checkbox" checked={selectedIndices.size === parsedItems.length && parsedItems.length > 0} onChange={toggleSelectAll} /></th>
                                 <th>Producto / Coincidencia</th>
-                                <th style={{ width: 130 }}>Costo</th>
-                                <th style={{ width: 110 }}>Similitud</th>
-                                <th style={{ width: 140 }}>Precio Venta</th>
-                                <th>Estado / Acción</th>
+                                <th style={{ width: 150 }}>Categoría</th>
+                                <th style={{ width: 120 }}>P. Costo (USD)</th>
+                                <th style={{ width: 120 }}>P. Venta (USD)</th>
+                                <th style={{ width: 100 }}>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {parsedItems.map((item, idx) => (
+                            {parsedItems.map((item, idx) => {
+                                // Aplicar filtro de búsqueda
+                                const matchesSearch = !searchTerm || 
+                                    item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                    (item.categoryName && item.categoryName.toLowerCase().includes(searchTerm.toLowerCase()));
+                                
+                                if (!matchesSearch) return null;
+
+                                const rowBg = item.status === 'deactivate' ? 'rgba(255, 59, 48, 0.08)' :
+                                              item.status === 'new' ? 'rgba(52, 199, 89, 0.08)' :
+                                              item.status === 'matched' ? 'rgba(0, 122, 255, 0.08)' :
+                                              selectedIndices.has(idx) ? 'rgba(255, 255, 255, 0.02)' : 'transparent';
+                                
+                                return (
                                 <tr key={idx} style={{
-                                    background: item.status === 'deactivate' ? 'rgba(255, 59, 48, 0.05)' : selectedIndices.has(idx) ? 'rgba(52, 199, 89, 0.03)' : 'transparent',
+                                    background: rowBg,
                                     transition: 'background 0.2s',
+                                    borderLeft: `4px solid ${
+                                        item.status === 'deactivate' ? 'var(--red)' : 
+                                        item.status === 'new' ? 'var(--green)' : 
+                                        item.status === 'matched' ? 'var(--blue)' : 'transparent'
+                                    }`,
                                     opacity: selectedIndices.has(idx) ? 1 : 0.6
                                 }}>
                                     <td><input type="checkbox" checked={selectedIndices.has(idx)} onChange={() => toggleItem(idx)} /></td>
                                     <td>
-                                        <div style={{ fontWeight: 600, color: item.status === 'deactivate' ? 'var(--red)' : 'inherit' }}>{item.name}</div>
+                                        <div style={{ fontWeight: 600, color: item.status === 'deactivate' ? 'var(--red)' : 'inherit', display: 'flex', alignItems: 'center', gap: 8 }}>
+                                            {item.name}
+                                            {item.status === 'new' && <span style={{ fontSize: '0.65rem', background: 'rgba(52, 199, 89, 0.15)', color: 'var(--green)', padding: '1px 6px', borderRadius: 4, fontWeight: 800 }}>NUEVO PRODUCTO</span>}
+                                            {item.status === 'matched' && <span style={{ fontSize: '0.65rem', background: 'rgba(0, 122, 255, 0.15)', color: 'var(--blue)', padding: '1px 6px', borderRadius: 4, fontWeight: 800 }}>ACTUALIZACIÓN</span>}
+                                            {item.status === 'deactivate' && <span style={{ fontSize: '0.65rem', background: 'rgba(255, 59, 48, 0.15)', color: 'var(--red)', padding: '1px 6px', borderRadius: 4, fontWeight: 800 }}>ELIMINAR</span>}
+                                        </div>
                                         {item.matchName && (
-                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
-                                                <Database size={10} /> Base: {item.matchName}
-                                            </div>
-                                        )}
-                                    </td>
-                                    <td style={{ fontSize: '0.85rem' }}>
-                                        {item.status !== 'deactivate' ? (
-                                            item.currentCost !== undefined && item.currentCost !== item.cost ? (
-                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                    <span style={{ textDecoration: 'line-through', opacity: 0.5, fontSize: '0.75rem' }}>${item.currentCost}</span>
-                                                    <span style={{ fontWeight: 800, color: 'var(--orange)' }}>${item.cost}</span>
-                                                </div>
-                                            ) : (
-                                                <span style={{ fontFamily: 'monospace', opacity: 0.8 }}>${item.cost}</span>
-                                            )
-                                        ) : '—'}
-                                    </td>
-                                    <td>
-                                        {item.similarity !== undefined && (
-                                            <div style={{
-                                                fontSize: '0.75rem',
-                                                fontWeight: 800,
-                                                color: getSimilarityColor(item.similarity),
-                                                background: `${getSimilarityColor(item.similarity)}15`,
-                                                padding: '2px 8px',
-                                                borderRadius: 6,
-                                                width: 'fit-content'
-                                            }}>
-                                                {item.similarity}% conf.
+                                            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
+                                                <Database size={10} /> {item.matchName} 
+                                                <span style={{ fontSize: '0.65rem', color: 'var(--blue)', fontWeight: 800 }}>({item.similarity}%)</span>
                                             </div>
                                         )}
                                     </td>
                                     <td>
-                                        {item.status === 'matched' ? (
-                                            <div style={{ fontSize: '0.85rem', display: 'flex', flexDirection: 'column' }}>
-                                                <span style={{ textDecoration: 'line-through', opacity: 0.5, fontSize: '0.75rem' }}>${item.currentPrice || '—'}</span>
-                                                <span style={{ fontWeight: 800, color: 'var(--green)' }}>${item.finalPrice}</span>
-                                            </div>
-                                        ) : item.status === 'new' ? (
-                                            <span style={{ fontWeight: 800 }}>${item.finalPrice}</span>
-                                        ) : '—'}
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                                            {item.categoryName || '—'}
+                                        </div>
+                                    </td>
+                                    <td style={{ fontSize: '0.9rem', fontWeight: 700, fontFamily: 'monospace' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                            {item.currentCost !== undefined && item.currentCost !== item.cost && (
+                                                <span style={{ fontSize: '0.7rem', textDecoration: 'line-through', opacity: 0.5 }}>${item.currentCost}</span>
+                                            )}
+                                            <span>${item.cost}</span>
+                                        </div>
+                                    </td>
+                                    <td style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--green)' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                            {item.currentPrice !== undefined && item.currentPrice !== item.finalPrice && (
+                                                <span style={{ fontSize: '0.7rem', textDecoration: 'line-through', color: 'var(--text-muted)', fontWeight: 400 }}>${item.currentPrice}</span>
+                                            )}
+                                            <span>${item.finalPrice}</span>
+                                        </div>
                                     </td>
                                     <td>
-                                        {item.status === 'matched' ? (
-                                            <div style={{ color: 'var(--green)', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 4 }}>
-                                                <CheckCircle2 size={12} /> ACTUALIZAR
-                                            </div>
-                                        ) : item.status === 'new' ? (
-                                            <div style={{ color: 'var(--orange)', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 4 }}>
-                                                <PlusCircle size={12} /> CREAR NUEVO
-                                            </div>
-                                        ) : item.status === 'deactivate' ? (
-                                            <div style={{ color: 'var(--red)', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 4 }}>
-                                                <AlertCircle size={12} /> DESACTIVAR (NO EN LISTA)
-                                            </div>
-                                        ) : (
-                                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Analizar...</span>
-                                        )}
+                                        <div style={{ display: 'flex', gap: 8 }}>
+                                            <button 
+                                                onClick={() => openEditModal(idx, item)} 
+                                                className="btn btn-ghost btn-sm" 
+                                                title="Editar"
+                                                style={{ width: 32, height: 32, padding: 0, border: '1px solid var(--border)' }}
+                                            >
+                                                <Pencil size={14} />
+                                            </button>
+                                            <button 
+                                                onClick={() => deleteItem(idx)} 
+                                                className="btn btn-ghost btn-sm" 
+                                                title="Eliminar"
+                                                style={{ width: 32, height: 32, padding: 0, color: 'var(--red)', border: '1px solid rgba(255, 59, 48, 0.2)' }}
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
-                            ))}
+                                )
+                            })}
                         </tbody>
                     </table>
                 </div>
+                
+                {/* Modal de Edición Local */}
+                {editingItem && (
+                    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
+                        <div className="card" style={{ width: 500, minHeight: 650, maxHeight: '90vh', overflowY: 'auto', padding: 32, borderRadius: 24, boxShadow: '0 20px 40px rgba(0,0,0,0.4)', display: 'flex', flexDirection: 'column', gap: 24 }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                <h3 style={{ fontWeight: 900, fontSize: '1.4rem' }}>Editar Producto</h3>
+                                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Ajusta los detalles antes de integrar a la base de datos.</p>
+                            </div>
+                            
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                    <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>NOMBRE DEL PRODUCTO</label>
+                                    <input 
+                                        type="text" 
+                                        value={editingItem.name} 
+                                        onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
+                                        style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', padding: '12px 16px', borderRadius: 12, color: 'white', fontWeight: 500 }}
+                                    />
+                                </div>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                        <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>COSTO (USD)</label>
+                                        <input 
+                                            type="number" 
+                                            value={editingItem.cost} 
+                                            onChange={(e) => {
+                                                const cost = parseFloat(e.target.value) || 0;
+                                                const sale = Math.ceil(((cost / 0.90) + 25) / 5) * 5;
+                                                setEditingItem({ ...editingItem, cost, sale });
+                                            }}
+                                            style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', padding: '12px 16px', borderRadius: 12, color: 'white', fontWeight: 700 }}
+                                        />
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                        <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>VENTA (USD)</label>
+                                        <input 
+                                            type="number" 
+                                            value={editingItem.sale} 
+                                            onChange={(e) => setEditingItem({ ...editingItem, sale: parseFloat(e.target.value) || 0 })}
+                                            style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', padding: '12px 16px', borderRadius: 12, color: 'var(--green)', fontWeight: 800 }}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                    <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>CATEGORÍA</label>
+                                    <SearchableSelect 
+                                        options={categories.map(c => ({ value: c.name, label: c.name }))}
+                                        value={editingItem.category}
+                                        onChange={(val) => setEditingItem({ ...editingItem, category: val })}
+                                        placeholder="Seleccionar categoría..."
+                                    />
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+                                <button onClick={() => setEditingItem(null)} className="btn btn-ghost" style={{ flex: 1 }}>Cancelar</button>
+                                <button onClick={saveEdit} className="btn btn-primary" style={{ flex: 1, fontWeight: 800 }}>Guardar Cambios</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                {bulkPreviewModal}
             </div>
         )
     }
@@ -437,7 +718,21 @@ export default function AdminPrecios() {
                                 className="btn btn-ghost btn-sm"
                                 style={{ background: 'white', border: '1px solid var(--border)', fontSize: '0.75rem', height: 'auto', padding: '8px' }}
                             >
-                                📦 Zentek Apple/RayBan
+                                📦 Zentek
+                            </button>
+                            <button 
+                                onClick={() => handleAutoLoad('productos_kadabra.json')}
+                                className="btn btn-ghost btn-sm"
+                                style={{ background: 'white', border: '1px solid var(--border)', fontSize: '0.75rem', height: 'auto', padding: '8px' }}
+                            >
+                                🐰 Kadabra
+                            </button>
+                            <button 
+                                onClick={() => handleAutoLoad('productos_tecnoduo.json')}
+                                className="btn btn-ghost btn-sm"
+                                style={{ background: 'white', border: '1px solid var(--border)', fontSize: '0.75rem', height: 'auto', padding: '8px' }}
+                            >
+                                👥 Tecno Duo
                             </button>
                             <button 
                                 onClick={() => handleAutoLoad('productos_ram.json')}
@@ -446,54 +741,72 @@ export default function AdminPrecios() {
                             >
                                 💎 Todos (Mejor Precio)
                             </button>
+                             <button 
+                                onClick={handleShowRecalculatePreview}
+                                disabled={isSyncing}
+                                className="btn btn-ghost btn-sm"
+                                style={{ background: 'rgba(52, 199, 89, 0.1)', border: '1px solid var(--green)', fontSize: '0.75rem', height: 'auto', padding: '8px', gridColumn: 'span 2', fontWeight: 800, color: 'var(--green-dark)' }}
+                            >
+                                {isSyncing ? <Loader2 className="animate-spin" size={14} style={{ marginRight: 6 }} /> : <Database size={14} style={{ marginRight: 6 }} />}
+                                Recalcular Todos BD (Modo Ceil)
+                            </button>
                         </div>
                     </div>
 
                     <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                        <div style={{ flex: 1, display: 'flex', gap: 12 }}>
+                        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                             <button
                                 onClick={() => setProvider('gcgroup')}
                                 style={{
-                                    flex: 1, padding: '12px', borderRadius: 12,
+                                    padding: '12px', borderRadius: 12,
                                     border: `2px solid ${provider === 'gcgroup' ? 'var(--green)' : 'var(--border)'}`,
                                     background: provider === 'gcgroup' ? 'rgba(52, 199, 89, 0.05)' : 'transparent',
                                     cursor: 'pointer', transition: 'all 0.2s ease',
                                     display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center'
                                 }}
                             >
-                                <FileJson size={20} color={provider === 'gcgroup' ? 'var(--green)' : 'var(--text-muted)'} />
-                                <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>GCgroup</span>
+                                <FileJson size={18} color={provider === 'gcgroup' ? 'var(--green)' : 'var(--text-muted)'} />
+                                <span style={{ fontWeight: 700, fontSize: '0.8rem' }}>GCgroup</span>
                             </button>
                             <button
                                 onClick={() => setProvider('zentek')}
                                 style={{
-                                    flex: 1, padding: '12px', borderRadius: 12,
+                                    padding: '12px', borderRadius: 12,
                                     border: `2px solid ${provider === 'zentek' ? 'var(--green)' : 'var(--border)'}`,
                                     background: provider === 'zentek' ? 'rgba(52, 199, 89, 0.05)' : 'transparent',
                                     cursor: 'pointer', transition: 'all 0.2s ease',
                                     display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center'
                                 }}
                             >
-                                <FileText size={20} color={provider === 'zentek' ? 'var(--green)' : 'var(--text-muted)'} />
-                                <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>Zentek Text</span>
+                                <FileText size={18} color={provider === 'zentek' ? 'var(--green)' : 'var(--text-muted)'} />
+                                <span style={{ fontWeight: 700, fontSize: '0.8rem' }}>Zentek</span>
                             </button>
-                        </div>
-                        
-                        <div style={{ position: 'relative' }}>
-                             <input 
-                                type="file" 
-                                id="json-upload" 
-                                accept=".json,.txt" 
-                                onChange={handleFileUpload} 
-                                style={{ display: 'none' }} 
-                            />
-                            <label 
-                                htmlFor="json-upload" 
-                                className="btn btn-ghost"
-                                style={{ gap: 8, background: 'var(--bg-secondary)', padding: '0 16px', height: 48, display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+                            <button
+                                onClick={() => setProvider('kadabra')}
+                                style={{
+                                    padding: '12px', borderRadius: 12,
+                                    border: `2px solid ${provider === 'kadabra' ? 'var(--green)' : 'var(--border)'}`,
+                                    background: provider === 'kadabra' ? 'rgba(52, 199, 89, 0.05)' : 'transparent',
+                                    cursor: 'pointer', transition: 'all 0.2s ease',
+                                    display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center'
+                                }}
                             >
-                                <Upload size={18} /> Subir File
-                            </label>
+                                <Zap size={18} color={provider === 'kadabra' ? 'var(--green)' : 'var(--text-muted)'} />
+                                <span style={{ fontWeight: 700, fontSize: '0.8rem' }}>Kadabra</span>
+                            </button>
+                            <button
+                                onClick={() => setProvider('tecnoduo')}
+                                style={{
+                                    padding: '12px', borderRadius: 12,
+                                    border: `2px solid ${provider === 'tecnoduo' ? 'var(--green)' : 'var(--border)'}`,
+                                    background: provider === 'tecnoduo' ? 'rgba(52, 199, 89, 0.05)' : 'transparent',
+                                    cursor: 'pointer', transition: 'all 0.2s ease',
+                                    display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center'
+                                }}
+                            >
+                                <ShieldCheck size={18} color={provider === 'tecnoduo' ? 'var(--green)' : 'var(--text-muted)'} />
+                                <span style={{ fontWeight: 700, fontSize: '0.8rem' }}>Tecno Duo</span>
+                            </button>
                         </div>
                     </div>
 
@@ -501,7 +814,7 @@ export default function AdminPrecios() {
                         <textarea
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            placeholder={provider === 'gcgroup' ? 'Pega el JSON aquí...' : 'Pega el texto de Zentek aquí...'}
+                            placeholder={['gcgroup', 'kadabra', 'tecnoduo'].includes(provider) ? 'Pega el JSON aquí...' : 'Pega el texto de Zentek aquí...'}
                             style={{
                                 width: '100%', height: '300px', padding: '20px', borderRadius: '16px',
                                 background: 'var(--bg-secondary)', border: '1px solid var(--border)',
@@ -534,43 +847,7 @@ export default function AdminPrecios() {
                     </button>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                    <div className="card" style={{ padding: 20, background: 'rgba(52, 199, 89, 0.05)', border: '1px solid rgba(52, 199, 89, 0.2)' }}>
-                        <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--green)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <ShieldCheck size={16} />
-                            Fórmula de Cálculo
-                        </h4>
-                        <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                            {provider === 'zentek' ? (
-                                <>
-                                    Para <strong>Zentek</strong> aplicamos:<br />
-                                    <code style={{ display: 'block', margin: '8px 0', padding: '4px 8px', background: 'var(--bg-secondary)', borderRadius: 4, fontWeight: 700 }}>
-                                        (Costo / 0.90) + 25
-                                    </code>
-                                    Y redondeamos al múltiplo de 5 más cercano.
-                                </>
-                            ) : (
-                                <>
-                                    Para <strong>GCgroup</strong> aplicamos:<br />
-                                    <code style={{ display: 'block', margin: '8px 0', padding: '4px 8px', background: 'var(--bg-secondary)', borderRadius: 4, fontWeight: 700 }}>
-                                        (Costo / 0.90) + 25
-                                    </code>
-                                    Y redondeamos al múltiplo de 5 más cercano.
-                                </>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="card" style={{ padding: 20, borderStyle: 'dashed' }}>
-                        <h4 style={{ fontSize: '0.85rem', fontWeight: 800, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <Zap size={14} color="var(--orange)" />
-                            Tip de Productividad
-                        </h4>
-                        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                            Usa la <strong>"Carga Mágica"</strong> para importar los archivos que el sistema ya procesó. Es la forma más rápida y segura.
-                        </p>
-                    </div>
-                </div>
+                {bulkPreviewModal}
             </div>
         </div>
     )

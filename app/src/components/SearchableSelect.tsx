@@ -113,7 +113,7 @@ export function SearchableSelect({ options, value, onChange, placeholder = 'Sele
                         overflow: 'hidden',
                         display: 'flex',
                         flexDirection: 'column',
-                        maxHeight: '300px'
+                        maxHeight: '400px'
                     }}
                 >
                     <div style={{ padding: '8px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', background: 'var(--bg-secondary)' }}>

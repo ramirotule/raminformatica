@@ -75,9 +75,11 @@ export interface Database {
 
 export interface ProviderCost {
     id: string
-    product_id: string
+    product_id: string | null
     provider_id: string
     cost_price: number
+    product_name: string | null
+    category_name: string | null
     updated_at: string
 }
 

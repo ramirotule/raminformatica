@@ -2,7 +2,7 @@ export const SHIPPING_COST_USD = 25;
 export const PROFIT_MARGIN_FACTOR = 0.9;
 
 export function round5(value: number) {
-    return Math.round(value / 5) * 5;
+    return Math.ceil(value / 5) * 5;
 }
 
 export function calculateSellingPrice(cost: number) {

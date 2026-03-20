@@ -117,6 +117,34 @@ function Alert({ type, message, onClose }: { type: 'success' | 'error'; message:
     )
 }
 
+function calculateSimilarity(s1: string, s2: string): number {
+    const longer = s1.length > s2.length ? s1 : s2;
+    const shorter = s1.length > s2.length ? s2 : s1;
+    if (longer.length === 0) return 1.0;
+    
+    // Levenshtein bit optimized
+    const editDistance = (a: string, b: string) => {
+        if (a.length === 0) return b.length;
+        if (b.length === 0) return a.length;
+        if (a.length < b.length) [a, b] = [b, a];
+
+        let row = Array.from({ length: b.length + 1 }, (_, i) => i);
+        for (let i = 1; i <= a.length; i++) {
+            let prev = i;
+            for (let j = 1; j <= b.length; j++) {
+                let val = a[i - 1] === b[j - 1] ? row[j - 1] : Math.min(row[j - 1] + 1, prev + 1, row[j] + 1);
+                row[j - 1] = prev;
+                prev = val;
+            }
+            row[b.length] = prev;
+        }
+        return row[b.length];
+    }
+
+    const dist = editDistance(longer, shorter);
+    return (longer.length - dist) / longer.length;
+}
+
 // ─── Dashboard ────────────────────────────────────────────────────────────────
 function Dashboard() {
     const [stats, setStats] = useState({ productos: 0, categorias: 0, marcas: 0, sinStock: 0 })
@@ -129,6 +157,9 @@ function Dashboard() {
     const [editCostData, setEditCostData] = useState<{id: string, name: string, cost: number} | null>(null)
     const [editCostInput, setEditCostInput] = useState('')
     const [isSavingCost, setIsSavingCost] = useState(false)
+    const [verifyingDuplicates, setVerifyingDuplicates] = useState(false)
+    const [duplicateGroups, setDuplicateGroups] = useState<any[][]>([])
+    const [duplicatesDone, setDuplicatesDone] = useState(false)
 
     async function verifyPrices() {
         setVerifyingPrices(true)
@@ -170,7 +201,7 @@ function Dashboard() {
                 if (sellPrice !== undefined && sellPrice !== null) {
                     // La fórmula real es (costo / 0.90) + 25 y redondeado al múltiplo de 5 más cercano
                     const exactAllowed = (cost / 0.90) + 25
-                    const minAllowed = Math.round(exactAllowed / 5) * 5
+                    const minAllowed = Math.ceil(exactAllowed / 5) * 5
 
                     if (sellPrice < minAllowed - 0.01) {
                         issues.push({ id: p.id, name: p.name, cost, sellPrice, minAllowed })
@@ -185,6 +216,77 @@ function Dashboard() {
         } finally {
             setVerifyingPrices(false)
         }
+    }
+
+    async function findDuplicates() {
+        setVerifyingDuplicates(true)
+        setDuplicatesDone(false)
+        setDuplicateGroups([])
+        try {
+            const { data, error } = await (supabase as any)
+                .from('products')
+                .select('id, name, active, category_id, categories(name)')
+            
+            if (error) throw error
+            const prods = data as any[]
+            const groups: any[][] = []
+            const processed = new Set<string>()
+
+            for (let i = 0; i < prods.length; i++) {
+                if (processed.has(prods[i].id)) continue
+                const group: any[] = [prods[i]]
+                
+                for (let j = i + 1; j < prods.length; j++) {
+                    if (processed.has(prods[j].id)) continue
+                    
+                    const s1 = prods[i].name.toLowerCase().trim()
+                    const s2 = prods[j].name.toLowerCase().trim()
+                    
+                    let similarity = 0
+                    if (s1 === s2) {
+                        similarity = 1
+                    } else {
+                        // Solo calcular Levenshtein si las longitudes son similares (ahorro CPU)
+                        const lenDiff = Math.abs(s1.length - s2.length)
+                        if (lenDiff / Math.max(s1.length, s2.length) < 0.1) {
+                            similarity = calculateSimilarity(s1, s2)
+                        }
+                    }
+
+                    if (similarity >= 0.95) {
+                        group.push(prods[j])
+                        processed.add(prods[j].id)
+                    }
+                }
+                if (group.length > 1) {
+                    groups.push(group)
+                    processed.add(prods[i].id)
+                }
+            }
+            setDuplicateGroups(groups)
+            setDuplicatesDone(true)
+        } catch (err) {
+            console.error('Error buscando duplicados', err)
+            alert('Error buscando duplicados')
+        } finally {
+            setVerifyingDuplicates(false)
+        }
+    }
+
+    async function deleteDuplicate(id: string) {
+        if (!confirm('¿Estás seguro de eliminar este producto duplicado?')) return
+        try {
+            const { error } = await (supabase as any).from('products').delete().eq('id', id)
+            if (error) throw error
+            // Actualizar la lista localmente para no re-escanear todo
+            setDuplicateGroups(prev => prev.map(group => group.filter(p => p.id !== id)).filter(group => group.length > 1))
+        } catch (err) {
+            alert('Error al eliminar el producto')
+        }
+    }
+
+    const dismissGroup = (idx: number) => {
+        setDuplicateGroups(prev => prev.filter((_, i) => i !== idx))
     }
 
     function openEditCostModal(id: string, name: string, currentCost: number) {
@@ -348,6 +450,84 @@ function Dashboard() {
                 )}
             </div>
 
+            <div className="card" style={{ padding: 24, marginBottom: 32 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                    <div>
+                        <h2 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Buscador de Duplicados</h2>
+                        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: 4 }}>
+                            Encuentra automáticamente productos con nombres idénticos o con una similitud del 95% o superior.
+                        </p>
+                    </div>
+                    <button 
+                        onClick={findDuplicates} 
+                        disabled={verifyingDuplicates}
+                        className="btn btn-primary"
+                        style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--orange)', borderColor: 'var(--orange)' }}
+                    >
+                        {verifyingDuplicates ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
+                        Buscar Duplicados
+                    </button>
+                </div>
+                
+                {duplicatesDone && (
+                    <div style={{ marginTop: 24 }}>
+                        {duplicateGroups.length === 0 ? (
+                            <div className="alert alert-success" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <CheckCircle2 size={16} /> No se encontraron productos duplicados.
+                            </div>
+                        ) : (
+                            <div>
+                                <div className="alert alert-error" style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, background: 'rgba(255,159,10,0.1)', color: 'var(--orange)', border: '1px solid var(--orange)' }}>
+                                    <AlertCircle size={16} /> Se encontraron {duplicateGroups.length} grupo(s) de posibles productos duplicados.
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                                    {duplicateGroups.map((group, gIdx) => (
+                                        <div key={gIdx} className="card" style={{ padding: 16, background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', position: 'relative' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                                                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                                    Grupo {gIdx + 1} ({group.length} coincidencias)
+                                                </div>
+                                                <button 
+                                                    onClick={() => dismissGroup(gIdx)}
+                                                    className="btn btn-ghost btn-sm"
+                                                    style={{ padding: 4, height: 'auto', minHeight: 0 }}
+                                                    title="Descartar este grupo"
+                                                >
+                                                    <X size={14} />
+                                                </button>
+                                            </div>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                                {group.map(p => (
+                                                    <div key={p.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--bg-card)', borderRadius: 8, border: '1px solid var(--border)' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: p.active ? 'var(--green)' : 'var(--red)' }} title={p.active ? 'Activo' : 'Inactivo'} />
+                                                            <div>
+                                                                <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{p.name}</div>
+                                                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{p.categories?.name || 'Sin categoría'} • ID: {p.id.substring(0, 8)}...</div>
+                                                            </div>
+                                                        </div>
+                                                        <div style={{ display: 'flex', gap: 8 }}>
+                                                            <button 
+                                                                className="btn btn-ghost btn-sm" 
+                                                                style={{ color: 'var(--red)', padding: 6 }}
+                                                                onClick={() => deleteDuplicate(p.id)}
+                                                                title="Eliminar Duplicado"
+                                                            >
+                                                                <Trash2 size={14} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+
             {!mfaEnabled && (
                 <div className="card" style={{
                     padding: 24,
@@ -377,7 +557,7 @@ function Dashboard() {
             )}
 
             {editCostModalOpen && editCostData && (
-                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setEditCostModalOpen(false)}>
+                <div className="modal-overlay animate-fade-in-fast">
                     <div className="modal" style={{ maxWidth: 400 }}>
                         <div className="modal-title">
                             <span>Editar Costo de Producto</span>
@@ -456,6 +636,9 @@ function AdminProductos() {
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
     const [isSaving, setIsSaving] = useState(false)
     const [providerFilter, setProviderFilter] = useState('')
+    const [categoryFilter, setCategoryFilter] = useState('')
+    const [brandFilter, setBrandFilter] = useState('')
+    const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
 
     const handleSort = (field: SortField) => {
         if (sortField === field) {
@@ -524,7 +707,13 @@ function AdminProductos() {
             (p.product_variants?.[0]?.sku?.toLowerCase() || '').includes(query)
         )
         const matchesProvider = !providerFilter || p.provider_id === providerFilter
-        return matchesSearch && matchesProvider
+        const matchesCategory = !categoryFilter || p.category_id === categoryFilter
+        const matchesBrand = !brandFilter || p.brand_id === brandFilter
+        const matchesStatus = statusFilter === 'all' || 
+                             (statusFilter === 'active' && p.active) || 
+                             (statusFilter === 'inactive' && !p.active)
+
+        return matchesSearch && matchesProvider && matchesCategory && matchesBrand && matchesStatus
     })
 
     const sortedProducts = [...filteredProducts].sort((a, b) => {
@@ -1031,30 +1220,9 @@ function AdminProductos() {
 
     return (
         <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
                 <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>{dict.admin.productos}</h1>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-secondary)', borderRadius: 8, padding: '0 12px' }}>
-                        <Search size={16} style={{ color: 'var(--text-muted)' }} />
-                        <input
-                            type="text"
-                            placeholder="Buscar productos..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            style={{ border: 'none', background: 'transparent', padding: '8px', color: 'var(--text)', outline: 'none', width: 200 }}
-                        />
-                    </div>
-                    <div style={{ width: 180 }}>
-                        <SearchableSelect
-                            value={providerFilter}
-                            onChange={(v) => setProviderFilter(v)}
-                            options={[
-                                { value: '', label: 'Todos los Proveedores' },
-                                ...providers.map(p => ({ value: p.id, label: p.name }))
-                            ]}
-                            placeholder="Filtrar por Proveedor"
-                        />
-                    </div>
+                <div style={{ display: 'flex', gap: 8 }}>
                     <button id="admin-refresh-products" className="btn btn-ghost btn-sm" onClick={load} aria-label="Recargar">
                         <RefreshCw size={15} />
                     </button>
@@ -1063,6 +1231,76 @@ function AdminProductos() {
                         {dict.admin.nuevo}
                     </button>
                 </div>
+            </div>
+
+            {/* Fila de Filtros y Búsqueda */}
+            <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: '1fr repeat(4, 180px)', 
+                gap: 12, 
+                marginBottom: 24,
+                background: 'var(--bg-card)',
+                padding: '16px',
+                borderRadius: 16,
+                border: '1px solid var(--border)',
+                alignItems: 'center'
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-secondary)', borderRadius: 10, padding: '0 12px', height: 44, border: '1px solid var(--border)' }}>
+                    <Search size={16} style={{ color: 'var(--text-muted)' }} />
+                    <input
+                        type="text"
+                        placeholder="Buscar por nombre, SKU, marca..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        style={{ border: 'none', background: 'transparent', padding: '8px', color: 'var(--text)', outline: 'none', width: '100%', fontSize: '0.9rem' }}
+                    />
+                    {searchQuery && (
+                        <button onClick={() => setSearchQuery('')} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+                            <X size={14} />
+                        </button>
+                    )}
+                </div>
+
+                <SearchableSelect
+                    value={categoryFilter}
+                    onChange={(v) => setCategoryFilter(v)}
+                    options={[
+                        { value: '', label: 'Todas las Categorías' },
+                        ...categories.map(c => ({ value: c.id, label: c.name }))
+                    ]}
+                    placeholder="Filtrar por Categoría"
+                />
+
+                <SearchableSelect
+                    value={brandFilter}
+                    onChange={(v) => setBrandFilter(v)}
+                    options={[
+                        { value: '', label: 'Todas las Marcas' },
+                        ...brands.map(b => ({ value: b.id, label: b.name }))
+                    ]}
+                    placeholder="Filtrar por Marca"
+                />
+
+                <SearchableSelect
+                    value={providerFilter}
+                    onChange={(v) => setProviderFilter(v)}
+                    options={[
+                        { value: '', label: 'Todos los Proveedores' },
+                        ...providers.map(p => ({ value: p.id, label: p.name }))
+                    ]}
+                    placeholder="Filtrar por Proveedor"
+                />
+
+                <SearchableSelect
+                    value={statusFilter}
+                    onChange={(v: any) => setStatusFilter(v)}
+                    options={[
+                        { value: 'all', label: 'Todos los Estados' },
+                        { value: 'active', label: 'Solo Activos' },
+                        { value: 'inactive', label: 'Solo Inactivos' }
+                    ]}
+                    placeholder="Estado"
+                />
             </div>
 
             {selectedIds.size > 0 && (
@@ -1276,7 +1514,7 @@ function AdminProductos() {
 
             {/* ─── Modal Form ─────────────────────────────── */}
             {modalOpen && (
-                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setModalOpen(false)}>
+                <div className="modal-overlay animate-fade-in-fast">
                     <div className="modal">
                         <div className="modal-title">
                             <span>{editProduct ? dict.admin.editar + ' Producto' : 'Nuevo Producto'}</span>
@@ -1297,23 +1535,14 @@ function AdminProductos() {
                                 <label className="form-label" htmlFor="form-cost-price">Precio Costo (USD)</label>
                                 <input id="form-cost-price" className="form-input" type="number" min="0" step="0.01"
                                     value={form.cost_price}
-                                    onChange={(e) => setForm((f) => ({ ...f, cost_price: e.target.value }))}
-                                    onBlur={(e) => {
+                                    onChange={(e) => {
                                         const cost = e.target.value
                                         const finalPrice = calculateSellingPrice(parseFloat(cost))
-                                        if (finalPrice > 0) {
-                                            setForm((f) => ({ ...f, priceUSD: finalPrice.toString() }))
-                                        }
-                                    }}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                            e.preventDefault()
-                                            const cost = (e.target as HTMLInputElement).value
-                                            const finalPrice = calculateSellingPrice(parseFloat(cost))
-                                            if (finalPrice > 0) {
-                                                setForm((f) => ({ ...f, priceUSD: finalPrice.toString() }))
-                                            }
-                                        }
+                                        setForm((f) => ({ 
+                                            ...f, 
+                                            cost_price: cost,
+                                            priceUSD: finalPrice > 0 ? finalPrice.toString() : f.priceUSD
+                                        }))
                                     }}
                                     placeholder="0.00" />
                             </div>
@@ -1594,7 +1823,7 @@ function AdminProductos() {
 
             {/* Bulk Category Modal */}
             {bulkCategoryOpen && (
-                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setBulkCategoryOpen(false)}>
+                <div className="modal-overlay animate-fade-in-fast">
                     <div className="modal" style={{ maxWidth: 400, overflow: 'visible' }}>
                         <div className="modal-title">
                             <span>Cambiar Categoría Masivo</span>
@@ -1619,7 +1848,7 @@ function AdminProductos() {
 
             {/* Bulk Brand Modal */}
             {bulkBrandOpen && (
-                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setBulkBrandOpen(false)}>
+                <div className="modal-overlay animate-fade-in-fast">
                     <div className="modal" style={{ maxWidth: 400, overflow: 'visible' }}>
                         <div className="modal-title">
                             <span>Cambiar Marca Masiva</span>
@@ -1644,7 +1873,7 @@ function AdminProductos() {
 
             {/* Bulk Provider Modal */}
             {bulkProviderOpen && (
-                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setBulkProviderOpen(false)}>
+                <div className="modal-overlay animate-fade-in-fast">
                     <div className="modal" style={{ maxWidth: 400, overflow: 'visible' }}>
                         <div className="modal-title">
                             <span>Asignar Proveedor Masivo</span>
@@ -1669,7 +1898,7 @@ function AdminProductos() {
 
             {/* Bulk Image Upload Modal */}
             {bulkImagesOpen && (
-                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setBulkImagesOpen(false)}>
+                <div className="modal-overlay animate-fade-in-fast">
                     <div className="modal" style={{ maxWidth: 800, width: '90vw' }}>
                         <div className="modal-title">
                             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -1782,7 +2011,7 @@ function AdminProductos() {
             )}
 
             {bulkRenameOpen && (
-                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setBulkRenameOpen(false)}>
+                <div className="modal-overlay animate-fade-in-fast">
                     <div className="modal" style={{ maxWidth: 450 }}>
                         <div className="modal-title">
                             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -1853,7 +2082,7 @@ function AdminProductos() {
             )}
 
             {bulkTagsOpen && (
-                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setBulkTagsOpen(false)}>
+                <div className="modal-overlay animate-fade-in-fast">
                     <div className="modal" style={{ maxWidth: 450 }}>
                         <div className="modal-title">
                             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -1887,7 +2116,7 @@ function AdminProductos() {
                 </div>
             )}
             {bulkDeleteConfirm && (
-                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setBulkDeleteConfirm(false)}>
+                <div className="modal-overlay animate-fade-in-fast">
                     <div className="modal" style={{ maxWidth: 440 }}>
                         <div className="modal-title">
                             <span>Confirmar Eliminación Masiva</span>
@@ -1905,7 +2134,7 @@ function AdminProductos() {
                 </div>
             )}
             {singleDeleteConfirm && (
-                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setSingleDeleteConfirm(null)}>
+                <div className="modal-overlay animate-fade-in-fast">
                     <div className="modal" style={{ maxWidth: 440 }}>
                         <div className="modal-title">
                             <span>Confirmar Eliminación</span>
@@ -2144,7 +2373,7 @@ function AdminCategorias() {
             )}
 
             {modalOpen && (
-                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setModalOpen(false)}>
+                <div className="modal-overlay animate-fade-in-fast">
                     <div className="modal">
                         <div className="modal-title">
                             <span>{editId ? 'Editar Categoría' : 'Nueva Categoría'}</span>
@@ -2205,7 +2434,7 @@ function AdminCategorias() {
             )}
 
             {deleteConfirm && (
-                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setDeleteConfirm(null)}>
+                <div className="modal-overlay animate-fade-in-fast">
                     <div className="modal" style={{ maxWidth: 450 }}>
                         <div className="modal-title">
                             <span>{deleteConfirm.count > 0 ? 'No se puede eliminar' : 'Confirmar Eliminación'}</span>
@@ -2239,7 +2468,7 @@ function AdminCategorias() {
                 </div>
             )}
             {bulkDeleteConfirm && (
-                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setBulkDeleteConfirm(false)}>
+                <div className="modal-overlay animate-fade-in-fast">
                     <div className="modal" style={{ maxWidth: 440 }}>
                         <div className="modal-title">
                             <span>Confirmar Eliminación</span>
@@ -2486,7 +2715,7 @@ function AdminMarcas() {
             )}
 
             {modalOpen && (
-                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setModalOpen(false)}>
+                <div className="modal-overlay animate-fade-in-fast">
                     <div className="modal" style={{ maxWidth: 400 }}>
                         <div className="modal-title">
                             <span>{editId ? 'Editar Marca' : 'Nueva Marca'}</span>
@@ -2530,7 +2759,7 @@ function AdminMarcas() {
             )}
 
             {deleteConfirm && (
-                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setDeleteConfirm(null)}>
+                <div className="modal-overlay animate-fade-in-fast">
                     <div className="modal" style={{ maxWidth: 450 }}>
                         <div className="modal-title">
                             <span>{deleteConfirm.count > 0 ? 'No se puede eliminar' : 'Confirmar Eliminación'}</span>
@@ -2564,7 +2793,7 @@ function AdminMarcas() {
                 </div>
             )}
             {bulkDeleteConfirm && (
-                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setBulkDeleteConfirm(false)}>
+                <div className="modal-overlay animate-fade-in-fast">
                     <div className="modal" style={{ maxWidth: 440 }}>
                         <div className="modal-title">
                             <span>Confirmar Eliminación</span>
@@ -3053,7 +3282,7 @@ function AdminHome() {
 
             {/* ── Modal ── */}
             {modalOpen && (
-                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setModalOpen(false)}>
+                <div className="modal-overlay animate-fade-in-fast">
                     <div className="modal" style={{ maxWidth: 500 }}>
                         <div className="modal-title">
                             <span>{tab === 'slides' ? (editItem ? 'Editar Slide' : 'Nuevo Slide') : (editItem ? 'Editar Logo' : 'Nuevo Logo')}</span>
@@ -3335,7 +3564,7 @@ function AdminProveedores() {
             )}
 
             {modalOpen && (
-                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setModalOpen(false)}>
+                <div className="modal-overlay animate-fade-in-fast">
                     <div className="modal" style={{ maxWidth: 600 }}>
                         <div className="modal-title">
                             <span>{editId ? 'Editar Proveedor' : 'Nuevo Proveedor'}</span>
@@ -3377,7 +3606,7 @@ function AdminProveedores() {
                 </div>
             )}
             {bulkDeleteConfirm && (
-                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setBulkDeleteConfirm(false)}>
+                <div className="modal-overlay animate-fade-in-fast">
                     <div className="modal" style={{ maxWidth: 440 }}>
                         <div className="modal-title">
                             <span>Confirmar Eliminación</span>
@@ -3395,7 +3624,7 @@ function AdminProveedores() {
                 </div>
             )}
             {singleDeleteConfirm && (
-                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setSingleDeleteConfirm(null)}>
+                <div className="modal-overlay animate-fade-in-fast">
                     <div className="modal" style={{ maxWidth: 440 }}>
                         <div className="modal-title">
                             <span>Confirmar Eliminación</span>
@@ -3584,7 +3813,7 @@ function AdminNovedades() {
             )}
 
             {modalOpen && (
-                <div className="modal-overlay animate-fade-in-fast" onClick={(e) => e.target === e.currentTarget && setModalOpen(false)}>
+                <div className="modal-overlay animate-fade-in-fast">
                     <div className="modal" style={{ maxWidth: 500 }}>
                         <div className="modal-title">
                             <span>{editId ? 'Editar Novedad' : 'Nueva Novedad'}</span>

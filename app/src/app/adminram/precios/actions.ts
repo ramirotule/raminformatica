@@ -23,6 +23,7 @@ export interface ParsedItem {
     similarity?: number;
     currentPrice?: number;
     currentCost?: number;
+    providerId?: string;
 }
 
 function calculateFinalPrice(cost: number, isGcGroup = false, originalJsonPrice?: number) {
@@ -30,21 +31,21 @@ function calculateFinalPrice(cost: number, isGcGroup = false, originalJsonPrice?
         // According to previous UI, GCGroup might take direct price, but to enforce rule:
         // Actually the rule was to enforce (cost / 0.90) + 25 on ALL. Let's just calculate it:
         const exactAllowed = (cost / 0.90) + 25;
-        return Math.round(exactAllowed / 5) * 5;
+        // Siempre redondear hacia ARRIBA (hacia el siguiente múltiplo de 5)
+        return Math.ceil(exactAllowed / 5) * 5;
     }
     const exactAllowed = (cost / 0.90) + 25;
-    return Math.round(exactAllowed / 5) * 5;
+    return Math.ceil(exactAllowed / 5) * 5;
 }
 
 /**
  * Parsea el texto o JSON y devuelve una lista de Items para previsualizar.
  */
-export async function parseImportData(input: string, provider: 'gcgroup' | 'zentek') {
+export async function parseImportData(input: string, provider: 'gcgroup' | 'zentek' | 'kadabra' | 'tecnoduo') {
     const items: ParsedItem[] = [];
 
     try {
-        if (provider === 'gcgroup' || provider === 'zentek') {
-            // Zentek now also uses JSON for specific products (MacBook, IPad, RayBan)
+        if (['gcgroup', 'zentek', 'kadabra', 'tecnoduo'].includes(provider)) {
             let data;
             try {
                 data = JSON.parse(input);
@@ -81,7 +82,7 @@ export async function parseImportData(input: string, provider: 'gcgroup' | 'zent
                     }
                     return { success: true, items, message: "Datos parseados (Raw Text)." };
                 }
-                throw e; // Reraise if gcgroup fails
+                throw e; // Reraise if others fail
             }
 
             const productos = Array.isArray(data.productos) ? data.productos : [];
@@ -103,6 +104,84 @@ export async function parseImportData(input: string, provider: 'gcgroup' | 'zent
         return { success: true, items, message: "Datos parseados correctamente." };
     } catch (err: any) {
         return { success: false, message: `Error al parsear: ${err.message}`, items: [] };
+    }
+}
+
+/**
+ * INTEGRA DATA COMPLETA A provider_costs
+ * Esta acción guarda toda la info del JSON en una tabla intermedia para que luego un script
+ * procese los productos, creando nuevos o actualizando existentes de forma diferida.
+ * 
+ * Lógica de persistencia: 
+ * - Si el producto ya existe para ese proveedor, REEMPLAZA el costo y actualiza la fecha.
+ * - Si NO existe en el JSON actual pero estaba en la base de datos, NO se borra (mantiene el histórico).
+ */
+export async function integrateProviderCosts(items: ParsedItem[], providerId: string) {
+    if (!providerId) return { success: false, message: "Falta seleccionar el proveedor." };
+
+    try {
+        // Obtenemos coincidencias actuales para intentar linkear el product_id si ya existe
+        const { items: matchedItems } = await searchMatches(items, providerId);
+
+        // --- DEDUPLICACIÓN EN EL LOTE ---
+        // Si varios productos matchean al mismo matchId, nos quedamos con el más barato.
+        const uniqueItems = new Map<string, any>();
+        matchedItems.forEach(item => {
+            const key = item.matchId ? `id:${item.matchId}` : `name:${item.name.toLowerCase().trim()}`;
+            const existing = uniqueItems.get(key);
+            if (!existing || item.cost < existing.cost) {
+                uniqueItems.set(key, item);
+            }
+        });
+
+        const allItems = Array.from(uniqueItems.values());
+        
+        // Dividimos en dos grupos para evitar conflictos de claves únicas en Supabase
+        // 1. Matcheados: Upsert por (product_id, provider_id)
+        // 2. Nuevos: Upsert por (provider_id, product_name)
+        const matchedToUpsert = allItems.filter(i => i.matchId).map(item => ({
+            product_id: item.matchId,
+            provider_id: providerId,
+            cost_price: item.cost,
+            product_name: item.name,
+            category_name: item.categoryName || "Sin Asignar",
+            updated_at: new Date().toISOString()
+        }));
+
+        const newToUpsert = allItems.filter(i => !i.matchId).map(item => ({
+            product_id: null,
+            provider_id: providerId,
+            cost_price: item.cost,
+            product_name: item.name,
+            category_name: item.categoryName || "Sin Asignar",
+            updated_at: new Date().toISOString()
+        }));
+
+        let finalError = null;
+
+        if (matchedToUpsert.length > 0) {
+            const { error } = await supabaseAdmin
+                .from('provider_costs')
+                .upsert(matchedToUpsert, { onConflict: 'product_id,provider_id' });
+            if (error) finalError = error;
+        }
+
+        if (newToUpsert.length > 0) {
+            const { error } = await supabaseAdmin
+                .from('provider_costs')
+                .upsert(newToUpsert, { onConflict: 'provider_id,product_name' });
+            if (error) finalError = error;
+        }
+
+        if (finalError) throw finalError;
+
+        return { 
+            success: true, 
+            message: `Sincronización histórica lista: se procesaron ${matchedToUpsert.length + newToUpsert.length} productos.` 
+        };
+    } catch (err: any) {
+        console.error("Error integrating provider costs:", err);
+        return { success: false, message: `Error al integrar: ${err.message}` };
     }
 }
 
@@ -261,7 +340,8 @@ function getSimilarity(s1: string, s2: string): number {
 export async function searchMatches(items: ParsedItem[], providerId?: string) {
     const results: ParsedItem[] = [];
 
-    let query = supabaseAdmin.from("products").select(`
+    // 1. Cargamos productos de la tienda para detectar actualizaciones en la web
+    const { data: dbProducts } = await supabaseAdmin.from("products").select(`
         id, 
         name,
         descripcion_original,
@@ -273,14 +353,28 @@ export async function searchMatches(items: ParsedItem[], providerId?: string) {
         )
     `);
 
-    const { data: dbProducts } = await query;
+    // 2. Cargamos costos históricos de este proveedor para ver cuánto cambió respecto a la última vez que lo subimos
+    let historyMap: Record<string, number> = {};
+    if (providerId) {
+        const { data: history } = await supabaseAdmin
+            .from('provider_costs')
+            .select('product_name, cost_price')
+            .eq('provider_id', providerId);
+        
+        if (history) {
+            history.forEach(h => {
+                historyMap[h.product_name.toLowerCase()] = h.cost_price;
+            });
+        }
+    }
+
     if (!dbProducts) return { success: false, message: "No se pudieron cargar los productos.", items };
 
     for (const item of items) {
         let bestMatch: any = null;
         let highestScore = 0;
 
-        // 1. Exacto por descripción original
+        // 1. Exacto por descripción original (Máxima prioridad)
         const exactMatch = dbProducts.find(dbP => 
             dbP.descripcion_original && 
             dbP.descripcion_original.trim().toLowerCase() === item.originalDescription.trim().toLowerCase()
@@ -300,12 +394,16 @@ export async function searchMatches(items: ParsedItem[], providerId?: string) {
             }
         }
 
-        const isMatched = highestScore >= 0.85; // Aceptamos > 85% para actualizar en vez de crear nuevos, conservando así las fotos
+        const isMatched = highestScore >= 0.85; 
         
         let currentPrice = undefined;
         if (isMatched && bestMatch?.product_variants?.[0]?.prices?.[0]) {
             currentPrice = bestMatch.product_variants[0].prices[0].amount;
         }
+
+        // El costo anterior lo sacamos prioritariamente de la tabla provider_costs (histórico real)
+        // y si no existe ahí, del producto matcheado en la tienda.
+        const prevCost = historyMap[item.name.toLowerCase()] || (isMatched ? bestMatch.cost_price : undefined);
 
         results.push({
             ...item,
@@ -313,7 +411,7 @@ export async function searchMatches(items: ParsedItem[], providerId?: string) {
             matchName: isMatched ? bestMatch.name : undefined,
             similarity: Math.round(highestScore * 100),
             currentPrice,
-            currentCost: isMatched ? bestMatch.cost_price : undefined,
+            currentCost: prevCost,
             status: isMatched ? 'matched' : 'new'
         });
     }
@@ -347,11 +445,9 @@ export async function getMissingProducts(matchedIds: string[], providerId?: stri
 /**
  * Procesa la sincronización final.
  */
-export async function processSync(items: ParsedItem[], providerId?: string) {
-    let updated = 0;
-    let created = 0;
-    let deactivated = 0;
-    const errors: string[] = [];
+export async function processSync(items: ParsedItem[], providerId: string | null = null) {
+    console.log(`Starting sync for ${items.length} items. Provider: ${providerId || 'Mixed'}`);
+    const results = { success: true, created: 0, updated: 0, deactivated: 0, errors: [] as string[] };
     const createdIds: string[] = [];
 
     const DEFAULT_CAT_NAME = "Sin Asignar";
@@ -400,7 +496,7 @@ export async function processSync(items: ParsedItem[], providerId?: string) {
 
                     // Doble validación y cálculo exacto de la fórmula del cliente para asegurar
                     const exactAllowed = (item.cost / 0.90) + 25;
-                    const recalculatedFinalPrice = Math.round(exactAllowed / 5) * 5;
+                    const recalculatedFinalPrice = Math.ceil(exactAllowed / 5) * 5;
 
                     // Usar el mapa de variantes precargado
                     const variants = variantsMap[item.matchId] || [];
@@ -427,7 +523,7 @@ export async function processSync(items: ParsedItem[], providerId?: string) {
                         descripcion_original: item.originalDescription
                     });
 
-                    updated++;
+                    results.updated++;
                 } else if (item.status === 'new') {
                     // La creación de nuevos sigue siendo individual por ahora para obtener el ID, 
                     // pero podemos mejorarla si son muchos. Normalmente son menos que las actualizaciones.
@@ -457,7 +553,7 @@ export async function processSync(items: ParsedItem[], providerId?: string) {
                         slug: slugify(item.name) + '-' + Math.random().toString(36).substring(2, 7),
                         category_id: categoryId || safeCategoryId,
                         brand_id: brandId || safeBrandId,
-                        provider_id: providerId || null,
+                        provider_id: item.providerId || providerId || null,
                         descripcion_original: item.originalDescription,
                         cost_price: item.cost,
                         active: true,
@@ -473,30 +569,51 @@ export async function processSync(items: ParsedItem[], providerId?: string) {
                     }
 
                     createdIds.push((newP as any).id);
-                    created++;
+                    results.created++;
                 } else if (item.status === 'deactivate' && item.matchId) {
                     await supabaseAdmin.from('products').update({ active: false }).eq('id', item.matchId);
-                    deactivated++;
+                    results.deactivated++;
                 }
             } catch (e: any) {
                 console.error(`Error procesando item ${item.name}:`, e);
-                errors.push(`${item.name}: ${e.message}`);
+                results.errors.push(`${item.name}: ${e.message}`);
             }
         }
 
-        // --- EJECUTAR OPERACIONES EN LOTE ---
+        // --- DEDUPLICACIÓN DE OPERACIONES EN LOTE ---
+        // Evitamos enviar el mismo product_id o variant_id varias veces en el mismo lote de upsert
         
+        const uniqueProviderCosts = new Map<string, any>();
+        providerCostsToUpsert.forEach(pc => {
+            const key = pc.product_id;
+            const existing = uniqueProviderCosts.get(key);
+            if (!existing || pc.cost_price < existing.cost_price) {
+                uniqueProviderCosts.set(key, pc);
+            }
+        });
+        const finalProviderCosts = Array.from(uniqueProviderCosts.values());
+
+        const uniquePrices = new Map<string, any>();
+        pricesToUpsert.forEach(pr => {
+            const key = pr.variant_id;
+            const existing = uniquePrices.get(key);
+            if (!existing || pr.amount < existing.amount) {
+                uniquePrices.set(key, pr);
+            }
+        });
+        const finalPrices = Array.from(uniquePrices.values());
+
         // 1. Upsert provider_costs
-        if (providerCostsToUpsert.length > 0) {
-            console.log(`Upserting ${providerCostsToUpsert.length} provider costs...`);
-            const { error } = await supabaseAdmin.from('provider_costs').upsert(providerCostsToUpsert, { onConflict: 'product_id,provider_id' });
+        if (finalProviderCosts.length > 0) {
+            console.log(`Upserting ${finalProviderCosts.length} provider costs...`);
+            const { error } = await supabaseAdmin.from('provider_costs').upsert(finalProviderCosts, { onConflict: 'product_id,provider_id' });
             if (error) console.error("Error bulk upserting provider costs:", error);
         }
 
         // 2. Upsert prices
-        if (pricesToUpsert.length > 0) {
-            console.log(`Upserting ${pricesToUpsert.length} prices...`);
-            const { error } = await supabaseAdmin.from('prices').upsert(pricesToUpsert, { onConflict: 'variant_id,currency' });
+        if (finalPrices.length > 0) {
+            console.log(`Upserting ${finalPrices.length} prices...`);
+            const { error } = await supabaseAdmin.from('prices').upsert(finalPrices, { onConflict: 'variant_id,currency' });
             if (error) console.error("Error bulk upserting prices:", error);
         }
 
@@ -532,21 +649,21 @@ export async function processSync(items: ParsedItem[], providerId?: string) {
                 if (idsToDeactivate.length > 0) {
                     console.log(`Deactivating ${idsToDeactivate.length} missing products...`);
                     await supabaseAdmin.from('products').update({ active: false }).in('id', idsToDeactivate);
-                    deactivated += idsToDeactivate.length;
+                    results.deactivated += idsToDeactivate.length;
                 }
             }
         }
 
     } catch (globalErr: any) {
         console.error("Global Sync Error:", globalErr);
-        errors.push(`Error general: ${globalErr.message}`);
+        results.errors.push(`Error general: ${globalErr.message}`);
     }
 
     return {
-        success: errors.length < items.length || items.length === 0,
-        message: `Completado. Act: ${updated}, Nuevos: ${created}, Des: ${deactivated}.`,
+        success: results.errors.length === 0,
+        message: `Sync completado. Actualizados: ${results.updated}, Creados: ${results.created}, Desactivados: ${results.deactivated}`,
         createdIds,
-        errors: errors.length > 0 ? errors : undefined
+        errors: results.errors.length > 0 ? results.errors : undefined
     };
 }
 
@@ -569,7 +686,7 @@ export async function getComparisonData() {
     try {
         const { data: products, error: pErr } = await supabaseAdmin.from('products').select('id, name, cost_price, provider_id').eq('active', true).order('name');
         const { data: providers, error: provErr } = await supabaseAdmin.from('providers').select('id, name').eq('active', true).order('name');
-        const { data: costs, error: cErr } = await supabaseAdmin.from('provider_costs').select('product_id, provider_id, cost_price, updated_at');
+        const { data: costs, error: cErr } = await supabaseAdmin.from('provider_costs').select('product_id, provider_id, cost_price, product_name, category_name, updated_at');
 
         if (pErr || provErr || cErr) throw new Error("Error cargando datos de comparador");
 
@@ -586,7 +703,9 @@ export async function applyBestPrice(productId: string, bestProviderId: string, 
         // Update product
         await supabaseAdmin.from('products').update({
             cost_price: bestCost,
+            price_usd: sellingPrice,
             provider_id: bestProviderId,
+            updated_at: new Date().toISOString()
         }).eq('id', productId);
 
         // Update variant prices (assuming 1 variant per product for simplicity in this tool)
@@ -620,8 +739,10 @@ export async function applyAllBestPrices() {
 
             const best = productCosts.reduce((prev: any, curr: any) => (prev.cost_price < curr.cost_price ? prev : curr));
             
-            // Only update if it's different and better (or if current is null)
-            if (p.provider_id !== best.provider_id || p.cost_price !== best.cost_price) {
+            // Sincronizar si el precio es diferente (para reflejar bajas Y alzas del mercado)
+            const hasChanged = p.cost_price === null || Math.abs(best.cost_price - p.cost_price) > 0.01;
+
+            if (hasChanged) {
                 await applyBestPrice(p.id, best.provider_id, best.cost_price);
                 count++;
             }
@@ -630,6 +751,100 @@ export async function applyAllBestPrices() {
         return { success: true, message: `Se actualizaron ${count} productos con el mejor precio.` };
     } catch (err: any) {
         return { success: false, message: err.message };
+    }
+}
+
+/**
+ * Obtiene una PREVISUALIZACIÓN de los cambios de precio sin aplicarlos aún.
+ */
+export async function getRecalculatePreview() {
+    try {
+        const { data: products, error: pErr } = await supabaseAdmin
+            .from('products')
+            .select('id, name, cost_price, price_usd')
+            .eq('active', true)
+            .order('name');
+
+        if (pErr) throw pErr;
+        if (!products) return { success: false, message: "No se encontraron productos." };
+
+        const preview = products
+            .filter(p => p.cost_price !== null)
+            .map(p => {
+                const currentSelling = p.price_usd || 0;
+                const newSelling = calculateFinalPrice(p.cost_price!);
+                return {
+                    id: p.id,
+                    name: p.name,
+                    cost: p.cost_price,
+                    oldPrice: currentSelling,
+                    newPrice: newSelling,
+                    changed: Math.abs(currentSelling - newSelling) > 0.01
+                };
+            });
+
+        return { success: true, preview };
+    } catch (err: any) {
+        console.error("Error getting preview:", err);
+        return { success: false, message: `Error: ${err.message}` };
+    }
+}
+
+/**
+ * RECALCULA MASIVAMENTE todos los precios de venta de la tienda
+ * basado en el cost_price actual de cada producto y la nueva lógica de redondeo.
+ */
+export async function recalculateAllPrices() {
+    try {
+        const { data: products, error: pErr } = await supabaseAdmin
+            .from('products')
+            .select('id, cost_price')
+            .eq('active', true);
+
+        if (pErr) throw pErr;
+        if (!products) return { success: false, message: "No se encontraron productos." };
+
+        let count = 0;
+        const CHUNK_SIZE = 25;
+
+        for (let i = 0; i < products.length; i += CHUNK_SIZE) {
+            const chunk = products.slice(i, i + CHUNK_SIZE);
+            
+            await Promise.all(chunk.map(async (p) => {
+                if (!p.cost_price) return;
+
+                const newSellingPrice = calculateFinalPrice(p.cost_price);
+                
+                // 1. Actualizar producto
+                await supabaseAdmin.from('products').update({
+                    price_usd: newSellingPrice,
+                    updated_at: new Date().toISOString()
+                }).eq('id', p.id);
+
+                // 2. Actualizar variantes/precios
+                const { data: variants } = await supabaseAdmin
+                    .from('product_variants')
+                    .select('id')
+                    .eq('product_id', p.id);
+
+                if (variants) {
+                    for (const v of variants) {
+                        await supabaseAdmin.from('prices').upsert({
+                            variant_id: v.id,
+                            currency: 'USD',
+                            amount: newSellingPrice,
+                            updated_at: new Date().toISOString()
+                        }, { onConflict: 'variant_id,currency' });
+                    }
+                }
+                count++;
+            }));
+        }
+
+        return { success: true, message: `Se recalcularon los precios de venta para ${count} productos exitosamente.` };
+    } catch (err: any) {
+        console.error("Error recalculating prices:", err);
+        return { success: false, message: `Error: ${err.message}` };
     }
 }
 
@@ -655,5 +870,31 @@ export async function triggerEnrichment(): Promise<{ started: boolean; message: 
         return { started: true, message: 'Enriquecimiento iniciado en segundo plano.' };
     } catch (err: any) {
         return { started: false, message: `No se pudo iniciar el enriquecimiento: ${err.message}` };
+    }
+}
+/**
+ * PUBLICA productos masivamente desde provider_costs
+ */
+export async function publishBulkFromProviderCosts(costs: any[], providerId: string | null = null) {
+    try {
+        const itemsToProcess: ParsedItem[] = costs.map(c => ({
+            name: c.product_name || "Producto sin nombre",
+            originalDescription: c.product_name || "",
+            categoryName: c.category_name || "Sin Asignar",
+            cost: c.cost_price,
+            finalPrice: Math.ceil(((c.cost_price / 0.90) + 25) / 5) * 5,
+            status: 'new',
+            providerId: c.provider_id
+        }));
+
+        const res = await processSync(itemsToProcess, providerId);
+        
+        // Link created IDs back to provider_costs if possible
+        // processSync returns createdIds but we don't know which ID belongs to which cost here easily 
+        // without more changes. However, integrateProviderCosts can be called after to re-match.
+        
+        return res;
+    } catch (err: any) {
+        return { success: false, message: err.message };
     }
 }
