@@ -1,20 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, Bell, Zap, Cpu, Sparkles, Loader2, MessageCircle } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import type { WeeklyNews as NewsType } from '@/lib/database.types'
-import { phone } from '@/const/phone'
 
-const iconMap: Record<string, React.ReactNode> = {
-    Zap: <Zap size={32} />,
-    Sparkles: <Sparkles size={32} />,
-    Cpu: <Cpu size={32} />,
-    Bell: <Bell size={32} />,
-}
-
-export default function WeeklyNews() {
+export default function WeeklyNews({ isHero = false }: { isHero?: boolean }) {
     const [news, setNews] = useState<NewsType[]>([])
     const [loading, setLoading] = useState(true)
     const [index, setIndex] = useState(0)
@@ -29,7 +22,12 @@ export default function WeeklyNews() {
                     .select('*')
                     .eq('active', true)
                     .order('sort_order', { ascending: true })
-                if (data && data.length > 0) setNews(data)
+                
+                if (data) {
+                    // Solo mostramos los que tienen imagen
+                    const onlyWithImages = (data as NewsType[]).filter(item => item.image_url)
+                    setNews(onlyWithImages)
+                }
             } catch (error) {
                 console.error("Error fetching news:", error)
             } finally {
@@ -40,11 +38,13 @@ export default function WeeklyNews() {
     }, [])
 
     const nextStep = () => {
+        if (news.length === 0) return
         setDirection(1)
         setIndex((prev) => (prev + 1) % news.length)
     }
 
     const prevStep = () => {
+        if (news.length === 0) return
         setDirection(-1)
         setIndex((prev) => (prev - 1 + news.length) % news.length)
     }
@@ -58,27 +58,31 @@ export default function WeeklyNews() {
             x: direction > 0 ? '100%' : '-100%',
             opacity: 0,
             scale: 0.9,
+            z: -100,
             filter: 'blur(10px)'
         }),
         center: {
             x: 0,
             opacity: 1,
             scale: 1,
+            z: 0,
             filter: 'blur(0px)',
             transition: {
-                x: { type: 'spring' as any, stiffness: 300, damping: 30 },
-                opacity: { duration: 0.4 },
-                scale: { duration: 0.4 },
-                filter: { duration: 0.4 }
+                x: { type: 'spring' as any, stiffness: 260, damping: 26 },
+                opacity: { duration: 0.5 },
+                scale: { duration: 0.5 },
+                z: { duration: 0.5 },
+                filter: { duration: 0.5 }
             }
         },
         exit: (direction: number) => ({
             x: direction < 0 ? '100%' : '-100%',
             opacity: 0,
             scale: 0.9,
+            z: -100,
             filter: 'blur(10px)',
             transition: {
-                x: { type: 'spring' as any, stiffness: 300, damping: 30 },
+                x: { type: 'spring' as any, stiffness: 260, damping: 26 },
                 opacity: { duration: 0.4 }
             }
         })
@@ -86,84 +90,36 @@ export default function WeeklyNews() {
 
     return (
         <section style={{ 
-            paddingTop: '0px', 
-            paddingBottom: '100px', 
+            paddingTop: isHero ? '0px' : '0px', 
+            paddingBottom: isHero ? '0px' : '80px', 
             overflow: 'hidden', 
             position: 'relative',
-            background: 'var(--bg-primary)'
+            background: isHero ? 'transparent' : 'var(--bg-primary)'
         }}>
-            {/* Background Glow */}
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={currentItem?.id}
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 0.15, scale: 1 }}
-                    exit={{ opacity: 0, scale: 1.2 }}
-                    transition={{ duration: 1 }}
-                    style={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        x: '-50%',
-                        y: '-50%',
-                        width: '800px',
-                        height: '800px',
-                        background: (currentItem?.color || '#34c759') as string,
-                        filter: 'blur(160px)',
-                        borderRadius: '100%',
-                        zIndex: 0,
-                        pointerEvents: 'none'
-                    }}
-                />
-            </AnimatePresence>
-
             <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 20, textAlign: 'center' }}>
-                    <div style={{ textAlign: 'center' }}>
-                        <motion.div 
-                            initial={{ opacity: 0, y: -20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            style={{ 
-                                display: 'inline-flex', 
-                                alignItems: 'center', 
-                                gap: 10, 
-                                background: 'rgba(52, 199, 89, 0.1)', 
-                                padding: '8px 20px', 
-                                borderRadius: 100, 
-                                color: 'var(--green)',
-                                fontSize: '0.8rem',
-                                fontWeight: 800,
-                                letterSpacing: '0.15em',
-                                textTransform: 'uppercase',
-                                marginBottom: 24,
-                                border: '1px solid rgba(52, 199, 89, 0.2)'
-                            }}
-                        >
-                            <Sparkles size={16} /> Oportunidades Directas
-                        </motion.div>
+                {!isHero && (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 32, textAlign: 'center' }}>
                         <h2 style={{ 
                             fontSize: 'clamp(2rem, 5vw, 3.5rem)', 
                             fontWeight: 950, 
                             letterSpacing: '0.02em', 
                             lineHeight: 1.1,
-                            wordSpacing: '0.15em'
                         }}>
-                            Novedades & Ofertas del mes de <span style={{ color: 'var(--green)', position: 'relative' }}>{new Date().toLocaleString('es-AR', { month: 'long' }).toUpperCase()}</span>
+                            Novedades & Ofertas <span style={{ color: 'var(--green)' }}>{new Date().toLocaleString('es-AR', { month: 'long' }).toUpperCase()}</span>
                         </h2>
                     </div>
-                </div>
+                )}
 
                 {loading ? (
-                    <div style={{ height: 500, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Loader2 className="animate-spin" size={48} color="var(--green)" />
                     </div>
                 ) : (
                     <div style={{ position: 'relative', maxWidth: '1400px', margin: '0 auto' }}>
-                        <div style={{ position: 'relative', height: 'auto', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0px 0' }}>
+                        <div style={{ position: 'relative', height: 'auto', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', perspective: '2000px' }}>
                             <AnimatePresence initial={false} custom={direction} mode="popLayout">
                                 <motion.div
-                                    key={index}
+                                    key={currentItem?.id}
                                     custom={direction}
                                     variants={variants}
                                     initial="enter"
@@ -182,201 +138,117 @@ export default function WeeklyNews() {
                                     style={{
                                         position: 'relative',
                                         width: '100%',
-                                        maxWidth: '900px',
+                                        maxWidth: isHero ? '100%' : '1100px',
                                         cursor: 'grab'
                                     }}
                                 >
                                     <div style={{
                                         width: '100%',
                                         background: 'var(--bg-card)',
-                                        borderRadius: 32,
-                                        border: '1px solid var(--border-light)',
+                                        borderRadius: 24,
+                                        border: '1px solid var(--border)',
                                         overflow: 'hidden',
-                                        boxShadow: '0 50px 100px -20px rgba(0,0,0,0.7)',
-                                        position: 'relative',
-                                        display: 'flex',
-                                        flexDirection: 'column'
+                                        boxShadow: '0 40px 80px -20px rgba(0,0,0,0.6)',
+                                        position: 'relative'
                                     }}>
-                                        {currentItem.image_url ? (
-                                            <div style={{ width: '100%', position: 'relative', background: '#000', borderRadius: 32, overflow: 'hidden' }}>
+                                        <div style={{ width: '100%', position: 'relative', background: '#000', overflow: 'hidden', cursor: (currentItem as any).link_url ? 'pointer' : 'grab' }}>
+                                            {(currentItem as any).link_url ? (
+                                                <Link href={(currentItem as any).link_url}>
+                                                    <motion.div 
+                                                        whileHover={{ opacity: 0.95, scale: 1.01 }}
+                                                        transition={{ duration: 0.2 }}
+                                                    >
+                                                        <img 
+                                                            src={currentItem.image_url!} 
+                                                            alt={currentItem.title || ''} 
+                                                            style={{ width: '100%', height: 'auto', display: 'block', objectFit: 'cover' }} 
+                                                        />
+                                                    </motion.div>
+                                                </Link>
+                                            ) : (
                                                 <img 
-                                                    src={currentItem.image_url} 
+                                                    src={currentItem.image_url!} 
                                                     alt={currentItem.title || ''} 
-                                                    style={{ width: '100%', height: 'auto', maxHeight: '75vh', display: 'block', objectFit: 'cover' }} 
+                                                    style={{ width: '100%', height: 'auto', display: 'block', objectFit: 'cover' }} 
                                                 />
-                                            </div>
-                                        ) : (
-                                            <div style={{ 
-                                                width: '100%', 
-                                                aspectRatio: '4/5',
-                                                display: 'flex', 
-                                                flexDirection: 'column', 
-                                                alignItems: 'center', 
-                                                justifyContent: 'center',
-                                                padding: 60,
-                                                textAlign: 'center',
-                                                background: `linear-gradient(135deg, var(--bg-card) 0%, ${currentItem.color || 'var(--green)'}10 100%)`
-                                            }}>
-                                                <motion.div 
-                                                    animate={{ 
-                                                        y: [0, -10, 0],
-                                                        rotate: [0, 5, -5, 0]
-                                                    }}
-                                                    transition={{ repeat: Infinity, duration: 4 }}
-                                                    style={{ 
-                                                        width: 100, 
-                                                        height: 100, 
-                                                        borderRadius: 30, 
-                                                        background: `${currentItem.color || '#34c759'}20`, 
-                                                        color: currentItem.color || 'var(--green)',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        marginBottom: 40,
-                                                        boxShadow: `0 20px 40px ${currentItem.color || 'var(--green)'}20`
-                                                    }}>
-                                                    {iconMap[currentItem.icon_name || 'Bell'] || <Bell size={32} />}
-                                                </motion.div>
-                                                <h3 style={{ fontSize: '2.5rem', fontWeight: 950, marginBottom: 20, letterSpacing: '-0.03em' }}>{currentItem.title}</h3>
-                                                <p style={{ color: 'var(--text-secondary)', lineHeight: 1.8, fontSize: '1.1rem' }}>{currentItem.description}</p>
-                                            </div>
-                                        )}
-
-                                        {/* Footer Content */}
-                                        {!(currentItem.title === 'Novedad con imagen' && !currentItem.description) && (
-                                            <div style={{ 
-                                                padding: '24px 32px 32px',
-                                                background: 'var(--bg-card)',
-                                                borderTop: '1px solid var(--border)',
-                                                zIndex: 2
-                                            }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, gap: 16 }}>
-                                                    <div style={{ flex: 1 }}>
-                                                        <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'white' }}>{currentItem.title}</h2>
-                                                        {currentItem.description && (
-                                                            <p style={{ 
-                                                                fontSize: '0.85rem', 
-                                                                color: 'var(--text-secondary)', 
-                                                                display: '-webkit-box', 
-                                                                WebkitLineClamp: 1, 
-                                                                WebkitBoxOrient: 'vertical', 
-                                                                overflow: 'hidden' 
-                                                            }}>
-                                                                {currentItem.description}
-                                                            </p>
-                                                        )}
-                                                    </div>
-                                                    {currentItem.tag && (
-                                                        <span style={{ 
-                                                            padding: '4px 12px', 
-                                                            borderRadius: 8, 
-                                                            background: currentItem.color || 'var(--green)', 
-                                                            color: 'white', 
-                                                            fontSize: '0.65rem', 
-                                                            fontWeight: 900,
-                                                            textTransform: 'uppercase'
-                                                        }}>
-                                                            {currentItem.tag}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                
-                                                <motion.a
-                                                    whileHover={{ scale: 1.02 }}
-                                                    whileTap={{ scale: 0.98 }}
-                                                    href={`https://wa.me/${phone}?text=${encodeURIComponent(`Hola! Vi el producto "${currentItem.title}" en la web y quería consultarles.`)}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="btn btn-primary"
-                                                    style={{ 
-                                                        width: '100%', 
-                                                        justifyContent: 'center', 
-                                                        background: '#25D366', 
-                                                        borderColor: '#25D366',
-                                                        height: 56,
-                                                        fontSize: '1rem',
-                                                        boxShadow: '0 20px 40px rgba(37, 211, 102, 0.2)',
-                                                        borderRadius: 16
-                                                    }}
-                                                >
-                                                    <MessageCircle size={20} /> ¡Lo quiero ya!
-                                                </motion.a>
-                                            </div>
-                                        )}
+                                            )}
+                                        </div>
                                     </div>
                                 </motion.div>
                             </AnimatePresence>
                         </div>
 
                         {/* Bottom Navigation */}
-                        <div style={{ 
-                            display: 'flex', 
-                            justifyContent: 'center', 
-                            alignItems: 'center',
-                            gap: 24, 
-                            marginTop: 40 
-                        }}>
-                            <button 
-                                onClick={prevStep}
-                                className="carousel-nav-btn" 
-                                style={{ 
-                                    width: 48, 
-                                    height: 48, 
-                                    background: 'var(--bg-secondary)', 
-                                    borderRadius: '50%',
-                                    border: '1px solid var(--border)',
-                                    color: 'white',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.3s ease'
-                                }}
-                            >
-                                <ChevronLeft size={20} />
-                            </button>
+                        {news.length > 1 && (
+                            <div style={{ 
+                                display: 'flex', 
+                                justifyContent: 'center', 
+                                alignItems: 'center',
+                                gap: 24, 
+                                marginTop: 40 
+                            }}>
+                                <button 
+                                    onClick={prevStep}
+                                    className="carousel-nav-btn" 
+                                    style={{ 
+                                        width: 44, 
+                                        height: 44, 
+                                        background: 'var(--bg-card)', 
+                                        borderRadius: '50%',
+                                        border: '1px solid var(--border)',
+                                        color: 'white',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.3s ease'
+                                    }}
+                                >
+                                    <ChevronLeft size={20} />
+                                </button>
 
-                            <div style={{ display: 'flex', gap: 10 }}>
-                                {news.map((_, i) => (
-                                    <button
-                                        key={i}
-                                        onClick={() => {
-                                            setDirection(i > index ? 1 : -1)
-                                            setIndex(i)
-                                        }}
-                                        style={{
-                                            width: i === index ? 32 : 8,
-                                            height: 8,
-                                            borderRadius: 10,
-                                            background: i === index ? 'var(--green)' : 'rgba(255,255,255,0.1)',
-                                            border: 'none',
-                                            transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
-                                            cursor: 'pointer'
-                                        }}
-                                    />
-                                ))}
+                                <div style={{ display: 'flex', gap: 10 }}>
+                                    {news.map((_, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => {
+                                                setDirection(i > index ? 1 : -1)
+                                                setIndex(i)
+                                            }}
+                                            style={{
+                                                width: i === index ? 32 : 8,
+                                                height: 8,
+                                                borderRadius: 10,
+                                                background: i === index ? 'var(--green)' : 'rgba(255,255,255,0.1)',
+                                                border: 'none',
+                                                transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+                                                cursor: 'pointer'
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+
+                                <button 
+                                    onClick={nextStep}
+                                    className="carousel-nav-btn" 
+                                    style={{ 
+                                        width: 44, 
+                                        height: 44, 
+                                        background: 'var(--bg-card)', 
+                                        borderRadius: '50%',
+                                        border: '1px solid var(--border)',
+                                        color: 'white',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.3s ease'
+                                    }}
+                                >
+                                    <ChevronRight size={20} />
+                                </button>
                             </div>
-
-                            <button 
-                                onClick={nextStep}
-                                className="carousel-nav-btn" 
-                                style={{ 
-                                    width: 48, 
-                                    height: 48, 
-                                    background: 'var(--bg-secondary)', 
-                                    borderRadius: '50%',
-                                    border: '1px solid var(--border)',
-                                    color: 'white',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.3s ease'
-                                }}
-                            >
-                                <ChevronRight size={20} />
-                            </button>
-                        </div>
+                        )}
                     </div>
                 )}
             </div>

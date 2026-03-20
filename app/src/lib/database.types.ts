@@ -224,6 +224,7 @@ export interface WeeklyNews {
     storage_path: string | null
     color: string | null
     tag: string | null
+    link_url: string | null
     active: boolean
     sort_order: number
     created_at: string

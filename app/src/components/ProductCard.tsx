@@ -102,15 +102,17 @@ export default function ProductCard({ product }: ProductCardProps) {
                 )}
 
                 <div style={{ marginTop: 'auto', paddingTop: 8 }}>
-                    {priceUSD !== null ? (
+                    {priceARS !== null ? (
                         <>
-                            <p className="product-price-usd">{formatUSD(priceUSD)}</p>
-                            {priceARS !== null && (
-                                <p className="product-price-ars">{formatARS(priceARS)}</p>
+                            <p className="product-price-usd" style={{ fontSize: '1.25rem' }}>{formatARS(priceARS)}</p>
+                            {priceUSD !== null && (
+                                <p className="product-price-ars" style={{ fontSize: '0.85rem', marginTop: 4 }}>{formatUSD(priceUSD)} USD</p>
                             )}
                         </>
+                    ) : priceUSD !== null ? (
+                        <p className="product-price-usd" style={{ fontSize: '1.25rem' }}>{formatUSD(priceUSD)} USD</p>
                     ) : (
-                        <p className="product-price-usd" style={{ color: 'var(--text-muted)' }}>
+                        <p className="product-price-usd" style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>
                             Consultar precio
                         </p>
                     )}

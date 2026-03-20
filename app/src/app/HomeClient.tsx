@@ -282,35 +282,54 @@ export default function HomeClient({ products, slides, brandLogos }: HomeClientP
             {/* <HeroCarousel slides={slides} products={products} /> */}
 
             {/* ─── HERO TEXT ──────────────────────────────────── */}
-            <section className="hero" style={{ minHeight: 'auto', padding: '0px 0', paddingTop: '180px', paddingBottom: '40px' }}>
-                <div className="container hero-content">
-                    <div className="hero-eyebrow">
-                        <Zap size={13} />
-                        <span>Toda la Tecnología que buscas en un solo lugar</span>
+            <section className="hero" style={{ 
+                minHeight: '80vh', 
+                padding: '120px 0 60px', 
+                background: 'var(--bg-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                overflow: 'hidden'
+            }}>
+                <div className="container" style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
+                    gap: 60, 
+                    alignItems: 'center' 
+                }}>
+                    {/* Left Column: Hero Text */}
+                    <div className="hero-content" style={{ textAlign: 'left', padding: 0 }}>
+                        <div className="hero-eyebrow" style={{ justifyContent: 'flex-start' }}>
+                            <Zap size={13} />
+                            <span>Toda la Tecnología que buscas</span>
+                        </div>
+
+                        <h1 className="hero-title" style={{ fontSize: 'clamp(2.5rem, 4vw, 4.5rem)' }}>
+                            <span>{dict.hero.titulo}</span>
+                            <br />
+                            {dict.hero.subtitulo}
+                        </h1>
+
+                        <p className="hero-desc" style={{ fontSize: '1.2rem', maxWidth: '100%', marginBottom: 40 }}>
+                            {dict.hero.descripcion}
+                        </p>
+
+                        <div className="hero-actions" style={{ justifyContent: 'flex-start' }}>
+                            <Link href="/productos" className="btn btn-primary">
+                                {dict.hero.cta}
+                                <ChevronRight size={16} />
+                            </Link>
+                            <Link href="/categorias" className="btn btn-secondary">
+                                {dict.hero.ctaSecundario}
+                            </Link>
+                        </div>
                     </div>
 
-                    <h1 className="hero-title">
-                        <span>{dict.hero.titulo}</span>
-                        <br />
-                        {dict.hero.subtitulo}
-                    </h1>
-
-                    <p className="hero-desc">{dict.hero.descripcion}</p>
-
-                    <div className="hero-actions">
-                        <Link href="/productos" className="btn btn-primary">
-                            {dict.hero.cta}
-                            <ChevronRight size={16} />
-                        </Link>
-                        <Link href="/categorias" className="btn btn-secondary">
-                            {dict.hero.ctaSecundario}
-                        </Link>
+                    {/* Right Column: WeeklyNews Component */}
+                    <div style={{ width: '100%', position: 'relative' }}>
+                        <WeeklyNews isHero />
                     </div>
                 </div>
             </section>
-
-            {/* ─── NOVEDADES SEMANALES ───────────────────── */}
-            <WeeklyNews />
 
             {/* ─── PRODUCTOS MÁS VENDIDOS ──────────────────── */}
             <ProductRow

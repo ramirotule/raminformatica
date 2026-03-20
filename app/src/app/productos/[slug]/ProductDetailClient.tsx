@@ -157,30 +157,34 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 )}
 
                 <div className="detail-price-box">
-                    {priceUSD !== null ? (
+                    {priceARS !== null ? (
                         <>
-                            <div className="detail-price-usd">{formatUSD(priceUSD)}</div>
-                            {priceARS !== null && (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                                    <div className="detail-price-ars">{formatARS(priceARS)}</div>
-                                    <span style={{
-                                        fontSize: '0.75rem',
-                                        fontWeight: 700,
-                                        color: 'var(--accent)',
-                                        background: 'rgba(var(--accent-rgb, 34,197,94), 0.1)',
-                                        border: '1px solid rgba(var(--accent-rgb, 34,197,94), 0.25)',
-                                        borderRadius: 99,
-                                        padding: '4px 10px',
-                                        whiteSpace: 'nowrap',
-                                        lineHeight: 1,
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                    }}>
-                                        Precio contado efectivo
-                                    </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 4 }}>
+                                <div className="detail-price-usd">{formatARS(priceARS)}</div>
+                                <span style={{
+                                    fontSize: '0.75rem',
+                                    fontWeight: 700,
+                                    color: 'var(--accent)',
+                                    background: 'rgba(var(--accent-rgb, 34,197,94), 0.1)',
+                                    border: '1px solid rgba(var(--accent-rgb, 34,197,94), 0.25)',
+                                    borderRadius: 99,
+                                    padding: '5px 12px',
+                                    whiteSpace: 'nowrap',
+                                    lineHeight: 1,
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                }}>
+                                    Precio contado efectivo
+                                </span>
+                            </div>
+                            {priceUSD !== null && (
+                                <div className="detail-price-ars" style={{ fontSize: '1.15rem', marginTop: 0 }}>
+                                    {formatUSD(priceUSD)} USD
                                 </div>
                             )}
                         </>
+                    ) : priceUSD !== null ? (
+                        <div className="detail-price-usd">{formatUSD(priceUSD)} USD</div>
                     ) : (
                         <div className="detail-price-usd">Consultar precio</div>
                     )}
@@ -305,7 +309,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     <p className="price-notice">* Precio sujeto a cambios sin previo aviso</p>
                 </div>
 
-                {product.long_description && (
+                {product.short_description && (
                     <button
                         onClick={() => setSpecsOpen(true)}
                         style={{
@@ -410,12 +414,12 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     whiteSpace: 'pre-wrap', // Esto respeta los saltos de línea
                     maxWidth: '900px' // Opcional: para que no sea excesivamente ancho en pantallas gigantes
                 }}>
-                    {product.short_description || 'Sin descripción disponible.'}
+                    {product.long_description || 'Sin descripción disponible.'}
                 </div>
             </div>
 
             {/* Specs Modal */}
-            {specsOpen && product.long_description && (
+            {specsOpen && product.short_description && (
                 <div
                     onClick={() => setSpecsOpen(false)}
                     style={{
@@ -484,7 +488,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                             paddingTop: 16,
                             marginBottom: 24
                         }}>
-                            {product.long_description}
+                            {product.short_description}
                         </div>
                         {/* Botón ir a descripción */}
                         <button

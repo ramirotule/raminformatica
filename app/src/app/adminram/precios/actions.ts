@@ -904,16 +904,18 @@ export async function publishBulkFromProviderCosts(costs: any[], providerId: str
 /**
  * ENRIQUECE productos seleccionados con IA (imágenes y descripción)
  */
-export async function bulkEnrichProducts(ids: string[]) {
+export async function bulkEnrichProducts(ids: string[], mode: 'all' | 'descriptions' | 'images' = 'all') {
     if (!ids || ids.length === 0) return { success: false, message: "No se seleccionaron productos." };
 
     try {
+        const { enrichSingleProduct } = await import('@/lib/enrichment');
+        
         let successCount = 0;
         let errorCount = 0;
 
         // Procesamos uno a uno para evitar saturar las APIs (especialmente Gemini 429)
         for (const id of ids) {
-            const res = await enrichSingleProduct(id);
+            const res = await enrichSingleProduct(id, { mode, force: true });
             if (res.success) successCount++;
             else errorCount++;
         }

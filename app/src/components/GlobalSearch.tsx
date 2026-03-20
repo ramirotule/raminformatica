@@ -7,11 +7,13 @@ import { useRouter, usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import type { ProductWithDetails } from '@/lib/database.types'
 import { dict } from '@/lib/dict'
-import { getPriceUSD, formatUSD } from '@/lib/utils'
+import { getPriceUSD, formatUSD, getPriceARS, formatARS } from '@/lib/utils'
 import { trackSearch } from '@/lib/analytics'
+import { useDolar } from '@/context/DolarContext'
 
 export default function GlobalSearch() {
     const { searchQuery, setSearchQuery } = useSearch()
+    const { dolar } = useDolar()
     const [results, setResults] = useState<ProductWithDetails[]>([])
     const [loading, setLoading] = useState(false)
     const [showDropdown, setShowDropdown] = useState(false)
@@ -50,20 +52,38 @@ export default function GlobalSearch() {
                     .from('products')
                     .select('*, brands(*), categories(*), product_images(*), product_variants(*, prices(*))')
                     .eq('active', true)
-                    .limit(8)
+                    // .limit(8) // Initial limit removed as it's applied later
 
                 // Aplicamos un .or() por cada término para que todos deban estar presentes en algún campo
                 terms.forEach(term => {
-                    queryBuilder = queryBuilder.or(`name.ilike.%${term}%,short_description.ilike.%${term}%,long_description.ilike.%${term}%,tags_index.ilike.%${term}%`)
+                    queryBuilder = queryBuilder.or(`name.ilike.%${term}%,short_description.ilike.%${term}%,long_description.ilike.%${term}%`)
                 })
 
-                const { data, error } = await queryBuilder
+                const { data, error } = await queryBuilder.limit(50)
+                if (error) throw error
 
-                if (data) {
-                    const sorted = (data as any).sort((a: any, b: any) => a.name.localeCompare(b.name, 'es'))
-                    setResults(sorted)
-                }
-                if (error) console.error('Search error details:', error)
+                // Scoring Local para relevancia
+                const scored = (data as ProductWithDetails[]).map(p => {
+                    let score = 0
+                    const name = p.name.toLowerCase()
+                    const brand = (p as any).brands?.name?.toLowerCase() || ''
+                    const shortDesc = (p.short_description || '').toLowerCase()
+                    const longDesc = (p.long_description || '').toLowerCase()
+                    const tags = (p as any).tags_index?.toLowerCase() || '' // Assuming tags_index is still available in the data
+
+                    terms.forEach(term => {
+                        if (name.includes(term)) score += 50
+                        if (brand.includes(term)) score += 30
+                        if (tags.includes(term)) score += 15 // Added tags scoring
+                        if (shortDesc.includes(term)) score += 5
+                        if (longDesc.includes(term)) score += 1
+                    })
+                    return { product: p, score }
+                })
+
+                // Ordenar por score y tomar los 8 mejores
+                scored.sort((a, b) => b.score - a.score)
+                setResults(scored.slice(0, 8).map(s => s.product))
             } catch (err) {
                 console.error('Fatal search error:', err)
             } finally {
@@ -144,10 +164,15 @@ export default function GlobalSearch() {
                                             <p className="item-name" style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: 2 }}>{product.name}</p>
                                             <p className="item-cat" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{product.categories?.name}</p>
                                         </div>
-                                        <div style={{ textAlign: 'right' }}>
-                                            <p style={{ fontWeight: 700, color: 'var(--accent)', fontSize: '0.9rem' }}>
-                                                {priceUSD ? formatUSD(priceUSD) : '—'}
+                                        <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                                            <p style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.95rem', lineHeight: 1.1 }}>
+                                                {priceUSD && dolar ? formatARS(getPriceARS(priceUSD, dolar.venta)) : priceUSD ? `${formatUSD(priceUSD)} USD` : '—'}
                                             </p>
+                                            {priceUSD && dolar && (
+                                                <p style={{ fontWeight: 600, color: 'var(--accent)', fontSize: '0.75rem', marginTop: 1 }}>
+                                                    {formatUSD(priceUSD)} USD
+                                                </p>
+                                            )}
                                         </div>
                                     </button>
                                 )

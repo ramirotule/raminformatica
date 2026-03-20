@@ -56,35 +56,72 @@ export default function ProductosClient({ products, categories, brands }: Produc
 
         if (search.trim()) {
             const terms = search.toLowerCase().trim().split(/\s+/).filter(t => t !== '')
-            list = list.filter(p => {
-                const searchableText = [
-                    p.name.toLowerCase(),
-                    (p.brands?.name || '').toLowerCase(),
-                    (p.categories?.name || '').toLowerCase(),
-                    (p.short_description || '').toLowerCase(),
-                    (p.long_description || '').toLowerCase(),
-                    ...(p.tags || []).map(t => t.toLowerCase()),
-                    p.product_variants?.[0]?.storage?.toLowerCase() || '',
-                    p.product_variants?.[0]?.color?.toLowerCase() || '',
-                    p.product_variants?.[0]?.connectivity?.toLowerCase() || ''
-                ].join(' ')
-                return terms.every(term => {
-                    // Si el término es puramente numérico (ej: "8"), queremos evitar que coincida con "128"
+            
+            // Calculamos score y filtramos
+            const listWithScores = list.map(p => {
+                let score = 0
+                const name = p.name.toLowerCase()
+                const brand = (p.brands?.name || '').toLowerCase()
+                const catName = (p.categories?.name || '').toLowerCase()
+                const shortDesc = (p.short_description || '').toLowerCase()
+                const longDesc = (p.long_description || '').toLowerCase()
+                const tagsRaw = (p.tags || []).join(' ').toLowerCase()
+                const variantSpecs = [
+                    p.product_variants?.[0]?.storage,
+                    p.product_variants?.[0]?.color,
+                    p.product_variants?.[0]?.connectivity
+                ].filter(Boolean).join(' ').toLowerCase()
+
+                const allText = [name, brand, catName, shortDesc, longDesc, tagsRaw, variantSpecs].join(' ')
+
+                // Todos los términos deben estar presentes
+                const allTermsPresent = terms.every(term => {
                     if (/^\d+$/.test(term)) {
                         const regex = new RegExp(`(^|[^0-9])${term}([^0-9]|$)`, 'i')
-                        return regex.test(searchableText)
+                        return regex.test(allText)
                     }
-                    return searchableText.includes(term)
+                    return allText.includes(term)
                 })
-            })
+
+                if (!allTermsPresent) return { product: p, score: -1 }
+
+                // Calcular peso
+                terms.forEach(term => {
+                    const isNum = /^\d+$/.test(term)
+                    const check = (text: string, weight: number) => {
+                         if (isNum) {
+                             const regex = new RegExp(`(^|[^0-9])${term}([^0-9]|$)`, 'i')
+                             if (regex.test(text)) score += weight
+                         } else if (text.includes(term)) {
+                             score += weight
+                         }
+                    }
+
+                    check(name, 50)        // El nombre es lo más importante
+                    check(brand, 30)       // La marca es muy importante
+                    check(catName, 20)     // La categoría
+                    check(tagsRaw, 15)     // Los tags
+                    check(variantSpecs, 10) // Specs de variante
+                    check(shortDesc, 5)    // Descripciones valen menos
+                    check(longDesc, 1)     // Descripciones técnicas valen menos
+                })
+
+                return { product: p, score }
+            }).filter(item => item.score >= 0)
+
+            // Ordenar por score descendente primariamente
+            listWithScores.sort((a, b) => b.score - a.score)
+            list = listWithScores.map(item => item.product)
         }
 
         if (selectedCategory) {
-            list = list.filter((p) => p.categories?.slug === selectedCategory)
+            const catList = selectedCategory.split(',')
+            list = list.filter((p) => p.categories?.slug && catList.includes(p.categories.slug))
         }
 
         if (selectedBrand) {
-            list = list.filter((p) => p.brands?.slug === selectedBrand)
+            const brandList = selectedBrand.split(',')
+            list = list.filter((p) => p.brands?.slug && brandList.includes(p.brands.slug))
         }
 
         if (selectedCondition) {

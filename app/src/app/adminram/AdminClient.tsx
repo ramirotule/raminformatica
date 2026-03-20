@@ -47,7 +47,7 @@ import AdminPrecios from './AdminPrecios'
 import AdminComparator from './AdminComparator'
 import { bulkEnrichProducts } from './precios/actions'
 
-type AdminSection = 'dashboard' | 'productos' | 'categorias' | 'marcas' | 'proveedores' | 'home' | 'precios' | 'novedades' | 'comparador'
+type AdminSection = 'dashboard' | 'productos' | 'categorias' | 'marcas' | 'proveedores' | 'home' | 'precios' | 'comparador'
 
 async function getFileHash(file: File): Promise<string> {
     const arrayBuffer = await file.arrayBuffer()
@@ -67,7 +67,6 @@ function Sidebar({ active, onChange }: { active: AdminSection; onChange: (s: Adm
         { id: 'proveedores', label: 'Proveedores', icon: <Warehouse size={16} /> },
         { id: 'precios', label: 'Actualizar Precios', icon: <RefreshCw size={16} /> },
         { id: 'comparador', label: 'Comparador', icon: <TrendingUp size={16} /> },
-        { id: 'novedades', label: 'Novedades', icon: <Bell size={16} /> },
     ]
     return (
         <aside className="admin-sidebar">
@@ -910,11 +909,11 @@ function AdminProductos() {
         }
     }
 
-    async function handleBulkEnrichment() {
+    async function handleBulkEnrichment(mode: 'all' | 'descriptions' | 'images' = 'all') {
         if (!selectedIds.size) return
         setIsSaving(true)
         try {
-            const res = await bulkEnrichProducts(Array.from(selectedIds))
+            const res = await bulkEnrichProducts(Array.from(selectedIds), mode)
             if (res.success) {
                 showAlert('success', res.message)
                 setSelectedIds(new Set())
@@ -1367,9 +1366,13 @@ function AdminProductos() {
                             <Wand2 size={14} style={{ marginRight: 4 }} />
                             Renombrar / Limpiar
                         </button>
-                        <button className="btn btn-sm btn-ghost" style={{ background: 'rgba(255,159,10,0.1)', border: '1px solid var(--orange)', color: 'var(--orange)' }} onClick={handleBulkEnrichment} disabled={isSaving}>
+                        <button className="btn btn-sm btn-ghost" style={{ background: 'rgba(255,159,10,0.1)', border: '1px solid var(--orange)', color: 'var(--orange)' }} onClick={() => handleBulkEnrichment('descriptions')} disabled={isSaving}>
                             {isSaving ? <Loader2 size={14} className="animate-spin" style={{ marginRight: 4 }} /> : <Sparkles size={14} style={{ marginRight: 4 }} />}
-                            Buscar Imágenes y Descripción
+                            Generar Descripción (IA)
+                        </button>
+                        <button className="btn btn-sm btn-ghost" style={{ background: 'rgba(52,199,89,0.1)', border: '1px solid var(--accent)', color: 'var(--accent)' }} onClick={() => handleBulkEnrichment('images')} disabled={isSaving}>
+                            {isSaving ? <Loader2 size={14} className="animate-spin" style={{ marginRight: 4 }} /> : <Image size={14} style={{ marginRight: 4 }} />}
+                            Buscar Imágenes (Web)
                         </button>
                         <button className="btn btn-danger btn-sm" onClick={bulkDelete}>Eliminar</button>
                     </div>
@@ -2053,7 +2056,7 @@ function AdminProductos() {
                                 }}
                             />
                             <label htmlFor="bulk-all-files" className="btn btn-primary btn-sm" style={{ cursor: 'pointer' }}>
-                                <Upload size={14} style={{ marginRight: 6 }} />
+                                <Upload size={14} style={{ marginRight: 4 }} />
                                 Cargar en todos ({selectedIds.size})
                             </label>
                         </div>
@@ -3095,7 +3098,7 @@ function AdminInventario() {
                                             ) : (
                                                 <span style={{ fontWeight: 700, fontSize: '1rem', color: inv.qty_available === 0 ? 'var(--red)' : isLow ? 'var(--yellow)' : 'var(--green)' }}>
                                                     {inv.qty_available}
-                                                </span>
+                                                 </span>
                                             )}
                                         </td>
                                         <td style={{ color: 'var(--text-secondary)' }}>{inv.qty_reserved}</td>
@@ -3127,27 +3130,37 @@ function AdminInventario() {
     )
 }
 
-// ─── Admin Home (Carousel + Brand Logos) ──────────────────────────────────────
+// ─── Admin Home (Brand Logos + Novedades) ──────────────────────────────────────
 function AdminHome() {
-    const [tab, setTab] = useState<'slides' | 'brands'>('slides')
-    const [slides, setSlides] = useState<HomeSlide[]>([])
+    const [tab, setTab] = useState<'news' | 'brands'>('news')
     const [logos, setLogos] = useState<BrandLogo[]>([])
     const [products, setProducts] = useState<ProductWithDetails[]>([])
+    const [newsItems, setNewsItems] = useState<WeeklyNews[]>([])
     const [loading, setLoading] = useState(true)
     const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
     const [modalOpen, setModalOpen] = useState(false)
     const [editItem, setEditItem] = useState<any>(null)
     const [isSaving, setIsSaving] = useState(false)
 
-    // Slide form
-    const [slideForm, setSlideForm] = useState({ title: '', subtitle: '', product_id: '', link_url: '', sort_order: '0', active: true })
-    const [slideFile, setSlideFile] = useState<File | null>(null)
-    const [slidePreview, setSlidePreview] = useState<string>('')
-
     // Logo form
     const [logoForm, setLogoForm] = useState({ name: '', sort_order: '0', active: true })
     const [logoFile, setLogoFile] = useState<File | null>(null)
     const [logoPreview, setLogoPreview] = useState<string>('')
+
+    // News form
+    const [newsForm, setNewsForm] = useState({
+        title: '',
+        description: '',
+        image_url: '',
+        storage_path: '',
+        link_url: '',
+        active: true,
+        sort_order: 0
+    })
+    const [newsFile, setNewsFile] = useState<File | null>(null)
+    const [newsPreview, setNewsPreview] = useState<string | null>(null)
+    const iconsList = ['Bell', 'Zap', 'Cpu', 'Sparkles']
+    const colorsList = ['#34C759', '#5856D6', '#007AFF', '#FF9500', '#FF3B30']
 
     const showAlert = (type: 'success' | 'error', message: string) => {
         setAlert({ type, message })
@@ -3156,101 +3169,18 @@ function AdminHome() {
 
     async function loadAll() {
         setLoading(true)
-        const [sRes, lRes, pRes] = await Promise.all([
-            (supabase as any).from('home_slides').select('*, products(id, name, slug)').order('sort_order'),
+        const [lRes, pRes, nRes] = await Promise.all([
             (supabase as any).from('brand_logos').select('*').order('sort_order'),
             (supabase as any).from('products').select('id, name, slug').eq('active', true).order('name'),
+            supabase.from('weekly_news').select('*').order('sort_order', { ascending: true })
         ])
-        setSlides((sRes.data as unknown as HomeSlide[]) ?? [])
         setLogos((lRes.data as BrandLogo[]) ?? [])
         setProducts((pRes.data as unknown as ProductWithDetails[]) ?? [])
+        setNewsItems((nRes.data as WeeklyNews[]) ?? [])
         setLoading(false)
     }
 
     useEffect(() => { loadAll() }, [])
-
-    // ── Slide CRUD ──
-    function openNewSlide() {
-        setEditItem(null)
-        setSlideForm({ title: '', subtitle: '', product_id: '', link_url: '', sort_order: String(slides.length), active: true })
-        setSlideFile(null)
-        setSlidePreview('')
-        setModalOpen(true)
-    }
-
-    function openEditSlide(s: HomeSlide) {
-        setEditItem(s)
-        setSlideForm({
-            title: s.title || '', subtitle: s.subtitle || '',
-            product_id: s.product_id || '', link_url: s.link_url || '',
-            sort_order: String(s.sort_order), active: s.active,
-        })
-        setSlideFile(null)
-        setSlidePreview(s.image_url)
-        setModalOpen(true)
-    }
-
-    async function saveSlide() {
-        setIsSaving(true)
-        try {
-            let imageUrl = editItem?.image_url || ''
-            let storagePath = editItem?.storage_path || ''
-
-            if (slideFile) {
-                const hash = await getFileHash(slideFile)
-                const ext = slideFile.name.split('.').pop()
-                const fileName = `home/${hash}.${ext}`
-                const { error: uploadError } = await supabase.storage.from('Images').upload(fileName, slideFile, { upsert: true })
-
-                if (!uploadError || (uploadError as any).status === 409 || uploadError.message?.includes('already exists')) {
-                    const { data: { publicUrl } } = supabase.storage.from('Images').getPublicUrl(fileName)
-                    imageUrl = publicUrl
-                    storagePath = fileName
-                } else {
-                    console.error("Error al subir slide:", uploadError)
-                    throw new Error(`Falló la subida de la imagen: ${uploadError.message}`)
-                }
-            }
-
-            if (!imageUrl) {
-                showAlert('error', 'Se requiere una imagen.')
-                setIsSaving(false)
-                return
-            }
-
-            const payload = {
-                title: slideForm.title || null,
-                subtitle: slideForm.subtitle || null,
-                image_url: imageUrl,
-                storage_path: storagePath || null,
-                product_id: slideForm.product_id || null,
-                link_url: slideForm.link_url || null,
-                sort_order: parseInt(slideForm.sort_order) || 0,
-                active: slideForm.active,
-            }
-
-            if (editItem) {
-                await ((supabase as any).from('home_slides') as any).update(payload).eq('id', editItem.id)
-            } else {
-                await (supabase as any).from('home_slides').insert(payload)
-            }
-
-            showAlert('success', 'Slide guardado correctamente.')
-            setModalOpen(false)
-            loadAll()
-        } catch (e: any) {
-            showAlert('error', e.message)
-        } finally {
-            setIsSaving(false)
-        }
-    }
-
-    async function deleteSlide(id: string) {
-        if (!confirm('¿Eliminar este slide?')) return
-        await (supabase as any).from('home_slides').delete().eq('id', id)
-        showAlert('success', 'Slide eliminado.')
-        loadAll()
-    }
 
     // ── Logo CRUD ──
     function openNewLogo() {
@@ -3328,17 +3258,101 @@ function AdminHome() {
         loadAll()
     }
 
+    // ── News CRUD ──
+    function openNewNews() {
+        setEditItem(null);
+        setNewsForm({ title: '', description: '', image_url: '', storage_path: '', link_url: '', active: true, sort_order: newsItems.length });
+        setNewsFile(null);
+        setNewsPreview(null);
+        setModalOpen(true);
+    }
+
+    function openEditNews(item: WeeklyNews) {
+        setEditItem(item);
+        setNewsForm({ 
+            title: item.title, 
+            description: item.description || '', 
+            image_url: item.image_url || '', 
+            storage_path: item.storage_path || '', 
+            link_url: (item as any).link_url || '', 
+            active: item.active, 
+            sort_order: item.sort_order 
+        });
+        setNewsPreview(item.image_url);
+        setNewsFile(null);
+        setModalOpen(true);
+    }
+
+    async function saveNews() {
+        setIsSaving(true)
+        try {
+            let finalImageUrl = newsForm.image_url
+            let finalStoragePath = newsForm.storage_path
+
+            if (newsFile) {
+                const fileExt = newsFile.name.split('.').pop()
+                const fileName = `weekly-news-${Date.now()}.${fileExt}`
+
+                const { error: uploadError } = await supabase.storage.from('Images').upload(fileName, newsFile, { upsert: true })
+                if (uploadError) throw uploadError
+
+                const { data: { publicUrl } } = supabase.storage.from('Images').getPublicUrl(fileName)
+                finalImageUrl = publicUrl
+                finalStoragePath = fileName
+            }
+
+            if (!finalImageUrl && !newsForm.title) {
+                showAlert('error', 'Debes subir una imagen o ingresar un título.')
+                setIsSaving(false)
+                return
+            }
+
+            const payload = { 
+                ...newsForm, 
+                title: newsForm.title || 'Novedad con imagen',
+                image_url: finalImageUrl, 
+                storage_path: finalStoragePath,
+                link_url: newsForm.link_url || null
+            }
+
+            if (editItem) {
+                const { error } = await (supabase as any).from('weekly_news').update(payload).eq('id', editItem.id)
+                if (error) throw error
+                showAlert('success', 'Novedad actualizada.')
+            } else {
+                const { error } = await (supabase as any).from('weekly_news').insert(payload)
+                if (error) throw error
+                showAlert('success', 'Novedad creada.')
+            }
+            setModalOpen(false)
+            setNewsFile(null)
+            setNewsPreview(null)
+            loadAll()
+        } catch (error: any) {
+            showAlert('error', error.message || 'Error al guardar')
+        } finally {
+            setIsSaving(false)
+        }
+    }
+
+    async function deleteNews(id: string, name: string) {
+        if (!confirm(`¿Eliminar la novedad "${name}"?`)) return
+        const { error } = await (supabase as any).from('weekly_news').delete().eq('id', id)
+        if (error) showAlert('error', error.message)
+        else { showAlert('success', 'Novedad eliminada.'); loadAll() }
+    }
+
     return (
         <div>
             <h1 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: 24 }}>Configuración del Home</h1>
 
             {/* Tabs */}
-            <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
+            <div style={{ display: 'flex', gap: 10, marginBottom: 24, borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
                 <button
-                    className={`btn ${tab === 'slides' ? 'btn-primary' : 'btn-ghost'} btn-sm`}
-                    onClick={() => { setTab('slides'); setModalOpen(false) }}
+                    className={`btn ${tab === 'news' ? 'btn-primary' : 'btn-ghost'} btn-sm`}
+                    onClick={() => { setTab('news'); setModalOpen(false) }}
                 >
-                    <Image size={14} /> Carousel
+                    <Bell size={14} /> Novedades
                 </button>
                 <button
                     className={`btn ${tab === 'brands' ? 'btn-primary' : 'btn-ghost'} btn-sm`}
@@ -3352,34 +3366,7 @@ function AdminHome() {
 
             {loading ? (
                 <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Cargando...</div>
-            ) : tab === 'slides' ? (
-                /* ── Slides Tab ── */
-                <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{slides.length} slide(s) configurados</p>
-                        <button className="btn btn-primary btn-sm" onClick={openNewSlide}><Plus size={14} /> Nuevo Slide</button>
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
-                        {slides.map((s) => (
-                            <div key={s.id} className="card" style={{ padding: 0, overflow: 'hidden', opacity: s.active ? 1 : 0.5 }}>
-                                <div style={{ height: 140, background: 'var(--bg-secondary)', overflow: 'hidden' }}>
-                                    <img src={s.image_url} alt={s.title || ''} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                </div>
-                                <div style={{ padding: 16 }}>
-                                    <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: 4 }}>{s.title || '(Sin título)'}</h3>
-                                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 8 }}>
-                                        {s.product_id ? `Producto: ${(s as any).products?.name || s.product_id}` : s.link_url ? `Link: ${s.link_url}` : 'Imagen fija'}
-                                    </p>
-                                    <div style={{ display: 'flex', gap: 6 }}>
-                                        <button className="btn btn-ghost btn-sm" onClick={() => openEditSlide(s)}><Pencil size={12} /></button>
-                                        <button className="btn btn-danger btn-sm" onClick={() => deleteSlide(s.id)}><Trash2 size={12} /></button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            ) : (
+            ) : tab === 'brands' ? (
                 /* ── Logos Tab ── */
                 <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
@@ -3401,6 +3388,66 @@ function AdminHome() {
                         ))}
                     </div>
                 </div>
+            ) : (
+                /* ── News Tab ── */
+                <div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                        <h2 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Novedades y Ofertas del Mes</h2>
+                        <button className="btn btn-primary btn-sm" onClick={openNewNews}>
+                            <Plus size={15} /> Nueva Novedad
+                        </button>
+                    </div>
+                    <div className="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style={{ width: 60 }}>Imagen</th>
+                                    <th>Identificador (Título)</th>
+                                    <th>Enlace</th>
+                                    <th>Orden</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {newsItems.map((it) => (
+                                    <tr key={it.id}>
+                                        <td>
+                                            {it.image_url ? (
+                                                <img src={it.image_url} alt="" style={{ width: 44, height: 44, borderRadius: 8, objectFit: 'cover' }} />
+                                            ) : (
+                                                <div style={{ width: 44, height: 44, borderRadius: 8, background: 'var(--bg-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <Image size={20} />
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td>
+                                            <div style={{ fontWeight: 600 }}>{it.title || 'Sin título'}</div>
+                                            {it.description && <div style={{ fontSize: '0.7rem', opacity: 0.6, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{it.description}</div>}
+                                        </td>
+                                        <td>
+                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                {(it as any).link_url || 'Sin enlace'}
+                                            </div>
+                                        </td>
+                                        <td style={{ textAlign: 'center' }}>{it.sort_order}</td>
+                                        <td>
+                                            <span className={`badge ${it.active ? 'badge-new' : 'badge-used'}`}>
+                                                {it.active ? 'Activo' : 'Pausado'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div style={{ display: 'flex', gap: 6 }}>
+                                                <button className="btn btn-ghost btn-sm" onClick={() => openEditNews(it)}><Pencil size={14} /></button>
+                                                <button className="btn btn-danger btn-sm" onClick={() => deleteNews(it.id, it.title)}><Trash2 size={14} /></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             )}
 
             {/* ── Modal ── */}
@@ -3408,63 +3455,11 @@ function AdminHome() {
                 <div className="modal-overlay animate-fade-in-fast">
                     <div className="modal" style={{ maxWidth: 500 }}>
                         <div className="modal-title">
-                            <span>{tab === 'slides' ? (editItem ? 'Editar Slide' : 'Nuevo Slide') : (editItem ? 'Editar Logo' : 'Nuevo Logo')}</span>
+                            <span>{tab === 'brands' ? (editItem ? 'Editar Logo' : 'Nuevo Logo') : (editItem ? 'Editar Novedad' : 'Nueva Novedad')}</span>
                             <button onClick={() => setModalOpen(false)} className="btn btn-ghost btn-sm"><X size={16} /></button>
                         </div>
 
-                        {tab === 'slides' ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                                <div className="form-group">
-                                    <label className="form-label">Imagen del Slide *</label>
-                                    <input type="file" accept="image/*" className="form-input" style={{ padding: '4px 8px' }}
-                                        onChange={(e) => {
-                                            const f = e.target.files?.[0]
-                                            if (f) { setSlideFile(f); setSlidePreview(URL.createObjectURL(f)) }
-                                        }}
-                                    />
-                                    {slidePreview && (
-                                        <div style={{ marginTop: 8, borderRadius: 8, overflow: 'hidden', maxHeight: 160 }}>
-                                            <img src={slidePreview} alt="Preview" style={{ width: '100%', objectFit: 'cover' }} />
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="form-group">
-                                    <label className="form-label">Título</label>
-                                    <input className="form-input" value={slideForm.title} onChange={(e) => setSlideForm(f => ({ ...f, title: e.target.value }))} placeholder="Título del slide" />
-                                </div>
-                                <div className="form-group">
-                                    <label className="form-label">Subtítulo</label>
-                                    <input className="form-input" value={slideForm.subtitle} onChange={(e) => setSlideForm(f => ({ ...f, subtitle: e.target.value }))} placeholder="Texto secundario" />
-                                </div>
-                                <div className="form-group">
-                                    <label className="form-label">Producto vinculado (opcional)</label>
-                                    <SearchableSelect
-                                        id="slide-product"
-                                        value={slideForm.product_id}
-                                        onChange={(v) => setSlideForm(f => ({ ...f, product_id: v }))}
-                                        options={[{ value: '', label: 'Ninguno (imagen fija)' }, ...products.map(p => ({ value: p.id, label: p.name }))]}
-                                        placeholder="Seleccionar producto..."
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label className="form-label">Link personalizado (si no hay producto)</label>
-                                    <input className="form-input" value={slideForm.link_url} onChange={(e) => setSlideForm(f => ({ ...f, link_url: e.target.value }))} placeholder="https://..." />
-                                </div>
-                                <div style={{ display: 'flex', gap: 12 }}>
-                                    <div className="form-group" style={{ flex: 1 }}>
-                                        <label className="form-label">Orden</label>
-                                        <input className="form-input" type="number" value={slideForm.sort_order} onChange={(e) => setSlideForm(f => ({ ...f, sort_order: e.target.value }))} />
-                                    </div>
-                                    <div className="form-group" style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8, paddingTop: 24 }}>
-                                        <input type="checkbox" checked={slideForm.active} onChange={(e) => setSlideForm(f => ({ ...f, active: e.target.checked }))} style={{ width: 18, height: 18, accentColor: 'var(--green)' }} />
-                                        <span style={{ fontSize: '0.85rem' }}>Activo</span>
-                                    </div>
-                                </div>
-                                <button className="btn btn-primary btn-full" onClick={saveSlide} disabled={isSaving}>
-                                    {isSaving ? <Loader2 className="animate-spin" size={18} /> : 'Guardar Slide'}
-                                </button>
-                            </div>
-                        ) : (
+                        {tab === 'brands' ? (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                                 <div className="form-group">
                                     <label className="form-label">Logo de la Marca *</label>
@@ -3481,8 +3476,8 @@ function AdminHome() {
                                     )}
                                 </div>
                                 <div className="form-group">
-                                    <label className="form-label">Nombre de la Marca *</label>
-                                    <input className="form-input" value={logoForm.name} onChange={(e) => setLogoForm(f => ({ ...f, name: e.target.value }))} placeholder="Apple, Samsung..." />
+                                    <label className="form-label">Nombre de la Marca</label>
+                                    <input className="form-input" value={logoForm.name} onChange={(e) => setLogoForm({ ...logoForm, name: e.target.value })} placeholder="Ej: Apple" />
                                 </div>
                                 <div style={{ display: 'flex', gap: 12 }}>
                                     <div className="form-group" style={{ flex: 1 }}>
@@ -3498,7 +3493,95 @@ function AdminHome() {
                                     {isSaving ? <Loader2 className="animate-spin" size={18} /> : 'Guardar Logo'}
                                 </button>
                             </div>
+                        ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                <div className="form-group" style={{
+                                    padding: '12px',
+                                    border: '2px dashed var(--border)',
+                                    borderRadius: '12px',
+                                    background: 'var(--bg-secondary)',
+                                    textAlign: 'center'
+                                }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center' }}>
+                                        <div style={{
+                                            width: '100%', height: 280, borderRadius: 12, background: 'var(--bg-primary)', border: '1px solid var(--border)',
+                                            overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+                                        }}>
+                                            {newsPreview ? (
+                                                <img src={newsPreview} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                                            ) : (
+                                                <div style={{ color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                                                    <Image size={48} />
+                                                    <span style={{ fontSize: '0.8rem' }}>Subir imagen generada por IA</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <input type="file" accept="image/*" onChange={(e) => {
+                                            const f = e.target.files?.[0]
+                                            if (f) {
+                                                setNewsFile(f)
+                                                setNewsPreview(URL.createObjectURL(f))
+                                            }
+                                        }} style={{ width: '100%', fontSize: '0.8rem' }} id="news-image-input" hidden />
+                                        <button
+                                            className="btn btn-primary btn-full"
+                                            onClick={() => document.getElementById('news-image-input')?.click()}
+                                            type="button"
+                                        >
+                                            <Image size={16} /> {newsPreview ? 'Cambiar Imagen' : 'Seleccionar Imagen'}
+                                        </button>
+                                        {(newsPreview || newsForm.image_url) && (
+                                            <button className="btn btn-ghost btn-sm" onClick={() => { setNewsFile(null); setNewsPreview(null); setNewsForm({ ...newsForm, image_url: '', storage_path: '' }) }} style={{ color: 'var(--red)' }}>
+                                                <Trash2 size={12} /> Quitar imagen
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Enlace al hacer click (Opcional)</label>
+                                    <input
+                                        className="form-input"
+                                        value={newsForm.link_url}
+                                        onChange={(e) => setNewsForm({ ...newsForm, link_url: e.target.value })}
+                                        placeholder="Ej: /productos?q=samsung+s26"
+                                    />
+                                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 4, display: 'block' }}>
+                                        Puedes usar rutas relativas como /productos?q=termino o enlaces externos.
+                                    </span>
+                                </div>
+
+                                <details style={{ width: '100%' }}>
+                                    <summary style={{ cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-muted)', padding: '8px 0' }}>
+                                        Opciones adicionales (Solo Administrador)
+                                    </summary>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 12, padding: '12px', background: 'var(--bg-secondary)', borderRadius: 12 }}>
+                                        <div className="form-group">
+                                            <label className="form-label">Identificador / Título</label>
+                                            <input className="form-input" value={newsForm.title} onChange={(e) => setNewsForm({ ...newsForm, title: e.target.value })} placeholder="Ej: Banner iPhone 16" />
+                                        </div>
+                                        <div className="form-group">
+                                            <label className="form-label">Notas / Descripción</label>
+                                            <textarea className="form-input" rows={2} value={newsForm.description} onChange={(e) => setNewsForm({ ...newsForm, description: e.target.value })} />
+                                        </div>
+                                        <div className="form-group">
+                                            <label className="form-label">Orden de aparición</label>
+                                            <input type="number" className="form-input" value={newsForm.sort_order} onChange={(e) => setNewsForm({ ...newsForm, sort_order: parseInt(e.target.value) })} />
+                                        </div>
+                                        <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                            <input type="checkbox" checked={newsForm.active} onChange={(e) => setNewsForm({ ...newsForm, active: e.target.checked })} style={{ width: 18, height: 18, accentColor: 'var(--green)' }} />
+                                            <span style={{ fontWeight: 600 }}>Novedad Activa</span>
+                                        </div>
+                                    </div>
+                                </details>
+                            </div>
                         )}
+                        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 16 }}>
+                            <button className="btn btn-ghost" onClick={() => setModalOpen(false)}>Cancelar</button>
+                            <button className="btn btn-primary" onClick={tab === 'brands' ? saveLogo : saveNews} disabled={isSaving}>
+                                {isSaving ? <Loader2 className="animate-spin" size={15} /> : <Check size={15} />} Guardar {tab === 'brands' ? 'Logo' : 'Novedad'}
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
@@ -3768,309 +3851,6 @@ function AdminProveedores() {
     )
 }
 
-// ─── Novedades Admin ──────────────────────────────────────────────────────────
-function AdminNovedades() {
-    const [items, setItems] = useState<WeeklyNews[]>([])
-    const [loading, setLoading] = useState(true)
-    const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
-    const [modalOpen, setModalOpen] = useState(false)
-    const [editId, setEditId] = useState<string | null>(null)
-    const [isSaving, setIsSaving] = useState(false)
-    const [newsFile, setNewsFile] = useState<File | null>(null)
-    const [newsPreview, setNewsPreview] = useState<string | null>(null)
-
-    const [form, setForm] = useState({
-        title: '',
-        description: '',
-        icon_name: 'Bell',
-        image_url: '',
-        storage_path: '',
-        color: '#34C759',
-        tag: 'NUEVO',
-        active: true,
-        sort_order: 0
-    })
-
-    const showAlert = (type: 'success' | 'error', message: string) => {
-        setAlert({ type, message })
-        setTimeout(() => setAlert(null), 4000)
-    }
-
-    const load = useCallback(async () => {
-        setLoading(true)
-        const { data, error } = await supabase.from('weekly_news').select('*').order('sort_order', { ascending: true })
-        if (error) showAlert('error', error.message)
-        else setItems(data || [])
-        setLoading(false)
-    }, [])
-
-    useEffect(() => { load() }, [load])
-
-    async function handleSave() {
-        // if (!form.title) { showAlert('error', 'El título es requerido'); return }
-        setIsSaving(true)
-        try {
-            let finalImageUrl = form.image_url
-            let finalStoragePath = form.storage_path
-
-            if (newsFile) {
-                const fileExt = newsFile.name.split('.').pop()
-                const fileName = `weekly-news-${Date.now()}.${fileExt}`
-
-                const { error: uploadError } = await supabase.storage.from('Images').upload(fileName, newsFile, { upsert: true })
-                if (uploadError) throw uploadError
-
-                const { data: { publicUrl } } = supabase.storage.from('Images').getPublicUrl(fileName)
-                finalImageUrl = publicUrl
-                finalStoragePath = fileName
-            }
-
-            if (!finalImageUrl && !form.title) {
-                showAlert('error', 'Debes subir una imagen o ingresar un título.')
-                setIsSaving(false)
-                return
-            }
-
-            const payload = { 
-                ...form, 
-                title: form.title || 'Novedad con imagen',
-                image_url: finalImageUrl, 
-                storage_path: finalStoragePath 
-            }
-
-            if (editId) {
-                const { error } = await (supabase as any).from('weekly_news').update(payload).eq('id', editId)
-                if (error) throw error
-                showAlert('success', 'Novedad actualizada.')
-            } else {
-                const { error } = await (supabase as any).from('weekly_news').insert(payload)
-                if (error) throw error
-                showAlert('success', 'Novedad creada.')
-            }
-            setModalOpen(false)
-            setNewsFile(null)
-            setNewsPreview(null)
-            load()
-        } catch (error: any) {
-            showAlert('error', error.message || 'Error al guardar')
-        } finally {
-            setIsSaving(false)
-        }
-    }
-
-    async function handleDelete(id: string, name: string) {
-        if (!confirm(`¿Eliminar la novedad "${name}"?`)) return
-        const { error } = await (supabase as any).from('weekly_news').delete().eq('id', id)
-        if (error) showAlert('error', error.message)
-        else { showAlert('success', 'Novedad eliminada.'); load() }
-    }
-
-    const iconsList = ['Bell', 'Zap', 'Cpu', 'Sparkles']
-    const colorsList = ['#34C759', '#5856D6', '#007AFF', '#FF9500', '#FF3B30']
-
-    return (
-        <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-                <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Novedades y Ofertas del Mes de {new Date().toLocaleDateString('es-AR', { month: 'long' }).toUpperCase()}</h1>
-                <button className="btn btn-primary btn-sm" onClick={() => {
-                    setEditId(null);
-                    setForm({ title: '', description: '', icon_name: 'Bell', image_url: '', storage_path: '', color: '#34C759', tag: 'NUEVO', active: true, sort_order: items.length });
-                    setNewsFile(null);
-                    setNewsPreview(null);
-                    setModalOpen(true)
-                }}>
-                    <Plus size={15} /> Nueva Novedad
-                </button>
-            </div>
-
-            {alert && <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
-
-            {loading ? <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 40 }}>Cargando...</div> : (
-                <div className="table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style={{ width: 60 }}>Orden</th>
-                                <th>Icono</th>
-                                <th>Título / Tag</th>
-                                <th>Descripción</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {items.map((it) => (
-                                <tr key={it.id}>
-                                    <td>{it.sort_order}</td>
-                                    <td>
-                                        {it.image_url ? (
-                                            <img src={it.image_url} alt="" style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover' }} />
-                                        ) : (
-                                            <div style={{
-                                                width: 32, height: 32, borderRadius: 8, background: `${it.color}15`, color: it.color || 'var(--text-primary)',
-                                                display: 'flex', alignItems: 'center', justifyContent: 'center'
-                                            }}>
-                                                {it.icon_name === 'Zap' && <Zap size={16} />}
-                                                {it.icon_name === 'Cpu' && <Cpu size={16} />}
-                                                {it.icon_name === 'Sparkles' && <Sparkles size={16} />}
-                                                {it.icon_name === 'Bell' && <Bell size={16} />}
-                                            </div>
-                                        )}
-                                    </td>
-                                    <td>
-                                        <div style={{ fontWeight: 600 }}>
-                                            {it.title === 'Novedad con imagen' ? '🖼️ Solo Imagen (IA)' : it.title}
-                                        </div>
-                                        <div style={{ fontSize: '0.7rem', opacity: 0.6 }}>{it.tag || 'Sin tag'}</div>
-                                    </td>
-                                    <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', maxWidth: 300 }}>{it.description}</td>
-                                    <td>
-                                        <span className={`badge ${it.active ? 'badge-new' : 'badge-used'}`}>
-                                            {it.active ? 'Activo' : 'Pausado'}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div style={{ display: 'flex', gap: 6 }}>
-                                            <button className="btn btn-ghost btn-sm" onClick={() => {
-                                                setEditId(it.id);
-                                                setForm({ title: it.title, description: it.description || '', icon_name: it.icon_name || 'Bell', image_url: it.image_url || '', storage_path: it.storage_path || '', color: it.color || '#34C759', tag: it.tag || '', active: it.active, sort_order: it.sort_order });
-                                                setNewsPreview(it.image_url);
-                                                setNewsFile(null);
-                                                setModalOpen(true)
-                                            }}><Pencil size={14} /></button>
-                                            <button className="btn btn-danger btn-sm" onClick={() => handleDelete(it.id, it.title)}><Trash2 size={14} /></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-
-            {modalOpen && (
-                <div className="modal-overlay animate-fade-in-fast">
-                    <div className="modal" style={{ maxWidth: 500 }}>
-                        <div className="modal-title">
-                            <span>{editId ? 'Editar Novedad' : 'Nueva Novedad'}</span>
-                            <button onClick={() => setModalOpen(false)} className="btn btn-ghost btn-sm"><X size={16} /></button>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                            <div className="form-group" style={{ 
-                                padding: '12px', 
-                                border: '2px dashed var(--border)', 
-                                borderRadius: '12px',
-                                background: 'var(--bg-secondary)',
-                                textAlign: 'center'
-                            }}>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center' }}>
-                                    <div style={{
-                                        width: '100%', height: 280, borderRadius: 12, background: 'var(--bg-primary)', border: '1px solid var(--border)',
-                                        overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
-                                    }}>
-                                        {newsPreview ? (
-                                            <img src={newsPreview} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                                        ) : (
-                                            <div style={{ color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                                                <Image size={48} />
-                                                <span style={{ fontSize: '0.8rem' }}>Subir imagen generada por IA</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <input type="file" accept="image/*" onChange={(e) => {
-                                        const file = e.target.files?.[0]
-                                        if (file) {
-                                            setNewsFile(file)
-                                            setNewsPreview(URL.createObjectURL(file))
-                                        }
-                                    }} style={{ width: '100%', fontSize: '0.8rem' }} id="news-image-input" hidden />
-                                    <button 
-                                        className="btn btn-primary btn-full" 
-                                        onClick={() => document.getElementById('news-image-input')?.click()}
-                                        type="button"
-                                    >
-                                        <Image size={16} /> {newsPreview ? 'Cambiar Imagen' : 'Seleccionar Imagen'}
-                                    </button>
-                                    {(newsPreview || form.image_url) && (
-                                        <button className="btn btn-ghost btn-sm" onClick={() => { setNewsFile(null); setNewsPreview(null); setForm({ ...form, image_url: '', storage_path: '' }) }} style={{ color: 'var(--red)' }}>
-                                            <Trash2 size={12} /> Quitar imagen
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-
-                            <details style={{ width: '100%' }}>
-                                <summary style={{ cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-muted)', padding: '8px 0' }}>
-                                    Más opciones (Título, Descripción, etc. - Opcional)
-                                </summary>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 12, padding: '12px', background: 'var(--bg-secondary)', borderRadius: 12 }}>
-                                    <div className="form-group">
-                                        <label className="form-label">Título (Opcional)</label>
-                                        <input className="form-input" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Ej: Ingreso iPhone 16" />
-                                    </div>
-                                    <div className="form-group">
-                                        <label className="form-label">Descripción (Opcional)</label>
-                                        <textarea className="form-input" rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-                                    </div>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                                        <div className="form-group">
-                                            <label className="form-label">Tag Superior</label>
-                                            <input className="form-input" value={form.tag} onChange={(e) => setForm({ ...form, tag: e.target.value })} placeholder="Ej: NUEVO" />
-                                        </div>
-                                        <div className="form-group">
-                                            <label className="form-label">Orden</label>
-                                            <input type="number" className="form-input" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) })} />
-                                        </div>
-                                    </div>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                                        <div className="form-group">
-                                            <label className="form-label">Icono</label>
-                                            <div style={{ display: 'flex', gap: 8 }}>
-                                                {iconsList.map(ic => (
-                                                    <button key={ic} onClick={() => setForm({ ...form, icon_name: ic })} style={{
-                                                        padding: 8, borderRadius: 8, border: `1px solid ${form.icon_name === ic ? 'var(--green)' : 'var(--border)'}`,
-                                                        background: form.icon_name === ic ? 'var(--green-light)' : 'transparent', cursor: 'pointer'
-                                                    }} type="button">
-                                                        {ic === 'Zap' && <Zap size={18} />}
-                                                        {ic === 'Cpu' && <Cpu size={18} />}
-                                                        {ic === 'Sparkles' && <Sparkles size={18} />}
-                                                        {ic === 'Bell' && <Bell size={18} />}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div className="form-group">
-                                            <label className="form-label">Color de fondo</label>
-                                            <div style={{ display: 'flex', gap: 8 }}>
-                                                {colorsList.map(c => (
-                                                    <button key={c} onClick={() => setForm({ ...form, color: c })} style={{
-                                                        width: 24, height: 24, borderRadius: '50%', background: c, border: `2px solid ${form.color === c ? 'var(--text-primary)' : 'transparent'}`,
-                                                        cursor: 'pointer'
-                                                    }} type="button" />
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                        <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} style={{ width: 18, height: 18, accentColor: 'var(--green)' }} />
-                                        <span style={{ fontWeight: 600 }}>Pestaña Activa</span>
-                                    </div>
-                                </div>
-                            </details>
-                        </div>
-                        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 16 }}>
-                            <button className="btn btn-ghost" onClick={() => setModalOpen(false)}>Cancelar</button>
-                            <button className="btn btn-primary" onClick={handleSave} disabled={isSaving}>
-                                {isSaving ? <Loader2 className="animate-spin" size={15} /> : <Check size={15} />} Guardar Novedad
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
-    )
-}
-
 // ─── Main AdminClient ─────────────────────────────────────────────────────────
 export default function AdminClient() {
     const [section, setSection] = useState<AdminSection>('dashboard')
@@ -4084,7 +3864,6 @@ export default function AdminClient() {
         proveedores: <AdminProveedores />,
         precios: <AdminPrecios />,
         comparador: <AdminComparator />,
-        novedades: <AdminNovedades />,
     }
 
     return (
