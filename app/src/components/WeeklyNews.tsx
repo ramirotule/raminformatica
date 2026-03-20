@@ -55,43 +55,31 @@ export default function WeeklyNews() {
 
     const variants = {
         enter: (direction: number) => ({
-            y: -800,
-            x: direction > 0 ? 100 : -100,
+            x: direction > 0 ? '100%' : '-100%',
             opacity: 0,
-            scale: 1.5,
-            rotate: direction > 0 ? 30 : -30,
-            rotateY: direction > 0 ? 45 : -45,
-            z: 200
+            scale: 0.9,
+            filter: 'blur(10px)'
         }),
         center: {
-            zIndex: 1,
-            y: 0,
             x: 0,
             opacity: 1,
             scale: 1,
-            rotate: 0,
-            rotateY: 0,
-            z: 0,
+            filter: 'blur(0px)',
             transition: {
-                type: 'spring' as any,
-                stiffness: 70,
-                damping: 15,
-                mass: 1,
-                restDelta: 0.001
+                x: { type: 'spring' as any, stiffness: 300, damping: 30 },
+                opacity: { duration: 0.4 },
+                scale: { duration: 0.4 },
+                filter: { duration: 0.4 }
             }
         },
         exit: (direction: number) => ({
-            zIndex: 0,
-            y: 800,
-            x: direction < 0 ? 100 : -100,
+            x: direction < 0 ? '100%' : '-100%',
             opacity: 0,
-            scale: 0.5,
-            rotate: direction < 0 ? 30 : -30,
-            rotateY: direction < 0 ? 45 : -45,
-            z: -200,
+            scale: 0.9,
+            filter: 'blur(10px)',
             transition: {
-                duration: 0.6,
-                ease: [0.16, 1, 0.3, 1] as any
+                x: { type: 'spring' as any, stiffness: 300, damping: 30 },
+                opacity: { duration: 0.4 }
             }
         })
     }
@@ -130,11 +118,11 @@ export default function WeeklyNews() {
             </AnimatePresence>
 
             <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 40, flexWrap: 'wrap', gap: 20 }}>
-                    <div style={{ textAlign: 'left' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 20, textAlign: 'center' }}>
+                    <div style={{ textAlign: 'center' }}>
                         <motion.div 
-                            initial={{ opacity: 0, x: -20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
+                            initial={{ opacity: 0, y: -20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             style={{ 
                                 display: 'inline-flex', 
@@ -148,56 +136,21 @@ export default function WeeklyNews() {
                                 fontWeight: 800,
                                 letterSpacing: '0.15em',
                                 textTransform: 'uppercase',
-                                marginBottom: 16,
+                                marginBottom: 24,
                                 border: '1px solid rgba(52, 199, 89, 0.2)'
                             }}
                         >
                             <Sparkles size={16} /> Oportunidades Directas
                         </motion.div>
-                        <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 900, letterSpacing: '-0.05em', lineHeight: 1.1 }}>
-                            Novedades de la <span style={{ color: 'var(--green)', position: 'relative' }}>Semana</span>
+                        <h2 style={{ 
+                            fontSize: 'clamp(2rem, 5vw, 3.5rem)', 
+                            fontWeight: 950, 
+                            letterSpacing: '0.02em', 
+                            lineHeight: 1.1,
+                            wordSpacing: '0.15em'
+                        }}>
+                            Novedades & Ofertas del mes de <span style={{ color: 'var(--green)', position: 'relative' }}>{new Date().toLocaleString('es-AR', { month: 'long' }).toUpperCase()}</span>
                         </h2>
-                    </div>
-
-                    <div style={{ display: 'flex', gap: 12 }}>
-                        <button 
-                            onClick={prevStep}
-                            className="carousel-nav-btn" 
-                            style={{ 
-                                width: 56, 
-                                height: 56, 
-                                background: 'var(--bg-secondary)', 
-                                borderRadius: '50%',
-                                border: '1px solid var(--border)',
-                                color: 'white',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                                transition: 'all 0.3s ease'
-                            }}
-                        >
-                            <ChevronLeft size={24} />
-                        </button>
-                        <button 
-                            onClick={nextStep}
-                            className="carousel-nav-btn" 
-                            style={{ 
-                                width: 56, 
-                                height: 56, 
-                                background: 'var(--bg-secondary)', 
-                                borderRadius: '50%',
-                                border: '1px solid var(--border)',
-                                color: 'white',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                                transition: 'all 0.3s ease'
-                            }}
-                        >
-                            <ChevronRight size={24} />
-                        </button>
                     </div>
                 </div>
 
@@ -206,8 +159,8 @@ export default function WeeklyNews() {
                         <Loader2 className="animate-spin" size={48} color="var(--green)" />
                     </div>
                 ) : (
-                    <div style={{ position: 'relative', maxWidth: '1200px', margin: '0 auto' }}>
-                        <div style={{ position: 'relative', height: 'auto', minHeight: '600px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', perspective: '2000px', padding: '40px 0' }}>
+                    <div style={{ position: 'relative', maxWidth: '1400px', margin: '0 auto' }}>
+                        <div style={{ position: 'relative', height: 'auto', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0px 0' }}>
                             <AnimatePresence initial={false} custom={direction} mode="popLayout">
                                 <motion.div
                                     key={index}
@@ -229,7 +182,7 @@ export default function WeeklyNews() {
                                     style={{
                                         position: 'relative',
                                         width: '100%',
-                                        maxWidth: '520px',
+                                        maxWidth: '900px',
                                         cursor: 'grab'
                                     }}
                                 >
@@ -245,11 +198,11 @@ export default function WeeklyNews() {
                                         flexDirection: 'column'
                                     }}>
                                         {currentItem.image_url ? (
-                                            <div style={{ width: '100%', position: 'relative', background: '#000', aspectRatio: '4/5' }}>
+                                            <div style={{ width: '100%', position: 'relative', background: '#000', borderRadius: 32, overflow: 'hidden' }}>
                                                 <img 
                                                     src={currentItem.image_url} 
-                                                    alt={currentItem.title} 
-                                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+                                                    alt={currentItem.title || ''} 
+                                                    style={{ width: '100%', height: 'auto', maxHeight: '75vh', display: 'block', objectFit: 'cover' }} 
                                                 />
                                             </div>
                                         ) : (
@@ -290,92 +243,139 @@ export default function WeeklyNews() {
                                         )}
 
                                         {/* Footer Content */}
-                                        <div style={{ 
-                                            padding: '24px 32px 32px',
-                                            background: 'var(--bg-card)',
-                                            borderTop: '1px solid var(--border)',
-                                            zIndex: 2
-                                        }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, gap: 16 }}>
-                                                <div style={{ flex: 1 }}>
-                                                    <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'white' }}>{currentItem.title}</h3>
-                                                    <p style={{ 
-                                                        fontSize: '0.85rem', 
-                                                        color: 'var(--text-secondary)', 
-                                                        display: '-webkit-box', 
-                                                        WebkitLineClamp: 1, 
-                                                        WebkitBoxOrient: 'vertical', 
-                                                        overflow: 'hidden' 
-                                                    }}>
-                                                        {currentItem.description}
-                                                    </p>
+                                        {!(currentItem.title === 'Novedad con imagen' && !currentItem.description) && (
+                                            <div style={{ 
+                                                padding: '24px 32px 32px',
+                                                background: 'var(--bg-card)',
+                                                borderTop: '1px solid var(--border)',
+                                                zIndex: 2
+                                            }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, gap: 16 }}>
+                                                    <div style={{ flex: 1 }}>
+                                                        <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'white' }}>{currentItem.title}</h2>
+                                                        {currentItem.description && (
+                                                            <p style={{ 
+                                                                fontSize: '0.85rem', 
+                                                                color: 'var(--text-secondary)', 
+                                                                display: '-webkit-box', 
+                                                                WebkitLineClamp: 1, 
+                                                                WebkitBoxOrient: 'vertical', 
+                                                                overflow: 'hidden' 
+                                                            }}>
+                                                                {currentItem.description}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    {currentItem.tag && (
+                                                        <span style={{ 
+                                                            padding: '4px 12px', 
+                                                            borderRadius: 8, 
+                                                            background: currentItem.color || 'var(--green)', 
+                                                            color: 'white', 
+                                                            fontSize: '0.65rem', 
+                                                            fontWeight: 900,
+                                                            textTransform: 'uppercase'
+                                                        }}>
+                                                            {currentItem.tag}
+                                                        </span>
+                                                    )}
                                                 </div>
-                                                {currentItem.tag && (
-                                                    <span style={{ 
-                                                        padding: '4px 12px', 
-                                                        borderRadius: 8, 
-                                                        background: currentItem.color || 'var(--green)', 
-                                                        color: 'white', 
-                                                        fontSize: '0.65rem', 
-                                                        fontWeight: 900,
-                                                        textTransform: 'uppercase'
-                                                    }}>
-                                                        {currentItem.tag}
-                                                    </span>
-                                                )}
+                                                
+                                                <motion.a
+                                                    whileHover={{ scale: 1.02 }}
+                                                    whileTap={{ scale: 0.98 }}
+                                                    href={`https://wa.me/${phone}?text=${encodeURIComponent(`Hola! Vi el producto "${currentItem.title}" en la web y quería consultarles.`)}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="btn btn-primary"
+                                                    style={{ 
+                                                        width: '100%', 
+                                                        justifyContent: 'center', 
+                                                        background: '#25D366', 
+                                                        borderColor: '#25D366',
+                                                        height: 56,
+                                                        fontSize: '1rem',
+                                                        boxShadow: '0 20px 40px rgba(37, 211, 102, 0.2)',
+                                                        borderRadius: 16
+                                                    }}
+                                                >
+                                                    <MessageCircle size={20} /> ¡Lo quiero ya!
+                                                </motion.a>
                                             </div>
-                                            
-                                            <motion.a
-                                                whileHover={{ scale: 1.02 }}
-                                                whileTap={{ scale: 0.98 }}
-                                                href={`https://wa.me/${phone}?text=${encodeURIComponent(`Hola! Vi el producto "${currentItem.title}" en la web y quería consultarles.`)}`}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="btn btn-primary"
-                                                style={{ 
-                                                    width: '100%', 
-                                                    justifyContent: 'center', 
-                                                    background: '#25D366', 
-                                                    borderColor: '#25D366',
-                                                    height: 56,
-                                                    fontSize: '1rem',
-                                                    boxShadow: '0 20px 40px rgba(37, 211, 102, 0.2)',
-                                                    borderRadius: 16
-                                                }}
-                                            >
-                                                <MessageCircle size={20} /> ¡Lo quiero ya!
-                                            </motion.a>
-                                        </div>
+                                        )}
                                     </div>
                                 </motion.div>
                             </AnimatePresence>
                         </div>
 
-                        {/* Dots */}
+                        {/* Bottom Navigation */}
                         <div style={{ 
                             display: 'flex', 
                             justifyContent: 'center', 
-                            gap: 12, 
-                            marginTop: 20 
+                            alignItems: 'center',
+                            gap: 24, 
+                            marginTop: 40 
                         }}>
-                            {news.map((_, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => {
-                                        setDirection(i > index ? 1 : -1)
-                                        setIndex(i)
-                                    }}
-                                    style={{
-                                        width: i === index ? 40 : 12,
-                                        height: 12,
-                                        borderRadius: 10,
-                                        background: i === index ? 'var(--green)' : 'rgba(255,255,255,0.1)',
-                                        border: 'none',
-                                        transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
-                                        cursor: 'pointer'
-                                    }}
-                                />
-                            ))}
+                            <button 
+                                onClick={prevStep}
+                                className="carousel-nav-btn" 
+                                style={{ 
+                                    width: 48, 
+                                    height: 48, 
+                                    background: 'var(--bg-secondary)', 
+                                    borderRadius: '50%',
+                                    border: '1px solid var(--border)',
+                                    color: 'white',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease'
+                                }}
+                            >
+                                <ChevronLeft size={20} />
+                            </button>
+
+                            <div style={{ display: 'flex', gap: 10 }}>
+                                {news.map((_, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => {
+                                            setDirection(i > index ? 1 : -1)
+                                            setIndex(i)
+                                        }}
+                                        style={{
+                                            width: i === index ? 32 : 8,
+                                            height: 8,
+                                            borderRadius: 10,
+                                            background: i === index ? 'var(--green)' : 'rgba(255,255,255,0.1)',
+                                            border: 'none',
+                                            transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+                                            cursor: 'pointer'
+                                        }}
+                                    />
+                                ))}
+                            </div>
+
+                            <button 
+                                onClick={nextStep}
+                                className="carousel-nav-btn" 
+                                style={{ 
+                                    width: 48, 
+                                    height: 48, 
+                                    background: 'var(--bg-secondary)', 
+                                    borderRadius: '50%',
+                                    border: '1px solid var(--border)',
+                                    color: 'white',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease'
+                                }}
+                            >
+                                <ChevronRight size={20} />
+                            </button>
                         </div>
                     </div>
                 )}

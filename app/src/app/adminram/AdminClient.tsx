@@ -3807,7 +3807,7 @@ function AdminNovedades() {
     useEffect(() => { load() }, [load])
 
     async function handleSave() {
-        if (!form.title) { showAlert('error', 'El título es requerido'); return }
+        // if (!form.title) { showAlert('error', 'El título es requerido'); return }
         setIsSaving(true)
         try {
             let finalImageUrl = form.image_url
@@ -3825,7 +3825,18 @@ function AdminNovedades() {
                 finalStoragePath = fileName
             }
 
-            const payload = { ...form, image_url: finalImageUrl, storage_path: finalStoragePath }
+            if (!finalImageUrl && !form.title) {
+                showAlert('error', 'Debes subir una imagen o ingresar un título.')
+                setIsSaving(false)
+                return
+            }
+
+            const payload = { 
+                ...form, 
+                title: form.title || 'Novedad con imagen',
+                image_url: finalImageUrl, 
+                storage_path: finalStoragePath 
+            }
 
             if (editId) {
                 const { error } = await (supabase as any).from('weekly_news').update(payload).eq('id', editId)
@@ -3860,7 +3871,7 @@ function AdminNovedades() {
     return (
         <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-                <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Novedades y Ofertas del Mes de MARZO</h1>
+                <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Novedades y Ofertas del Mes de {new Date().toLocaleDateString('es-AR', { month: 'long' }).toUpperCase()}</h1>
                 <button className="btn btn-primary btn-sm" onClick={() => {
                     setEditId(null);
                     setForm({ title: '', description: '', icon_name: 'Bell', image_url: '', storage_path: '', color: '#34C759', tag: 'NUEVO', active: true, sort_order: items.length });
@@ -3907,8 +3918,10 @@ function AdminNovedades() {
                                         )}
                                     </td>
                                     <td>
-                                        <div style={{ fontWeight: 600 }}>{it.title}</div>
-                                        <div style={{ fontSize: '0.7rem', opacity: 0.6 }}>{it.tag}</div>
+                                        <div style={{ fontWeight: 600 }}>
+                                            {it.title === 'Novedad con imagen' ? '🖼️ Solo Imagen (IA)' : it.title}
+                                        </div>
+                                        <div style={{ fontSize: '0.7rem', opacity: 0.6 }}>{it.tag || 'Sin tag'}</div>
                                     </td>
                                     <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', maxWidth: 300 }}>{it.description}</td>
                                     <td>
@@ -3942,84 +3955,108 @@ function AdminNovedades() {
                             <span>{editId ? 'Editar Novedad' : 'Nueva Novedad'}</span>
                             <button onClick={() => setModalOpen(false)} className="btn btn-ghost btn-sm"><X size={16} /></button>
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                            <div className="form-group">
-                                <label className="form-label">Título *</label>
-                                <input className="form-input" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Ej: Ingreso iPhone 16" />
-                            </div>
-                            <div className="form-group">
-                                <label className="form-label">Descripción</label>
-                                <textarea className="form-input" rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-                            </div>
-                            <div className="form-group">
-                                <label className="form-label">Imagen de Portada (Opcional)</label>
-                                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                            <div className="form-group" style={{ 
+                                padding: '12px', 
+                                border: '2px dashed var(--border)', 
+                                borderRadius: '12px',
+                                background: 'var(--bg-secondary)',
+                                textAlign: 'center'
+                            }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center' }}>
                                     <div style={{
-                                        width: 80, height: 60, borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)',
+                                        width: '100%', height: 280, borderRadius: 12, background: 'var(--bg-primary)', border: '1px solid var(--border)',
                                         overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
                                     }}>
-                                        {newsPreview ? <img src={newsPreview} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Image size={24} color="var(--text-muted)" />}
+                                        {newsPreview ? (
+                                            <img src={newsPreview} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                                        ) : (
+                                            <div style={{ color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                                                <Image size={48} />
+                                                <span style={{ fontSize: '0.8rem' }}>Subir imagen generada por IA</span>
+                                            </div>
+                                        )}
                                     </div>
-                                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                        <input type="file" accept="image/*" onChange={(e) => {
-                                            const file = e.target.files?.[0]
-                                            if (file) {
-                                                setNewsFile(file)
-                                                setNewsPreview(URL.createObjectURL(file))
-                                            }
-                                        }} style={{ fontSize: '0.8rem' }} />
-                                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>* Se subirá al bucket "Images" de Supabase.</div>
-                                    </div>
+                                    <input type="file" accept="image/*" onChange={(e) => {
+                                        const file = e.target.files?.[0]
+                                        if (file) {
+                                            setNewsFile(file)
+                                            setNewsPreview(URL.createObjectURL(file))
+                                        }
+                                    }} style={{ width: '100%', fontSize: '0.8rem' }} id="news-image-input" hidden />
+                                    <button 
+                                        className="btn btn-primary btn-full" 
+                                        onClick={() => document.getElementById('news-image-input')?.click()}
+                                        type="button"
+                                    >
+                                        <Image size={16} /> {newsPreview ? 'Cambiar Imagen' : 'Seleccionar Imagen'}
+                                    </button>
                                     {(newsPreview || form.image_url) && (
-                                        <button className="btn btn-danger btn-sm" onClick={() => { setNewsFile(null); setNewsPreview(null); setForm({ ...form, image_url: '', storage_path: '' }) }} title="Quitar imagen">
-                                            <Trash2 size={12} />
+                                        <button className="btn btn-ghost btn-sm" onClick={() => { setNewsFile(null); setNewsPreview(null); setForm({ ...form, image_url: '', storage_path: '' }) }} style={{ color: 'var(--red)' }}>
+                                            <Trash2 size={12} /> Quitar imagen
                                         </button>
                                     )}
                                 </div>
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                                <div className="form-group">
-                                    <label className="form-label">Tag Superior</label>
-                                    <input className="form-input" value={form.tag} onChange={(e) => setForm({ ...form, tag: e.target.value })} placeholder="Ej: NUEVO" />
-                                </div>
-                                <div className="form-group">
-                                    <label className="form-label">Orden</label>
-                                    <input type="number" className="form-input" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) })} />
-                                </div>
-                            </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                                <div className="form-group">
-                                    <label className="form-label">Icono</label>
-                                    <div style={{ display: 'flex', gap: 8 }}>
-                                        {iconsList.map(ic => (
-                                            <button key={ic} onClick={() => setForm({ ...form, icon_name: ic })} style={{
-                                                padding: 8, borderRadius: 8, border: `1px solid ${form.icon_name === ic ? 'var(--green)' : 'var(--border)'}`,
-                                                background: form.icon_name === ic ? 'var(--green-light)' : 'transparent', cursor: 'pointer'
-                                            }}>
-                                                {ic === 'Zap' && <Zap size={18} />}
-                                                {ic === 'Cpu' && <Cpu size={18} />}
-                                                {ic === 'Sparkles' && <Sparkles size={18} />}
-                                                {ic === 'Bell' && <Bell size={18} />}
-                                            </button>
-                                        ))}
+
+                            <details style={{ width: '100%' }}>
+                                <summary style={{ cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-muted)', padding: '8px 0' }}>
+                                    Más opciones (Título, Descripción, etc. - Opcional)
+                                </summary>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 12, padding: '12px', background: 'var(--bg-secondary)', borderRadius: 12 }}>
+                                    <div className="form-group">
+                                        <label className="form-label">Título (Opcional)</label>
+                                        <input className="form-input" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Ej: Ingreso iPhone 16" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Descripción (Opcional)</label>
+                                        <textarea className="form-input" rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                                        <div className="form-group">
+                                            <label className="form-label">Tag Superior</label>
+                                            <input className="form-input" value={form.tag} onChange={(e) => setForm({ ...form, tag: e.target.value })} placeholder="Ej: NUEVO" />
+                                        </div>
+                                        <div className="form-group">
+                                            <label className="form-label">Orden</label>
+                                            <input type="number" className="form-input" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) })} />
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                                        <div className="form-group">
+                                            <label className="form-label">Icono</label>
+                                            <div style={{ display: 'flex', gap: 8 }}>
+                                                {iconsList.map(ic => (
+                                                    <button key={ic} onClick={() => setForm({ ...form, icon_name: ic })} style={{
+                                                        padding: 8, borderRadius: 8, border: `1px solid ${form.icon_name === ic ? 'var(--green)' : 'var(--border)'}`,
+                                                        background: form.icon_name === ic ? 'var(--green-light)' : 'transparent', cursor: 'pointer'
+                                                    }} type="button">
+                                                        {ic === 'Zap' && <Zap size={18} />}
+                                                        {ic === 'Cpu' && <Cpu size={18} />}
+                                                        {ic === 'Sparkles' && <Sparkles size={18} />}
+                                                        {ic === 'Bell' && <Bell size={18} />}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div className="form-group">
+                                            <label className="form-label">Color de fondo</label>
+                                            <div style={{ display: 'flex', gap: 8 }}>
+                                                {colorsList.map(c => (
+                                                    <button key={c} onClick={() => setForm({ ...form, color: c })} style={{
+                                                        width: 24, height: 24, borderRadius: '50%', background: c, border: `2px solid ${form.color === c ? 'var(--text-primary)' : 'transparent'}`,
+                                                        cursor: 'pointer'
+                                                    }} type="button" />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                        <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} style={{ width: 18, height: 18, accentColor: 'var(--green)' }} />
+                                        <span style={{ fontWeight: 600 }}>Pestaña Activa</span>
                                     </div>
                                 </div>
-                                <div className="form-group">
-                                    <label className="form-label">Color</label>
-                                    <div style={{ display: 'flex', gap: 8 }}>
-                                        {colorsList.map(c => (
-                                            <button key={c} onClick={() => setForm({ ...form, color: c })} style={{
-                                                width: 24, height: 24, borderRadius: '50%', background: c, border: `2px solid ${form.color === c ? 'var(--text-primary)' : 'transparent'}`,
-                                                cursor: 'pointer'
-                                            }} />
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} style={{ width: 18, height: 18, accentColor: 'var(--green)' }} />
-                                <span style={{ fontWeight: 600 }}>Pestaña Activa</span>
-                            </div>
+                            </details>
                         </div>
                         <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 16 }}>
                             <button className="btn btn-ghost" onClick={() => setModalOpen(false)}>Cancelar</button>
