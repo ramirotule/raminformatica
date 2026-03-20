@@ -24,6 +24,8 @@ interface Product {
     name: string
     cost_price: number | null
     provider_id: string | null
+    short_description?: string | null
+    long_description?: string | null
 }
 
 interface Provider {
@@ -45,6 +47,7 @@ export default function AdminComparator() {
     const [products, setProducts] = useState<Product[]>([])
     const [providers, setProviders] = useState<Provider[]>([])
     const [costs, setCosts] = useState<ProviderCost[]>([])
+    const [dbCategories, setDbCategories] = useState<{id: string, name: string}[]>([])
     const [loading, setLoading] = useState(true)
     const [syncing, setSyncing] = useState<string | null>(null) // ID of product being synced
     const [syncingAll, setSyncingAll] = useState(false)
@@ -63,6 +66,7 @@ export default function AdminComparator() {
             setProducts(res.products as Product[])
             setProviders(res.providers as Provider[])
             setCosts(res.costs as ProviderCost[])
+            setDbCategories(res.categories || [])
         }
         setLoading(false)
     }
@@ -148,7 +152,7 @@ export default function AdminComparator() {
                 name: cost.product_name || "Producto sin nombre",
                 cost: cost.cost_price,
                 price: Math.ceil(((cost.cost_price / 0.90) + 25) / 5) * 5,
-                category: categories.includes(cost.category_name || '') ? (cost.category_name || "Sin Asignar") : "Sin Asignar",
+                category: dbCategories.find(c => c.name === cost.category_name) ? (cost.category_name || "Sin Asignar") : "Sin Asignar",
                 original: cost
             }
         }).filter(Boolean) as { original: ProviderCost, name: string, cost: number, price: number, category: string }[]
@@ -196,8 +200,11 @@ export default function AdminComparator() {
         setPublishPreview(newPreview)
     }
 
-    // LISTA DE CATEGORÍAS DISPONIBLES (Extraídas de productos.json o estáticas)
-    const categories = Array.from(new Set(products.map(p => (p as any).category_name || "Sin Asignar"))).sort()
+    // LISTA DE CATEGORÍAS DISPONIBLES (Extraídas de la base de datos)
+    const categoryNames = Array.from(new Set([
+        "Sin Asignar",
+        ...dbCategories.map(c => c.name)
+    ])).sort()
 
     const toggleSelectItem = (id: string) => {
         setSelectedItemIds(prev => 
@@ -205,12 +212,15 @@ export default function AdminComparator() {
         )
     }
 
-    const toggleSelectAll = (visibleItems: { id: string, selectable: boolean }[]) => {
-        const selectableIds = visibleItems.filter(item => item.selectable).map(item => item.id)
-        if (selectedItemIds.length === selectableIds.length && selectableIds.length > 0) {
-            setSelectedItemIds([])
+    const toggleSelectAll = (visibleIds: string[]) => {
+        const allSelected = visibleIds.length > 0 && visibleIds.every(id => selectedItemIds.includes(id))
+        
+        if (allSelected) {
+            // Deseleccionar solo los visibles
+            setSelectedItemIds(prev => prev.filter(id => !visibleIds.includes(id)))
         } else {
-            setSelectedItemIds(selectableIds)
+            // Añadir los visibles a la selección existente
+            setSelectedItemIds(prev => Array.from(new Set([...prev, ...visibleIds])))
         }
     }
 
@@ -225,7 +235,12 @@ export default function AdminComparator() {
     }
 
     const filteredProducts = products.filter(p => {
-        const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase())
+        const terms = searchQuery.toLowerCase().trim().split(/\s+/).filter(t => t !== '')
+        const matchesSearch = terms.length === 0 || terms.every(term => 
+            p.name.toLowerCase().includes(term) ||
+            (p.short_description || '').toLowerCase().includes(term) ||
+            (p.long_description || '').toLowerCase().includes(term)
+        )
         const matchesProvider = !providerFilter || p.provider_id === providerFilter
         return matchesSearch && matchesProvider
     })
@@ -390,13 +405,15 @@ export default function AdminComparator() {
                                     <th style={{ padding: '16px 20px', textAlign: 'left', width: 40, position: 'sticky', top: 0, background: 'var(--bg-secondary)', zIndex: 10 }}>
                                         <input 
                                             type="checkbox" 
-                                            checked={selectedItemIds.length > 0 && (() => {
-                                                const selectable = costs.filter(c => !c.product_id && (!searchQuery || c.product_name?.toLowerCase().includes(searchQuery.toLowerCase())))
-                                                return selectedItemIds.length === selectable.length && selectable.length > 0
+                                            checked={(() => {
+                                                const terms = searchQuery.toLowerCase().trim().split(/\s+/).filter(t => t !== '')
+                                                const visibleSelectable = costs.filter(c => !c.product_id && (terms.length === 0 || terms.every(term => (c.product_name || '').toLowerCase().includes(term))))
+                                                return visibleSelectable.length > 0 && visibleSelectable.every(c => selectedItemIds.includes(c.id))
                                             })()}
                                             onChange={() => {
-                                                const selectable = costs.filter(c => !c.product_id && (!searchQuery || c.product_name?.toLowerCase().includes(searchQuery.toLowerCase())))
-                                                toggleSelectAll(selectable.map(s => ({ id: s.id, selectable: true })))
+                                                const terms = searchQuery.toLowerCase().trim().split(/\s+/).filter(t => t !== '')
+                                                const visibleSelectable = costs.filter(c => !c.product_id && (terms.length === 0 || terms.every(term => (c.product_name || '').toLowerCase().includes(term))))
+                                                toggleSelectAll(visibleSelectable.map(s => s.id))
                                             }}
                                         />
                                     </th>
@@ -411,13 +428,15 @@ export default function AdminComparator() {
                                     <th style={{ padding: '16px 20px', textAlign: 'left', width: 40, position: 'sticky', top: 0, background: 'var(--bg-secondary)', zIndex: 10 }}>
                                         <input 
                                             type="checkbox" 
-                                            checked={selectedItemIds.length > 0 && (() => {
-                                                const selectable = costs.filter(c => c.provider_id === providerFilter && !products.find(p => p.id === c.product_id) && (!searchQuery || c.product_name?.toLowerCase().includes(searchQuery.toLowerCase())))
-                                                return selectedItemIds.length === selectable.length && selectable.length > 0
+                                            checked={(() => {
+                                                const terms = searchQuery.toLowerCase().trim().split(/\s+/).filter(t => t !== '')
+                                                const visibleSelectable = costs.filter(c => c.provider_id === providerFilter && !products.find(p => p.id === c.product_id) && (terms.length === 0 || terms.every(term => (c.product_name || '').toLowerCase().includes(term))))
+                                                return visibleSelectable.length > 0 && visibleSelectable.every(c => selectedItemIds.includes(c.id))
                                             })()}
                                             onChange={() => {
-                                                const selectable = costs.filter(c => c.provider_id === providerFilter && !products.find(p => p.id === c.product_id) && (!searchQuery || c.product_name?.toLowerCase().includes(searchQuery.toLowerCase())))
-                                                toggleSelectAll(selectable.map(s => ({ id: s.id, selectable: true })))
+                                                const terms = searchQuery.toLowerCase().trim().split(/\s+/).filter(t => t !== '')
+                                                const visibleSelectable = costs.filter(c => c.provider_id === providerFilter && !products.find(p => p.id === c.product_id) && (terms.length === 0 || terms.every(term => (c.product_name || '').toLowerCase().includes(term))))
+                                                toggleSelectAll(visibleSelectable.map(s => s.id))
                                             }}
                                         />
                                     </th>
@@ -450,7 +469,12 @@ export default function AdminComparator() {
                                         type: 'unlinked' as const,
                                         originalCost: c 
                                     }))
-                                ].filter(row => !searchQuery || row.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                                ].filter(row => {
+                                    const terms = searchQuery.toLowerCase().trim().split(/\s+/).filter(t => t !== '')
+                                    if (terms.length === 0) return true
+                                    const text = (row.name + (row.type === 'linked' ? (row.original.short_description || '') + (row.original.long_description || '') : '')).toLowerCase()
+                                    return terms.every(term => text.includes(term))
+                                })
 
                                 const getPriceBadgeForGlobal = (costValue: number | null, allPrices: number[], storePrice: number | null) => {
                                     if (costValue === null) return null
@@ -559,7 +583,13 @@ export default function AdminComparator() {
                                 })
                             } else {
                                 // MODO FILTER: Basado en el costo del proveedor seleccionado
-                                const filteredCosts = costs.filter(c => c.provider_id === providerFilter && (!searchQuery || (c as any).product_name?.toLowerCase().includes(searchQuery.toLowerCase())))
+                                const filteredCosts = costs.filter(c => {
+                                    if (c.provider_id !== providerFilter) return false
+                                    const terms = searchQuery.toLowerCase().trim().split(/\s+/).filter(t => t !== '')
+                                    if (terms.length === 0) return true
+                                    const text = (c.product_name || '').toLowerCase()
+                                    return terms.every(term => text.includes(term))
+                                })
                                 return filteredCosts.map((c, i) => {
                                     const linkedProduct = products.find(p => p.id === c.product_id)
                                     const suggestedSale = Math.ceil(((c.cost_price / 0.90) + 25) / 5) * 5
@@ -687,7 +717,7 @@ export default function AdminComparator() {
             {/* Modal de Previsualización de Publicación Masiva */}
             {publishPreview && (
                 <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1200, padding: 20 }}>
-                    <div className="card" style={{ width: '100%', maxWidth: 800, maxHeight: '90vh', display: 'flex', flexDirection: 'column', padding: 32, borderRadius: 24, boxShadow: '0 30px 60px rgba(0,0,0,0.5)', gap: 24 }}>
+                    <div className="card" style={{ width: '100%', maxWidth: 1000, maxHeight: '90vh', display: 'flex', flexDirection: 'column', padding: 32, borderRadius: 24, boxShadow: '0 30px 60px rgba(0,0,0,0.5)', gap: 24 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                             <div>
                                 <h2 style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: 8, color: 'var(--green)' }}>Publicación Masiva de Productos</h2>
@@ -741,14 +771,14 @@ export default function AdminComparator() {
                                                     <span style={{ fontSize: '0.65rem', opacity: 0.5 }}>Venta Sug.</span>
                                                 </div>
                                             </td>
-                                            <td style={{ padding: '12px 16px', textAlign: 'right' }}>
-                                                <select 
+                                            <td style={{ padding: '12px 16px', textAlign: 'right', minWidth: 200 }}>
+                                                <SearchableSelect
                                                     value={p.category}
-                                                    onChange={(e) => updatePreviewItem(i, 'category', e.target.value)}
-                                                    style={{ background: 'var(--bg-primary)', border: '1px solid var(--border)', color: 'white', padding: '4px 8px', borderRadius: 8, fontSize: '0.75rem', maxWidth: 150 }}
-                                                >
-                                                    {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                                                </select>
+                                                    onChange={(v) => updatePreviewItem(i, 'category', v)}
+                                                    options={categoryNames.map(cat => ({ value: cat, label: cat }))}
+                                                    placeholder="Categoría..."
+                                                    style={{ height: '38px', borderRadius: '8px' }}
+                                                />
                                             </td>
                                         </tr>
                                     ))}

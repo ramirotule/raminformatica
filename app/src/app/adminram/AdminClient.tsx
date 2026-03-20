@@ -20,6 +20,7 @@ import {
     CheckSquare,
     ChevronUp,
     ChevronDown,
+    ChevronLeft,
     ChevronRight,
     Loader2,
     ImagePlus,
@@ -44,6 +45,7 @@ import { SearchableSelect } from '@/components/SearchableSelect'
 import { calculateSellingPrice } from '@/lib/constants'
 import AdminPrecios from './AdminPrecios'
 import AdminComparator from './AdminComparator'
+import { bulkEnrichProducts } from './precios/actions'
 
 type AdminSection = 'dashboard' | 'productos' | 'categorias' | 'marcas' | 'proveedores' | 'home' | 'precios' | 'novedades' | 'comparador'
 
@@ -611,6 +613,8 @@ function AdminProductos() {
     })
     const [images, setImages] = useState<{ id: string, file?: File, url: string, isExisting: boolean, storagePath?: string }[]>([])
     const [draggedIdx, setDraggedIdx] = useState<number | null>(null)
+    const [lightboxOpen, setLightboxOpen] = useState(false)
+    const [lightboxIndex, setLightboxIndex] = useState(0)
 
     // Estado para Bulk Actions y Búsqueda
     const [searchQuery, setSearchQuery] = useState('')
@@ -697,15 +701,33 @@ function AdminProductos() {
     useEffect(() => { load() }, [load])
 
     const filteredProducts = products.filter(p => {
-        const query = searchQuery.toLowerCase()
-        const matchesSearch = (
-            p.name.toLowerCase().includes(query) ||
-            (p.brands?.name?.toLowerCase() || '').includes(query) ||
-            (p.categories?.name?.toLowerCase() || '').includes(query) ||
-            (p.providers?.name?.toLowerCase() || '').includes(query) ||
-            p.tags?.some(t => t.toLowerCase().includes(query)) ||
-            (p.product_variants?.[0]?.sku?.toLowerCase() || '').includes(query)
-        )
+        const terms = searchQuery.toLowerCase().trim().split(/\s+/).filter(t => t !== '')
+        if (terms.length === 0) return true;
+
+        // Concatenamos todos los campos buscables para este producto
+        const searchableText = [
+            p.name.toLowerCase(),
+            p.brands?.name?.toLowerCase() || '',
+            p.categories?.name?.toLowerCase() || '',
+            p.providers?.name?.toLowerCase() || '',
+            p.short_description?.toLowerCase() || '',
+            p.long_description?.toLowerCase() || '',
+            ...(p.tags || []).map(t => t.toLowerCase()),
+            p.product_variants?.[0]?.sku?.toLowerCase() || '',
+            p.product_variants?.[0]?.storage?.toLowerCase() || '',
+            p.product_variants?.[0]?.color?.toLowerCase() || '',
+            p.product_variants?.[0]?.connectivity?.toLowerCase() || ''
+        ].join(' ')
+
+        // Cada término de la búsqueda debe estar presente en el texto buscable
+        const matchesSearch = terms.every(term => {
+            // Si el término es puramente numérico (ej: "8"), queremos evitar que coincida con "128"
+            if (/^\d+$/.test(term)) {
+                const regex = new RegExp(`(^|[^0-9])${term}([^0-9]|$)`, 'i')
+                return regex.test(searchableText)
+            }
+            return searchableText.includes(term)
+        })
         const matchesProvider = !providerFilter || p.provider_id === providerFilter
         const matchesCategory = !categoryFilter || p.category_id === categoryFilter
         const matchesBrand = !brandFilter || p.brand_id === brandFilter
@@ -780,7 +802,9 @@ function AdminProductos() {
                     const noEmojis = p.name.replace(emojiRegex, '').replace(/\s+/g, ' ').trim()
                     newName = smartCapitalize(noEmojis)
                 } else if (mode === 'replace' && bulkRenameSearch) {
-                    const regex = new RegExp(bulkRenameSearch, 'gi')
+                    // Escapar caracteres especiales para tratar la búsqueda como texto literal
+                    const escapedSearch = bulkRenameSearch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+                    const regex = new RegExp(escapedSearch, 'gi')
                     newName = p.name.replace(regex, bulkRenameReplace).replace(/\s+/g, ' ').trim()
                 }
 
@@ -881,6 +905,25 @@ function AdminProductos() {
             load()
         } catch (error: any) {
             showAlert('error', 'Error al procesar tags: ' + error.message)
+        } finally {
+            setIsSaving(false)
+        }
+    }
+
+    async function handleBulkEnrichment() {
+        if (!selectedIds.size) return
+        setIsSaving(true)
+        try {
+            const res = await bulkEnrichProducts(Array.from(selectedIds))
+            if (res.success) {
+                showAlert('success', res.message)
+                setSelectedIds(new Set())
+                load()
+            } else {
+                showAlert('error', res.message)
+            }
+        } catch (error: any) {
+            showAlert('error', 'Error en el enriquecimiento: ' + error.message)
         } finally {
             setIsSaving(false)
         }
@@ -1324,6 +1367,10 @@ function AdminProductos() {
                             <Wand2 size={14} style={{ marginRight: 4 }} />
                             Renombrar / Limpiar
                         </button>
+                        <button className="btn btn-sm btn-ghost" style={{ background: 'rgba(255,159,10,0.1)', border: '1px solid var(--orange)', color: 'var(--orange)' }} onClick={handleBulkEnrichment} disabled={isSaving}>
+                            {isSaving ? <Loader2 size={14} className="animate-spin" style={{ marginRight: 4 }} /> : <Sparkles size={14} style={{ marginRight: 4 }} />}
+                            Buscar Imágenes y Descripción
+                        </button>
                         <button className="btn btn-danger btn-sm" onClick={bulkDelete}>Eliminar</button>
                     </div>
                 </div>
@@ -1743,19 +1790,27 @@ function AdminProductos() {
                                                     width: 100,
                                                     height: 100,
                                                     borderRadius: 8,
-                                                    border: idx === 0 ? '2px solid var(--primary)' : '1px solid var(--border)',
                                                     background: 'var(--bg)',
                                                     overflow: 'hidden',
-                                                    cursor: 'grab',
+                                                    cursor: 'pointer',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center'
                                                 }}
+                                                onClick={(e) => {
+                                                    // Evitar abrir lightbox si se hizo clic en el botón de borrar
+                                                    if ((e.target as HTMLElement).closest('.btn-delete-img')) return;
+                                                    setLightboxIndex(idx)
+                                                    setLightboxOpen(true)
+                                                }}
                                             >
                                                 <img src={img.url} alt="preview" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', pointerEvents: 'none' }} />
                                                 <button
+                                                    type="button"
+                                                    className="btn-delete-img"
                                                     onClick={(e) => {
                                                         e.preventDefault();
+                                                        e.stopPropagation();
                                                         setImages(images.filter(i => i.id !== img.id))
                                                     }}
                                                     style={{
@@ -1763,7 +1818,7 @@ function AdminProductos() {
                                                         background: 'rgba(255, 59, 48, 0.9)', color: 'white',
                                                         border: 'none', borderRadius: '50%', width: 20, height: 20,
                                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                        cursor: 'pointer', fontSize: 12
+                                                        cursor: 'pointer', fontSize: 12, zIndex: 10
                                                     }}
                                                 >
                                                     <X size={12} />
@@ -1806,6 +1861,74 @@ function AdminProductos() {
                                 {dict.admin.guardar}
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ─── Lightbox Modal (Carousel) ───────────────── */}
+            {lightboxOpen && images.length > 0 && (
+                <div 
+                    className="modal-overlay animate-fade-in-fast" 
+                    style={{ zIndex: 4000, background: 'rgba(0,0,0,0.95)' }}
+                    onClick={() => setLightboxOpen(false)}
+                >
+                    <button 
+                        onClick={() => setLightboxOpen(false)}
+                        className="btn btn-ghost"
+                        style={{ position: 'absolute', top: 20, right: 20, color: 'white', background: 'rgba(255,255,255,0.1)' }}
+                    >
+                        <X size={24} />
+                    </button>
+
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', gap: 20, position: 'relative' }}>
+                        {/* Botón previo */}
+                        {images.length > 1 && (
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); setLightboxIndex(prev => (prev - 1 + images.length) % images.length) }}
+                                style={{ background: 'rgba(255,255,255,0.1)', color: 'white', border: 'none', borderRadius: '50%', width: 50, height: 50, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                            >
+                                <ChevronLeft size={30} />
+                            </button>
+                        )}
+
+                        <div 
+                            style={{ position: 'relative', maxWidth: '80%', maxHeight: '80%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <img 
+                                src={images[lightboxIndex]?.url} 
+                                alt="preview large" 
+                                style={{ maxWidth: '100%', maxHeight: '70vh', borderRadius: 8, objectFit: 'contain' }} 
+                            />
+                            
+                            <div style={{ marginTop: 20, display: 'flex', alignItems: 'center', gap: 24, padding: '12px 24px', background: 'rgba(255,255,255,0.05)', borderRadius: 99, border: '1px solid rgba(255,255,255,0.1)' }}>
+                                <span style={{ color: 'white', fontWeight: 600, fontSize: '0.9rem' }}>{lightboxIndex + 1} / {images.length}</span>
+                                <button 
+                                    onClick={() => {
+                                        const idToRemove = images[lightboxIndex].id
+                                        const newImgList = images.filter(i => i.id !== idToRemove)
+                                        setImages(newImgList)
+                                        if (newImgList.length === 0) setLightboxOpen(false)
+                                        else if (lightboxIndex >= newImgList.length) setLightboxIndex(newImgList.length - 1)
+                                    }}
+                                    className="btn btn-danger btn-sm"
+                                    style={{ height: 32 }}
+                                >
+                                    <Trash2 size={14} style={{ marginRight: 6 }} />
+                                    Borrar imagen
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Botón siguiente */}
+                        {images.length > 1 && (
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); setLightboxIndex(prev => (prev + 1) % images.length) }}
+                                style={{ background: 'rgba(255,255,255,0.1)', color: 'white', border: 'none', borderRadius: '50%', width: 50, height: 50, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                            >
+                                <ChevronRight size={30} />
+                            </button>
+                        )}
                     </div>
                 </div>
             )}
@@ -3737,7 +3860,7 @@ function AdminNovedades() {
     return (
         <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-                <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Novedades de la Semana</h1>
+                <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Novedades y Ofertas del Mes de MARZO</h1>
                 <button className="btn btn-primary btn-sm" onClick={() => {
                     setEditId(null);
                     setForm({ title: '', description: '', icon_name: 'Bell', image_url: '', storage_path: '', color: '#34C759', tag: 'NUEVO', active: true, sort_order: items.length });

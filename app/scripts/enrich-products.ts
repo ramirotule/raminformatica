@@ -2,17 +2,7 @@
 /**
  * enrich-products.ts
  *
- * Enriquece productos en Supabase con:
- *   - short_description (visual, emojis, por categoría)
- *   - long_description  (texto profesional para e-commerce)
- *   - Imágenes desde MercadoLibre
- *
- * Características:
- *   - Idempotente: no duplica ni sobreescribe datos ya existentes
- *   - Logs detallados por producto
- *   - Maneja errores por producto sin detener el proceso
- *
- * Uso: npm run enrich-products
+ * Versión sincronizada con enrichment.ts para asegurar coherencia en toda la app.
  */
 
 import { createClient } from '@supabase/supabase-js'
@@ -20,33 +10,20 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 import * as dotenv from 'dotenv'
 import * as path from 'path'
 
-// ─── Env setup ───────────────────────────────────────────────────────────────
-
 dotenv.config({ path: path.resolve(process.cwd(), '.env.local') })
 
 const SUPABASE_URL  = process.env.NEXT_PUBLIC_SUPABASE_URL
 const SUPABASE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 const GEMINI_KEY    = process.env.GOOGLE_GENERATIVE_AI_API_KEY
-if (!SUPABASE_URL || !SUPABASE_KEY) {
-  console.error('❌ Faltan NEXT_PUBLIC_SUPABASE_URL o SUPABASE_KEY en .env.local')
-  process.exit(1)
-}
-if (!GEMINI_KEY) {
-  console.error('❌ Falta GOOGLE_GENERATIVE_AI_API_KEY en .env.local')
+
+if (!SUPABASE_URL || !SUPABASE_KEY || !GEMINI_KEY) {
+  console.error('❌ Faltan variables de entorno en .env.local')
   process.exit(1)
 }
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 const genAI    = new GoogleGenerativeAI(GEMINI_KEY)
-// Gemini con Google Search grounding — busca specs reales en la web en tiempo real
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const gemini   = genAI.getGenerativeModel({
-  model: 'gemini-2.5-flash',
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  tools: [{ googleSearch: {} } as any],
-})
-
-// ─── Types ────────────────────────────────────────────────────────────────────
+const gemini   = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
 
 interface ProductRow {
   id:                string
@@ -60,8 +37,6 @@ interface ProductRow {
   brands:            { name: string } | null
   product_images:    { id: string }[]
 }
-
-// ─── Category detection ───────────────────────────────────────────────────────
 
 function detectCategory(p: ProductRow): string {
   const src = [p.name, p.categories?.name, p.categories?.slug, ...(p.tags ?? [])]
@@ -83,293 +58,85 @@ function detectCategory(p: ProductRow): string {
   if (/teclado|keyboard/.test(src))                       return 'teclado'
   if (/\bmouse\b/.test(src))                              return 'mouse'
   if (/cargador|charger|power bank/.test(src))            return 'accesorios'
+  if (/monopatin|scooter|kickboot/.test(src))             return 'monopatin'
   return 'electronico'
 }
 
-// ─── AI descriptions ──────────────────────────────────────────────────────────
-
-async function generateDescriptions(
-  p: ProductRow,
-  catType: string,
-  force = false
-): Promise<{ short: string | null; long: string | null }> {
-  const needsShort = force || !p.short_description
-  const needsLong  = force || !p.long_description
-  if (!needsShort && !needsLong) return { short: null, long: null }
-
+async function generateDescriptions(p: ProductRow, catType: string): Promise<any> {
   const brandName = p.brands?.name ?? ''
   const catName   = p.categories?.name ?? ''
 
-  // Specs relevantes por categoría para guiar a Gemini
   const specsGuide: Record<string, string> = {
-    celular:    'pantalla (tamaño, tipo, resolución, Hz), procesador, RAM, almacenamiento, cámara principal (MP, apertura, sensor), cámara frontal, batería (mAh), carga rápida (W), conectividad (5G/4G, WiFi, BT), protección (IP, gorilla glass), SO',
-    notebook:   'pantalla (tamaño, tipo, resolución), procesador (modelo, núcleos, GHz), RAM (GB, tipo), almacenamiento (GB/TB, tipo SSD/HDD), GPU, batería (Wh/horas), puertos, peso, SO',
-    tablet:     'pantalla (tamaño, tipo, resolución, Hz), procesador, RAM, almacenamiento, cámara trasera y frontal, batería, conectividad (WiFi, celular), stylus/teclado compatible',
-    smartwatch: 'pantalla (tamaño, tipo), salud (sensores: SpO2, ECG, frecuencia cardíaca), GPS, batería (días de autonomía), resistencia al agua (ATM/IP), conectividad, compatibilidad iOS/Android',
-    auricular:  'tipo (in-ear/over-ear), cancelación de ruido activa (dB si disponible), batería (horas auricular + estuche), driver (mm), conectividad (BT versión, códecs), micrófono, resistencia al agua',
-    consola:    'tipo (portátil/sobremesa), pantalla (si portátil: tamaño, Hz), almacenamiento, resolución máxima, conectividad, controles incluidos, autonomía (si portátil)',
-    monitor:    'tamaño (pulgadas), panel (IPS/VA/OLED), resolución, frecuencia (Hz), tiempo de respuesta (ms), HDR, conectividad (HDMI, DP, USB)',
-    storage:    'tipo (SSD/HDD/NVMe), capacidad, velocidad lectura/escritura (MB/s), interfaz (SATA/NVMe/USB), factor de forma',
-    gpu:        'modelo exacto, VRAM (GB, tipo), arquitectura, puertos de salida, TDP (W), clock base/boost',
-    procesador: 'modelo exacto, núcleos/hilos, frecuencia base/boost, caché, socket, TDP, litografía',
+    celular:    'pantalla, procesador, RAM, almacenamiento, cámaras, batería, carga, conectividad',
+    notebook:   'pantalla, CPUs, RAM, SSD, GPU, batería, puertos, SO',
+    monopatin:  'autonomía (km), velocidad (km/h), motor (W), batería, frenos, ruedas',
+    smartwatch: 'pantalla, sensores salud, GPS, batería, resistencia agua, conectividad',
   }
 
-  const specsHint = specsGuide[catType] ?? 'specs técnicas principales del producto'
+  const specsHint = specsGuide[catType] ?? 'especificaciones técnicas principales'
 
-  const prompt = `Sos un experto en tecnología y redactor de e-commerce.
-Usá tu conocimiento entrenado sobre este producto para obtener sus especificaciones técnicas reales.
+  const prompt = `Sos un experto en tecnología y redactor de e-commerce. Generá datos reales del producto:
+Producto: ${p.name}
+Marca: ${brandName}
+Categoría: ${catName} (tipo: ${catType})
 
-Producto:
-  Nombre    : ${p.name}
-  Marca     : ${brandName || '(no especificada)'}
-  Categoría : ${catName} (tipo: ${catType})
-  Condición : ${p.condition ?? 'nuevo'}
+## TAREA: Generar datos del producto
+Generá un objeto JSON con los siguientes campos:
+1. "long_description": Una ficha técnica visual, una spec por línea, con emoji al inicio. Entre 8 y 12 líneas. Formato: "[emoji] [Nombre]: [Valor]".
+    - Úsalo para specs concretas (ej: 📱 Pantalla: 6.78").
+2. "short_description": Descripción profesional tipo e-commerce, entre 150 y 250 palabras, tono comercial técnico. Sin HTML.
+3. "tags": Array de strings con entre 5 y 10 palabras clave.
 
-IMPORTANTE: Buscá en tu conocimiento las specs reales de este modelo exacto.
-Incluí valores concretos y verificables: números, medidas, nombres de sensores, versiones.
-No uses frases genéricas. Si no conocés una spec con certeza, omitila.
+Responde ÚNICAMENTE con el objeto JSON puro.
+Ejemplo: {"long_description": "...", "short_description": "...", "tags": ["...", "..."]}
+`
 
-Specs a priorizar para este tipo de producto: ${specsHint}
-
-${needsShort ? `## TAREA 1 — short_description
-Generá una ficha técnica visual, una spec por línea, con emoji al inicio.
-Formato exacto de cada línea: [emoji] [Nombre spec]: [valor concreto]
-Entre 8 y 12 líneas. Sin intro, sin cierre comercial.
-
-Ejemplo de línea correcta: 📱 Pantalla: 6.78" AMOLED 144 Hz
-Ejemplo de línea INCORRECTA: 📱 Pantalla de alta resolución
-
-Envolvé el resultado en: <short_description>…</short_description>
-` : ''}
-
-${needsLong ? `## TAREA 2 — long_description
-Descripción profesional para ficha de producto en tienda online.
-- Español neutro, tono comercial técnico y creíble
-- Entre 150 y 280 palabras
-- Incluir specs clave con valores reales
-- Sin frases vacías como "excelente calidad"
-- Sin HTML
-
-Envolvé el resultado en: <long_description>…</long_description>
-` : ''}`
-
-  const maxRetries = 3
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      const result = await gemini.generateContent(prompt)
-      const text   = result.response.text()
-
-      const short = needsShort
-        ? (text.match(/<short_description>([\s\S]*?)<\/short_description>/)?.[1]?.trim() ?? null)
-        : null
-      const long = needsLong
-        ? (text.match(/<long_description>([\s\S]*?)<\/long_description>/)?.[1]?.trim() ?? null)
-        : null
-
-      return { short, long }
-    } catch (err) {
-      const msg = (err as Error).message
-      // Parse retry delay from 429 response
-      const retryMatch = msg.match(/Please retry in ([\d.]+)s/)
-      const retrySec   = retryMatch ? Math.ceil(parseFloat(retryMatch[1])) + 2 : attempt * 15
-
-      if (attempt < maxRetries && msg.includes('429')) {
-        console.log(`  ⏳ Rate limit, esperando ${retrySec}s antes de reintentar (intento ${attempt}/${maxRetries})...`)
-        await new Promise(r => setTimeout(r, retrySec * 1000))
-      } else {
-        console.error(`  ⚠️  Error llamando a Gemini: ${msg.split('\n')[0]}`)
-        return { short: null, long: null }
-      }
-    }
-  }
-  return { short: null, long: null }
-}
-
-// ─── DuckDuckGo Image Search ──────────────────────────────────────────────────
-
-interface DDGImageResult {
-  results?: { image: string; width?: number; height?: number }[]
-}
-
-async function fetchProductImages(query: string, maxImages = 5): Promise<string[]> {
-  const urls: string[] = []
   try {
-    const headers = {
-      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
-      'Referer':    'https://duckduckgo.com/',
-    }
-
-    // Step 1: get vqd token
-    const initRes = await fetch(
-      `https://duckduckgo.com/?q=${encodeURIComponent(query)}&iax=images&ia=images`,
-      { headers }
-    )
-    const html = await initRes.text()
-    const vqdMatch = html.match(/vqd=['"]([^'"]+)['"]/)
-    if (!vqdMatch) return urls
-    const vqd = vqdMatch[1]
-
-    // Step 2: fetch image results
-    const imgRes = await fetch(
-      `https://duckduckgo.com/i.js?q=${encodeURIComponent(query)}&vqd=${vqd}&p=1&o=json&l=us-en`,
-      { headers }
-    )
-    if (!imgRes.ok) return urls
-
-    const data = await imgRes.json() as DDGImageResult
-    for (const item of data.results ?? []) {
-      if (urls.length >= maxImages) break
-      // Prefer larger images (filter out tiny thumbnails)
-      if (item.image && (item.width ?? 0) >= 400) urls.push(item.image)
-    }
-
-    // Fallback: accept any size if not enough results
-    if (urls.length < maxImages) {
-      for (const item of data.results ?? []) {
-        if (urls.length >= maxImages) break
-        if (item.image && !urls.includes(item.image)) urls.push(item.image)
-      }
-    }
+    const result = await gemini.generateContent(prompt)
+    const text   = result.response.text()
+    const jsonMatch = text.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) return null
+    return JSON.parse(jsonMatch[0])
   } catch (err) {
-    console.error(`  ⚠️  Error buscando imágenes: ${(err as Error).message}`)
+    console.error(`  ⚠️  Error en Gemini para ${p.name}:`, (err as Error).message)
+    return null
   }
-  return urls
 }
-
-// ─── Insert images ────────────────────────────────────────────────────────────
-
-async function insertImages(
-  productId: string,
-  productName: string,
-  urls: string[]
-): Promise<number> {
-  let inserted = 0
-  for (let i = 0; i < urls.length; i++) {
-    const { error } = await supabase.from('product_images').insert({
-      product_id:   productId,
-      storage_path: `external/${productId}/${i}`,
-      public_url:   urls[i],
-      alt:          productName,
-      sort_order:   i + 1,
-      is_primary:   i === 0,
-    })
-    if (error) {
-      console.error(`  ⚠️  Error insertando imagen ${i + 1}: ${error.message}`)
-    } else {
-      inserted++
-    }
-  }
-  return inserted
-}
-
-// ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
-  const forceRegen = process.argv.includes('--force')
-  if (forceRegen) console.log('⚡ Modo --force: se re-generan todas las descripciones\n')
-  console.log('🚀 Iniciando enriquecimiento de productos...\n')
+  const force = process.argv.includes('--force')
+  console.log(`🚀 Iniciando enriquecimiento... (Modo force: ${force})\n`)
 
   const { data: products, error } = await supabase
     .from('products')
-    .select(`
-      id, name, slug, short_description, long_description, condition, tags,
-      categories (name, slug),
-      brands     (name),
-      product_images (id)
-    `)
+    .select('*, categories(name, slug), brands(name), product_images(id)')
     .eq('active', true)
-    .order('created_at', { ascending: true })
 
-  if (error) {
-    console.error('❌ Error al leer productos:', error.message)
-    process.exit(1)
-  }
+  if (error || !products) { console.error('Error:', error); return }
 
-  const total = products?.length ?? 0
-  console.log(`📦 Productos activos encontrados: ${total}\n${'─'.repeat(60)}`)
-
-  let processed = 0, skipped = 0, errors = 0
-
-  for (const raw of products ?? []) {
-    // Cast since Supabase returns joined objects
+  for (const raw of products) {
     const p = raw as unknown as ProductRow
+    console.log(`🔍 [${p.id}] ${p.name}`)
 
-    console.log(`\n🔍 [${processed + skipped + errors + 1}/${total}] ${p.name}`)
+    const needsDesc = force || !p.short_description || !p.long_description
+    if (needsDesc) {
+      const data = await generateDescriptions(p, detectCategory(p))
+      if (data) {
+        const updates: any = {}
+        if (data.long_description) updates.long_description = data.long_description
+        if (data.short_description) updates.short_description = data.short_description
+        if (data.tags) updates.tags = data.tags
 
-    try {
-      const catType    = detectCategory(p)
-      const needsShort = forceRegen || !p.short_description
-      const needsLong  = forceRegen || !p.long_description
-      const hasImages  = p.product_images?.length > 0
-
-      console.log(`  📂 Categoría detectada : ${catType}`)
-      console.log(`  📝 short_description   : ${!p.short_description ? 'falta' : forceRegen ? '🔄 re-generando' : '✅ ya tiene'}`)
-      console.log(`  📄 long_description    : ${!p.long_description  ? 'falta' : forceRegen ? '🔄 re-generando' : '✅ ya tiene'}`)
-      console.log(`  🖼️  imágenes            : ${hasImages  ? `✅ ya tiene (${p.product_images.length})` : 'falta'}`)
-
-      if (!needsShort && !needsLong && hasImages) {
-        console.log('  ⏭️  Todo completo, salteando')
-        skipped++
-        continue
+        await supabase.from('products').update(updates).eq('id', p.id)
+        console.log('   ✅ Descripciones generadas')
       }
-
-      // ── Descriptions ──
-      if (needsShort || needsLong) {
-        const { short, long } = await generateDescriptions(p, catType, forceRegen)
-        const updates: Record<string, string> = {}
-
-        if (short) { updates.short_description = short; console.log('  ✅ short_description generada') }
-        else if (needsShort) console.log('  ⚠️  No se pudo generar short_description')
-
-        if (long)  { updates.long_description  = long;  console.log('  ✅ long_description generada')  }
-        else if (needsLong)  console.log('  ⚠️  No se pudo generar long_description')
-
-        if (Object.keys(updates).length > 0) {
-          const { error: ue } = await supabase.from('products').update(updates).eq('id', p.id)
-          if (ue) console.error(`  ❌ Error guardando descripciones: ${ue.message}`)
-        }
-      }
-
-      // ── Images ──
-      if (!hasImages) {
-        // Construir query precisa: evitar marca duplicada y agregar contexto de producto oficial
-        const brand = p.brands?.name ?? ''
-        const nameAlreadyHasBrand = brand && p.name.toLowerCase().startsWith(brand.toLowerCase())
-        const baseName = nameAlreadyHasBrand || !brand ? p.name : `${brand} ${p.name}`
-        // Limpiar variantes de storage/color del nombre para mejor match visual
-        const cleanName = baseName.replace(/\s+\d+\/\d+\s*(gb|tb)?/gi, '').replace(/\s+(esim|5g|4g)/gi, '').trim()
-        const query = `${cleanName} official product photo`
-        console.log(`  🔎 Buscando imágenes: "${query}"`)
-
-        const urls = await fetchProductImages(query)
-        console.log(`  🖼️  Imágenes encontradas: ${urls.length}`)
-
-        if (urls.length > 0) {
-          const n = await insertImages(p.id, p.name, urls)
-          console.log(`  ✅ Imágenes insertadas: ${n}`)
-        } else {
-          console.log('  ⚠️  Sin imágenes disponibles en ML para este producto')
-        }
-      }
-
-      processed++
-    } catch (err) {
-      console.error(`  ❌ Error inesperado: ${(err as Error).message}`)
-      errors++
+    } else {
+      console.log('   ⏭️  Ya tiene descripciones')
     }
-
-    // Pausa entre productos para no saturar APIs
-    await new Promise(r => setTimeout(r, 600))
+    
+    // Pausa para evitar 429
+    await new Promise(r => setTimeout(r, 800))
   }
-
-  console.log(`\n${'─'.repeat(60)}`)
-  console.log('✅ Proceso completado')
-  console.log(`  📦 Procesados con cambios : ${processed}`)
-  console.log(`  ⏭️  Salteados (completos)  : ${skipped}`)
-  console.log(`  ❌ Errores                : ${errors}`)
 }
 
-main().catch(err => {
-  console.error('❌ Error fatal:', err)
-  process.exit(1)
-})
+main()

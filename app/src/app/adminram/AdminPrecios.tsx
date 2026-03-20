@@ -537,9 +537,12 @@ export default function AdminPrecios() {
                         <tbody>
                             {parsedItems.map((item, idx) => {
                                 // Aplicar filtro de búsqueda
-                                const matchesSearch = !searchTerm || 
-                                    item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                                    (item.categoryName && item.categoryName.toLowerCase().includes(searchTerm.toLowerCase()));
+                                const terms = searchTerm.toLowerCase().trim().split(/\s+/).filter(t => t !== '')
+                                const matchesSearch = terms.length === 0 || terms.every(term => 
+                                    item.name.toLowerCase().includes(term) || 
+                                    (item.categoryName && item.categoryName.toLowerCase().includes(term)) ||
+                                    (item.originalDescription && item.originalDescription.toLowerCase().includes(term))
+                                );
                                 
                                 if (!matchesSearch) return null;
 

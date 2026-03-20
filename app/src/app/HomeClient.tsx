@@ -282,7 +282,7 @@ export default function HomeClient({ products, slides, brandLogos }: HomeClientP
             {/* <HeroCarousel slides={slides} products={products} /> */}
 
             {/* ─── HERO TEXT ──────────────────────────────────── */}
-            <section className="hero" style={{ minHeight: 'auto', padding: '64px 0', paddingTop: '200px' }}>
+            <section className="hero" style={{ minHeight: 'auto', padding: '0px 0', paddingTop: '180px', paddingBottom: '40px' }}>
                 <div className="container hero-content">
                     <div className="hero-eyebrow">
                         <Zap size={13} />

@@ -73,8 +73,8 @@ export function SearchableSelect({ options, value, onChange, placeholder = 'Sele
                     userSelect: 'none',
                     background: 'var(--bg-card)',
                     border: '1px solid var(--border-light)',
-                    borderRadius: '12px',
-                    height: '46px',
+                    borderRadius: style?.borderRadius || '12px',
+                    height: style?.height || '46px',
                     padding: '0 16px'
                 }}
                 onClick={() => !disabled && setIsOpen(!isOpen)}
@@ -113,7 +113,7 @@ export function SearchableSelect({ options, value, onChange, placeholder = 'Sele
                         overflow: 'hidden',
                         display: 'flex',
                         flexDirection: 'column',
-                        maxHeight: '400px'
+                        maxHeight: '300px'
                     }}
                 >
                     <div style={{ padding: '8px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', background: 'var(--bg-secondary)' }}>

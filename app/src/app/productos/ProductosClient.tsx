@@ -55,14 +55,28 @@ export default function ProductosClient({ products, categories, brands }: Produc
         let list = [...products]
 
         if (search.trim()) {
-            const q = search.toLowerCase()
-            list = list.filter(
-                (p) =>
-                    p.name.toLowerCase().includes(q) ||
-                    (p.brands?.name || '').toLowerCase().includes(q) ||
-                    p.short_description?.toLowerCase().includes(q) ||
-                    p.tags?.some(tag => tag.toLowerCase().includes(q))
-            )
+            const terms = search.toLowerCase().trim().split(/\s+/).filter(t => t !== '')
+            list = list.filter(p => {
+                const searchableText = [
+                    p.name.toLowerCase(),
+                    (p.brands?.name || '').toLowerCase(),
+                    (p.categories?.name || '').toLowerCase(),
+                    (p.short_description || '').toLowerCase(),
+                    (p.long_description || '').toLowerCase(),
+                    ...(p.tags || []).map(t => t.toLowerCase()),
+                    p.product_variants?.[0]?.storage?.toLowerCase() || '',
+                    p.product_variants?.[0]?.color?.toLowerCase() || '',
+                    p.product_variants?.[0]?.connectivity?.toLowerCase() || ''
+                ].join(' ')
+                return terms.every(term => {
+                    // Si el término es puramente numérico (ej: "8"), queremos evitar que coincida con "128"
+                    if (/^\d+$/.test(term)) {
+                        const regex = new RegExp(`(^|[^0-9])${term}([^0-9]|$)`, 'i')
+                        return regex.test(searchableText)
+                    }
+                    return searchableText.includes(term)
+                })
+            })
         }
 
         if (selectedCategory) {

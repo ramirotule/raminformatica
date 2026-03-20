@@ -45,13 +45,19 @@ export default function GlobalSearch() {
             trackSearch(query)
             setLoading(true)
             try {
-                // Ahora buscamos coincidencias parciales en nombre, descripción Y la nueva columna tags_index
-                const { data, error } = await supabase
+                const terms = query.split(/\s+/).filter(t => t.length > 0)
+                let queryBuilder = supabase
                     .from('products')
                     .select('*, brands(*), categories(*), product_images(*), product_variants(*, prices(*))')
-                    .or(`name.ilike.%${query}%,short_description.ilike.%${query}%,tags_index.ilike.%${query}%`)
                     .eq('active', true)
                     .limit(8)
+
+                // Aplicamos un .or() por cada término para que todos deban estar presentes en algún campo
+                terms.forEach(term => {
+                    queryBuilder = queryBuilder.or(`name.ilike.%${term}%,short_description.ilike.%${term}%,long_description.ilike.%${term}%,tags_index.ilike.%${term}%`)
+                })
+
+                const { data, error } = await queryBuilder
 
                 if (data) {
                     const sorted = (data as any).sort((a: any, b: any) => a.name.localeCompare(b.name, 'es'))

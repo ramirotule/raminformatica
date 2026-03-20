@@ -3,6 +3,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { slugify, smartCapitalize } from "@/lib/utils";
 import { calculateSellingPrice } from "@/lib/constants";
+import { enrichSingleProduct } from "@/lib/enrichment";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey =
@@ -684,13 +685,14 @@ export async function updatePricesFromRawText(rawText: string, provider: string)
  */
 export async function getComparisonData() {
     try {
-        const { data: products, error: pErr } = await supabaseAdmin.from('products').select('id, name, cost_price, provider_id').eq('active', true).order('name');
+        const { data: categories, error: catErr } = await supabaseAdmin.from('categories').select('id, name').order('name');
+        const { data: products, error: pErr } = await supabaseAdmin.from('products').select('id, name, cost_price, provider_id, short_description, long_description').eq('active', true).order('name');
         const { data: providers, error: provErr } = await supabaseAdmin.from('providers').select('id, name').eq('active', true).order('name');
-        const { data: costs, error: cErr } = await supabaseAdmin.from('provider_costs').select('product_id, provider_id, cost_price, product_name, category_name, updated_at');
+        const { data: costs, error: cErr } = await supabaseAdmin.from('provider_costs').select('id, product_id, provider_id, cost_price, product_name, category_name, updated_at');
 
-        if (pErr || provErr || cErr) throw new Error("Error cargando datos de comparador");
+        if (pErr || provErr || cErr || catErr) throw new Error("Error cargando datos de comparador");
 
-        return { success: true, products, providers, costs };
+        return { success: true, products, providers, costs, categories };
     } catch (err: any) {
         return { success: false, message: err.message };
     }
@@ -896,5 +898,32 @@ export async function publishBulkFromProviderCosts(costs: any[], providerId: str
         return res;
     } catch (err: any) {
         return { success: false, message: err.message };
+    }
+}
+
+/**
+ * ENRIQUECE productos seleccionados con IA (imágenes y descripción)
+ */
+export async function bulkEnrichProducts(ids: string[]) {
+    if (!ids || ids.length === 0) return { success: false, message: "No se seleccionaron productos." };
+
+    try {
+        let successCount = 0;
+        let errorCount = 0;
+
+        // Procesamos uno a uno para evitar saturar las APIs (especialmente Gemini 429)
+        for (const id of ids) {
+            const res = await enrichSingleProduct(id);
+            if (res.success) successCount++;
+            else errorCount++;
+        }
+
+        return { 
+            success: true, 
+            message: `Enriquecimiento finalizado. Éxito: ${successCount}, Errores: ${errorCount}.` 
+        };
+    } catch (err: any) {
+        console.error("Error in bulkEnrichProducts:", err);
+        return { success: false, message: `Error general: ${err.message}` };
     }
 }
