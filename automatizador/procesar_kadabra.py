@@ -17,6 +17,7 @@ Formula de venta: (precio_costo / 0.90) + $25 USD, redondeado a múltiplo de 5
 import re
 import os
 import json
+import math
 from datetime import datetime
 
 
@@ -55,6 +56,13 @@ CATEGORIA_MAP = {
     "MOUSE": "Mouse",
     "TECLADO": "Teclados",
     "GARMIN": "Smartwatch",
+    "QUEST": "Video Juegos",
+    "VR2": "Video Juegos",
+    "PLAYSTATION": "Video Juegos",
+    "NINTENDO": "Video Juegos",
+    "XBOX": "Video Juegos",
+    "JOYSTICK": "Video Juegos",
+    "G29": "Video Juegos",
 }
 
 # Líneas que indican que son headers o separadores, no productos
@@ -63,6 +71,7 @@ HEADER_KEYWORDS = [
     "MAYORISTA", "MINORISTA", "TRANSFERENCIA", "EFECTIVO", "CREDITO", "DEBITO",
     "WHATSAPP", "INSTAGRAM", "TELEFONO", "CONTACTO", "HORARIO", "LOCAL",
     "ENTREGA", "ENVIO", "PAGO", "CONDICIONES", "INFO", "NOTA", "AVISO",
+    "LISTADO", "TECNOLOGIA", "KADABRA",
 ]
 
 
@@ -103,7 +112,8 @@ class ProcesadorKadabra:
         """Formula: (precio_costo / 0.90) + $25 USD, redondeado a múltiplo de 5."""
         try:
             precio = (precio_costo / 0.9) + 25
-            return int(round(precio / 5) * 5)
+            # Redondear siempre hacia ARRIBA al múltiplo de 5
+            return int(math.ceil(precio / 5) * 5)
         except Exception:
             return None
 
@@ -151,16 +161,15 @@ class ProcesadorKadabra:
 
     def limpiar_nombre_producto(self, nombre: str) -> str:
         """Limpia emojis y caracteres raros del nombre (en cualquier posición)."""
-        # Quitar emojis suplementarios (U+10000–U+10FFFF)
-        nombre = re.sub(r'[\U00010000-\U0010ffff]', '', nombre)
-        # Quitar emojis del plano básico (U+2000–U+27BF, U+2B00–U+2BFF, U+FE00–U+FEFF)
-        nombre = re.sub(r'[\u2000-\u27BF\u2B00-\u2BFF\uFE00-\uFEFF]', '', nombre)
-        # Quitar variantes de emoji y símbolos misceláneos
-        nombre = re.sub(r'[\u2600-\u26FF\u2700-\u27BF]', '', nombre)
-        # Quitar caracteres especiales de decoración (flechas, bullets, etc.)
-        nombre = re.sub(r'[✅❌⚠️🔹🔸►▶→•\*]', '', nombre)
-        # Quitar cualquier carácter no ASCII que quede al inicio/final
-        nombre = re.sub(r'^[^\x00-\x7F\wáéíóúÁÉÍÓÚñÑüÜ]+', '', nombre)
+        # Limpiar emojis y símbolos decorativos en cualquier posicion
+        nombre = re.sub(r'[^\w\s\+\-\.\,\/\(\)\&\'\"]', '', nombre).strip()
+        
+        # Corregir Joy -> Joystick si parece ser un joystick (Xbox, PS, etc)
+        if re.search(r'\bJoy\b', nombre, re.IGNORECASE):
+            # Solo si contiene keywords de consolas o controles
+            if re.search(r'Xbox|Playstation|PS5|PS4|Switch|Series|Pro|Wireless|DualSense', nombre, re.IGNORECASE):
+                nombre = re.sub(r'\bJoy\b', 'Joystick', nombre, flags=re.IGNORECASE)
+
         nombre = re.sub(r'\s+', ' ', nombre).strip()
         return nombre
 
@@ -188,6 +197,19 @@ class ProcesadorKadabra:
         """Ajusta la categoría basándose en el nombre del producto (tiene prioridad sobre el header)."""
         nu = nombre.upper()
 
+        # Teclados (prioridad sobre Tablets/Ipads por 'Magic Keyboard Ipad')
+        if 'MAGIC KEYBOARD' in nu or 'TECLADO' in nu:
+            return 'Teclados'
+
+        # Tablets & Ipads
+        if re.search(r'IPAD|TABLET|TABLETA|\bPAD\b|\bTAB\b|SM-X\d+|GALAXY TAB', nu):
+            return 'Tablets & Ipads'
+
+
+        # Mouse
+        if 'MAGIC MOUSE' in nu or 'MAGIC TRACKPAD' in nu:
+            return 'Mouse'
+
         # Desktop / PC de Escritorio
         if 'IMAC' in nu or 'MAC MINI' in nu or 'MAC STUDIO' in nu:
             return 'Desktop / PC de Escritorio'
@@ -195,10 +217,6 @@ class ProcesadorKadabra:
         # Notebooks
         if 'MACBOOK' in nu:
             return 'Notebooks & Macbooks'
-
-        # Tablets
-        if 'IPAD' in nu:
-            return 'Tablets & Ipads'
 
         # AirPods
         if 'AIRPODS' in nu or 'AIR PODS' in nu:
@@ -208,14 +226,6 @@ class ProcesadorKadabra:
         if re.search(r'\bWATCH\b|\bSERIES\b|\bMILANESE\b|\bGARMIN\b|\bFENIX\b|\bFOREATHLETE\b|\bFORErunner\b', nu):
             return 'Smartwatch'
 
-        # Teclados
-        if 'MAGIC KEYBOARD' in nu or 'TECLADO' in nu:
-            return 'Teclados'
-
-        # Mouse
-        if 'MAGIC MOUSE' in nu or 'MAGIC TRACKPAD' in nu:
-            return 'Mouse'
-
         # Cargadores
         if re.search(r'CARGADOR|ADAPTADOR|CHARGER', nu):
             return 'Cargadores'
@@ -223,6 +233,14 @@ class ProcesadorKadabra:
         # Accesorios Apple (Pencil, AirTag, etc.)
         if re.search(r'PENCIL|AIRTAG|AIR TAG', nu):
             return 'Accesorios'
+
+        # Video Juegos
+        if re.search(r'QUEST|VR2|PLAYSTATION|NINTENDO|XBOX|JOYSTICK|G29|PORTAL|PS5|PS4|SWITCH|SERIES X|SERIES S', nu):
+            return 'Video Juegos'
+
+        # Monopatines
+        if 'KICKBOOT' in nu:
+            return 'Monopatines'
 
         return categoria_actual
 
@@ -247,6 +265,11 @@ class ProcesadorKadabra:
             linea = lineas[i]
 
             if not linea or len(linea) < 3:
+                i += 1
+                continue
+
+            # ── Ignorar metadatos de WhatsApp o headers de la empresa ──
+            if re.search(r'\[\d{1,2}:\d{2}.*?\d{4}\]|Kadabra Tecnología|Listado', linea, re.IGNORECASE):
                 i += 1
                 continue
 
@@ -378,6 +401,7 @@ class ProcesadorKadabra:
                     {
                         "nombre": p['producto'],
                         "precio": p['precio_venta'],
+                        "precio_costo": p['precio_costo'],
                         "categoria": p['categoria'],
                         "proveedor": "Kadabra"
                     }

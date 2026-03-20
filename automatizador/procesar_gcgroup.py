@@ -94,8 +94,8 @@ class ProcesadorGCGroup:
             # Sumar $20 USD extras
             precio_con_extras = precio_con_margen + 25
             
-            # Redondear al múltiplo de 5 más cercano (como REDOND.MULT de Excel)
-            precio_final = round(precio_con_extras / 5) * 5
+            # Redondear siempre hacia ARRIBA al múltiplo de 5 (Siguiente múltiplo)
+            precio_final = math.ceil(precio_con_extras / 5) * 5
             
             return int(precio_final)
             
@@ -110,7 +110,9 @@ class ProcesadorGCGroup:
         - Capitalizar palabras (Title Case)
         - Mantener unidades en mayúsculas
         """
-        nombre_final = nombre.strip()
+        # Eliminar emojis y símbolos decorativos (como ▪️, ✅, etc.) en cualquier posición
+        nombre_limpio = re.sub(r'[^\w\s\+\-\.\,\/\(\)\&\'\"]', '', nombre)
+        nombre_final = " ".join(nombre_limpio.split()) # Limpia espacios extras
         
         # Prefijos según categoría
         prefix = ""
@@ -224,11 +226,16 @@ class ProcesadorGCGroup:
                     cat_final = categoria_actual
                     prod_upper = producto.upper()
                     
-                    if "PENCIL" in prod_upper:
+                    if "MAGIC KEYBOARD" in prod_upper or "TECLADO" in prod_upper:
+                        cat_final = "Teclados"
+                    elif re.search(r'IPAD|TABLET|\bTAB\b|\bPAD\b', prod_upper):
+                        cat_final = "Tablets & Ipads"
+                    elif "PENCIL" in prod_upper:
                         cat_final = "Accesorios"
                     elif "AIRPODS" in prod_upper or "AIR PODS" in prod_upper:
                         cat_final = "AirPods"
                     # -----------------------------------------------
+
 
                     # Calcular precio de venta
                     precio_venta = self.calcular_precio_venta(precio_costo)
@@ -285,6 +292,7 @@ class ProcesadorGCGroup:
                 productos_publicos_lista.append({
                     "nombre": p['producto'],
                     "precio": p['precio_venta'],
+                    "precio_costo": p['precio_costo'],
                     "categoria": p['categoria']
                 })
             

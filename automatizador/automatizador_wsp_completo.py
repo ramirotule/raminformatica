@@ -20,23 +20,29 @@ class AutomatizadorWSP:
         # Permitir al usuario indicar un día específico; si se deja vacío, usar hoy
         self.fecha_hoy = self.solicitar_fecha_objetivo()
         self.proveedores = {
-            "GcGroup": {
-                "archivo_salida": "output/lista_gcgroup.txt",
-                "filtro_inicio": ["lista de hoy", "buen dia"],
-                "nombre_corto": "gcgroup",
-                "busqueda_alternativa": ["gc", "group", "gcgroup"]
-            },
-            "Kadabra Tecnología": {  # Simplificado
-                "archivo_salida": "output/lista_kadabra.txt", 
-                "filtro_inicio": ["lista", "precios", "iphone", "samsung", "kadabra"],
-                "nombre_corto": "kadabra",
-                "busqueda_alternativa": ["kadabra", "kadabra tecnologia", "kadabra tecnología"]
-            },
-            "Zentek BA": {
-                "archivo_salida": "output/lista_zentek.txt",
-                "filtro_inicio": ["lista", "precios", "zentek"],
-                "nombre_corto": "zentek",
-                "busqueda_alternativa": ["zentek", "zentekba", "zentek ba"]
+            # "GcGroup": {
+            #     "archivo_salida": "output/lista_gcgroup.txt",
+            #     "filtro_inicio": ["lista de hoy", "buen dia"],
+            #     "nombre_corto": "gcgroup",
+            #     "busqueda_alternativa": ["gc", "group", "gcgroup"]
+            # },
+            # "Kadabra Tecnología": {  # Simplificado
+            #     "archivo_salida": "output/lista_kadabra.txt", 
+            #     "filtro_inicio": ["lista", "precios", "iphone", "samsung", "kadabra"],
+            #     "nombre_corto": "kadabra",
+            #     "busqueda_alternativa": ["kadabra", "kadabra tecnologia", "kadabra tecnología"]
+            # },
+            # "Zentek BA": {
+            #     "archivo_salida": "output/lista_zentek.txt",
+            #     "filtro_inicio": ["lista", "precios", "zentek"],
+            #     "nombre_corto": "zentek",
+            #     "busqueda_alternativa": ["zentek", "zentekba", "zentek ba"]
+            # },
+            "Tecno Duo": {
+                "archivo_salida": "output/lista_tecnoduo.txt",
+                "filtro_inicio": ["*Buen día!*🫶🏻", "buen dia", "Buen día", "LISTA DE HOY"],
+                "nombre_corto": "tecnoduo",
+                "busqueda_alternativa": ["Provee Quiro Naza Último", "Provee Quiro Naza Útlimo", "tecno duo"]
             },
         }
         
@@ -164,7 +170,7 @@ class AutomatizadorWSP:
             print("✅ Abriendo WhatsApp Web...")
             self.driver.get("https://web.whatsapp.com")
             print("⏳ Esperando 8 segundos para cargar WhatsApp...")
-            time.sleep(30)
+            # time.sleep(30)
             return True
             
         except Exception as e:
@@ -254,6 +260,7 @@ class AutomatizadorWSP:
                     # --- LÓGICA DE COINCIDENCIA ---
                     # 1. ¿Contiene alguna palabra clave del filtro?
                     match_keywords = any(kw.upper() in texto_normalizado for kw in filtro_inicio)
+                    print(f"   🎯 ¿Contiene alguna palabra clave del filtro?: {match_keywords}" )
                     if not match_keywords:
                         # Fallback a palabras clave genéricas de listas de precios
                         match_keywords = any(kw in texto_normalizado for kw in ["LISTA", "PRECIOS", "SAMSUNG", "IPHONE"])
@@ -1055,10 +1062,25 @@ class AutomatizadorWSP:
                         break
                 
                 if chat_match:
-                    # Hacer clic en el chat
-                    chat_match.click()
+                    # Hacer clic en el chat usando múltiples métodos para mayor robustez
+                    print(f"   🎯 Intentando abrir chat: '{chat_match.get_attribute('title')}'")
+                    try:
+                        # Método 1: JavaScript Click (más confiable en WhatsApp Web)
+                        self.driver.execute_script("arguments[0].click();", chat_match)
+                    except:
+                        # Método 2: Click directo de Selenium (fallback)
+                        try:
+                            chat_match.click()
+                        except:
+                            # Método 3: Click en el ancestro (a veces el span no recibe el click)
+                            try:
+                                parent = chat_match.find_element(By.XPATH, "./ancestor::div[@role='row' or @role='listitem']")
+                                self.driver.execute_script("arguments[0].click();", parent)
+                            except:
+                                pass
+                    
                     time.sleep(4)
-                    print(f"✅ Chat abierto: {chat.get_attribute('title')}")
+                    print(f"✅ Chat supuestamente abierto: {chat_match.get_attribute('title')}")
                     return True
             
             print(f"❌ No se encontró ningún chat para: {nombre_proveedor}")
@@ -1110,14 +1132,20 @@ class AutomatizadorWSP:
         try:
             print("📝 Iniciando extracción optimizada del mensaje objetivo...")
             
-            # EXTRACCIÓN DIRECTA: Usar el nuevo método optimizado
+            # Priorizar extracción por etiquetas DOM (Hoy)
+            textos_hoy = self.extraer_mensajes_por_etiquetas_dom()
+            
+            if textos_hoy:
+                print(f"✅ Se extrajeron {len(textos_hoy)} mensajes después de la etiqueta 'Hoy'")
+                return textos_hoy
+                
+            # Fallback al método optimizado si falla el de etiquetas
+            print("⚠️ Falló extracción por etiquetas, usando método optimizado...")
             mensajes_extraidos = self.extraer_mensaje_objetivo_optimizado(config)
             
             if mensajes_extraidos:
-                print(f"📊 Mensaje extraído exitosamente: {len(mensajes_extraidos[0])} caracteres")
                 return mensajes_extraidos
             else:
-                print("⚠️ No se pudo extraer el mensaje con el método optimizado")
                 return []
             
         except Exception as e:
@@ -1131,15 +1159,16 @@ class AutomatizadorWSP:
             
             # Buscar todas las etiquetas de fecha (Hoy, Ayer, fechas específicas)
             # Incluir el selector específico proporcionado para el elemento "Hoy"
+            # Selectores basados en el HTML real proporcionado por el usuario
             selectores_fecha = [
-                # Selector específico para el elemento "Hoy" con las clases exactas
-                '//span[contains(@class, "x140p0ai") and contains(@class, "x1gufx9m") and contains(@class, "x1s928wv") and text()="Hoy"]',
-                # Selector más general pero específico para "Hoy"
-                '//span[contains(@class, "x140p0ai") and text()="Hoy"]',
-                # Selectores originales como fallback
-                '//span[contains(@class, "x140p0ai") and (text()="Hoy" or text()="Ayer" or text()="Today" or text()="Yesterday")]',
-                '//span[text()="Hoy" or text()="Ayer" or text()="Today" or text()="Yesterday"]',
-                '//div[contains(@class, "x1n2onr6")]//span[contains(@class, "x140p0ai")]'
+                # Selector exacto basado en la clase del span proporcionado
+                '//span[text()="Hoy" and contains(@class, "x140p0ai") and contains(@class, "x1s928wv")]',
+                '//span[text()="Hoy" and contains(@class, "x140p0ai")]',
+                # Selector por el contenedor div proporcionado
+                '//div[contains(@class, "x1n2onr6")]//span[text()="Hoy"]',
+                # Fallbacks
+                '//span[text()="Hoy" or text()="Today"]',
+                '//span[contains(@class, "x140p0ai") and (text()="Hoy" or text()="Ayer" or text()="Today" or text()="Yesterday")]'
             ]
             
             ultima_etiqueta = None
@@ -1195,21 +1224,25 @@ class AutomatizadorWSP:
                     selectores_mensajes = [
                         './/following::div[contains(@class, "copyable-text")]',
                         './/following::span[contains(@class, "selectable-text")]',
-                        './/following::div[@data-testid="msg-container"]//span',
-                        './/following::div[contains(@class, "message")]//span[contains(@class, "selectable-text")]'
+                        './/following::div[@data-testid="msg-container"]',
+                        './/following::div[contains(@class, "message-in") or contains(@class, "message-out")]'
                     ]
                     
                     for selector_msg in selectores_mensajes:
                         try:
                             mensajes = contenedor_etiqueta.find_elements(By.XPATH, selector_msg)
                             if mensajes:
-                                print(f"   📋 Encontrados {len(mensajes)} mensajes después de la etiqueta")
+                                print(f"   📋 Encontrados {len(mensajes)} bloques de mensaje después de la etiqueta")
                                 for msg in mensajes:
-                                    texto = msg.text.strip()
-                                    if texto and len(texto) > 2:
-                                        textos.append(texto)
-                                if textos:
-                                    break
+                                    try:
+                                        # Intentar obtener el texto del mensaje de forma limpia
+                                        texto = msg.text.strip()
+                                        if texto and len(texto) > 5:
+                                            # Evitar duplicados de sub-elementos si el selector es muy amplio
+                                            if not any(texto in t for t in textos):
+                                                textos.append(texto)
+                                    except: continue
+                                if textos: break
                         except:
                             continue
                     
@@ -1466,7 +1499,8 @@ class AutomatizadorWSP:
             return False
         
         # Filtrar mensajes del día
-        mensajes_filtrados = self.filtrar_mensajes_del_dia(mensajes, config["filtro_inicio"])
+        filtro_inicio = config.get("filtro_inicio", ["LISTA DE HOY", "BUEN DIA"])
+        mensajes_filtrados = self.filtrar_mensajes_del_dia(mensajes, filtro_inicio)
         print(f"🎯 Mensajes filtrados del día: {len(mensajes_filtrados)}")
         
         # VALIDACIÓN: Verificar si algún mensaje está incompleto

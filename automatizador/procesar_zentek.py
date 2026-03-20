@@ -9,6 +9,7 @@ Formula: (precio_costo / 0.90) + $25 USD, redondeado a múltiplo de 5
 import re
 import os
 import json
+import math
 from datetime import datetime
 
 
@@ -87,8 +88,9 @@ class ProcesadorZentek:
         if "MAGIC MOUSE" in nombre_upper or "MAGIC TRACKPAD" in nombre_upper:
             return "Mouse", "Apple"
         # Tablets
-        if "IPAD" in nombre_upper:
+        if re.search(r'IPAD|TABLET|\bTAB\b|\bPAD\b', nombre_upper):
             return "Tablets & Ipads", "Apple"
+
         # AirPods
         if "AIRPODS" in nombre_upper or "AIR PODS" in nombre_upper:
             return "AirPods", "Apple"
@@ -113,7 +115,8 @@ class ProcesadorZentek:
         try:
             if isinstance(precio_costo, str):
                 precio_costo = float(precio_costo.replace(',', '.'))
-            return int(round(((precio_costo / 0.9) + 25) / 5) * 5)
+            # Redondear siempre hacia ARRIBA al múltiplo de 5
+            return int(math.ceil(((precio_costo / 0.9) + 25) / 5) * 5)
         except Exception as e:
             print(f"⚠️ Error calculando precio: {e}")
             return None
@@ -127,7 +130,9 @@ class ProcesadorZentek:
         Agrega prefijo de marca si corresponde y aplica Title Case
         respetando excepciones técnicas (GB, TB, SSD, 5G, etc.).
         """
-        nombre_final = re.sub(r'^[^\x00-\x7F\wáéíóúÁÉÍÓÚñÑüÜ]+', '', nombre).strip()
+        # Eliminar emojis y símbolos decorativos en cualquier posicion
+        nombre_final = re.sub(r'[^\w\s\+\-\.\,\/\(\)\&\'\"]', '', nombre).strip()
+        nombre_final = " ".join(nombre_final.split()) # Limpia espacios extras
 
         # Agregar marca al frente si no la tiene
         if brand:
@@ -305,6 +310,7 @@ class ProcesadorZentek:
                     {
                         "nombre": p['producto'],
                         "precio": p['precio_venta'],
+                        "precio_costo": p['precio_costo'],
                         "categoria": p['categoria'],
                         "proveedor": "Zentek",
                     }

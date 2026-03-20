@@ -280,7 +280,8 @@ def main():
     scripts_proveedores = [
         "procesar_gcgroup.py",
         "procesar_zentek.py",
-        "procesar_kadabra.py"
+        "procesar_kadabra.py",
+        "procesar_tecnoduo.py"
     ]
     
     for script in scripts_proveedores:
