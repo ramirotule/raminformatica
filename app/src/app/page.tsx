@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { supabase } from '@/lib/supabase'
 import { dict } from '@/lib/dict'
-import type { ProductWithDetails, HomeSlide, BrandLogo } from '@/lib/database.types'
+import type { ProductWithDetails, HomeSlide, BrandLogo, WeeklyNews } from '@/lib/database.types'
 import HomeClient from './HomeClient'
 
 export const metadata: Metadata = {
@@ -69,11 +69,27 @@ async function getBrandLogos(): Promise<BrandLogo[]> {
   return (data as BrandLogo[]) ?? []
 }
 
+async function getWeeklyNews(): Promise<WeeklyNews[]> {
+  const { data, error } = await (supabase as any)
+    .from('weekly_news')
+    .select('*')
+    .eq('active', true)
+    .order('sort_order', { ascending: true })
+
+  if (error) {
+    console.error('Error fetching weekly news:', error)
+    return []
+  }
+
+  return (data as WeeklyNews[]) ?? []
+}
+
 export default async function HomePage() {
-  const [products, slides, brandLogos] = await Promise.all([
+  const [products, slides, brandLogos, news] = await Promise.all([
     getFeaturedProducts(),
     getHomeSlides(),
     getBrandLogos(),
+    getWeeklyNews(),
   ])
 
   return (
@@ -81,6 +97,7 @@ export default async function HomePage() {
       products={products}
       slides={slides}
       brandLogos={brandLogos}
+      news={news}
     />
   )
 }

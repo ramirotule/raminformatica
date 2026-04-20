@@ -701,32 +701,35 @@ function AdminProductos() {
 
     const filteredProducts = products.filter(p => {
         const terms = searchQuery.toLowerCase().trim().split(/\s+/).filter(t => t !== '')
-        if (terms.length === 0) return true;
+        
+        let matchesSearch = true;
+        if (terms.length > 0) {
+            // Concatenamos todos los campos buscables para este producto
+            const searchableText = [
+                p.name.toLowerCase(),
+                p.brands?.name?.toLowerCase() || '',
+                p.categories?.name?.toLowerCase() || '',
+                p.providers?.name?.toLowerCase() || '',
+                p.short_description?.toLowerCase() || '',
+                p.long_description?.toLowerCase() || '',
+                ...(p.tags || []).map(t => t.toLowerCase()),
+                p.product_variants?.[0]?.sku?.toLowerCase() || '',
+                p.product_variants?.[0]?.storage?.toLowerCase() || '',
+                p.product_variants?.[0]?.color?.toLowerCase() || '',
+                p.product_variants?.[0]?.connectivity?.toLowerCase() || ''
+            ].join(' ')
 
-        // Concatenamos todos los campos buscables para este producto
-        const searchableText = [
-            p.name.toLowerCase(),
-            p.brands?.name?.toLowerCase() || '',
-            p.categories?.name?.toLowerCase() || '',
-            p.providers?.name?.toLowerCase() || '',
-            p.short_description?.toLowerCase() || '',
-            p.long_description?.toLowerCase() || '',
-            ...(p.tags || []).map(t => t.toLowerCase()),
-            p.product_variants?.[0]?.sku?.toLowerCase() || '',
-            p.product_variants?.[0]?.storage?.toLowerCase() || '',
-            p.product_variants?.[0]?.color?.toLowerCase() || '',
-            p.product_variants?.[0]?.connectivity?.toLowerCase() || ''
-        ].join(' ')
+            // Cada término de la búsqueda debe estar presente en el texto buscable
+            matchesSearch = terms.every(term => {
+                // Si el término es puramente numérico (ej: "8"), queremos evitar que coincida con "128"
+                if (/^\d+$/.test(term)) {
+                    const regex = new RegExp(`(^|[^0-9])${term}([^0-9]|$)`, 'i')
+                    return regex.test(searchableText)
+                }
+                return searchableText.includes(term)
+            })
+        }
 
-        // Cada término de la búsqueda debe estar presente en el texto buscable
-        const matchesSearch = terms.every(term => {
-            // Si el término es puramente numérico (ej: "8"), queremos evitar que coincida con "128"
-            if (/^\d+$/.test(term)) {
-                const regex = new RegExp(`(^|[^0-9])${term}([^0-9]|$)`, 'i')
-                return regex.test(searchableText)
-            }
-            return searchableText.includes(term)
-        })
         const matchesProvider = !providerFilter || p.provider_id === providerFilter
         const matchesCategory = !categoryFilter || p.category_id === categoryFilter
         const matchesBrand = !brandFilter || p.brand_id === brandFilter

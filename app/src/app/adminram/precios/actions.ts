@@ -25,6 +25,7 @@ export interface ParsedItem {
     currentPrice?: number;
     currentCost?: number;
     providerId?: string;
+    isActive?: boolean;
 }
 
 function calculateFinalPrice(cost: number, isGcGroup = false, originalJsonPrice?: number) {
@@ -125,7 +126,7 @@ export async function integrateProviderCosts(items: ParsedItem[], providerId: st
         const { items: matchedItems } = await searchMatches(items, providerId);
 
         // --- DEDUPLICACIÓN EN EL LOTE ---
-        // Si varios productos matchean al mismo matchId, nos quedamos con el más barato.
+        // Si varios productos matchean al mismo matchId o nombre, nos quedamos con el más barato.
         const uniqueItems = new Map<string, any>();
         matchedItems.forEach(item => {
             const key = item.matchId ? `id:${item.matchId}` : `name:${item.name.toLowerCase().trim()}`;
@@ -136,12 +137,19 @@ export async function integrateProviderCosts(items: ParsedItem[], providerId: st
         });
 
         const allItems = Array.from(uniqueItems.values());
-        
-        // Dividimos en dos grupos para evitar conflictos de claves únicas en Supabase
-        // 1. Matcheados: Upsert por (product_id, provider_id)
-        // 2. Nuevos: Upsert por (provider_id, product_name)
-        const matchedToUpsert = allItems.filter(i => i.matchId).map(item => ({
-            product_id: item.matchId,
+
+        // Estrategia: DELETE todas las filas existentes del proveedor + INSERT limpio.
+        // Esto evita cualquier conflicto con constraints únicos (provider_costs_unique_product_vendor)
+        // sin depender de que PostgREST interprete correctamente el nombre del constraint.
+        const { error: delError } = await supabaseAdmin
+            .from('provider_costs')
+            .delete()
+            .eq('provider_id', providerId);
+
+        if (delError) throw delError;
+
+        const toInsert = allItems.map(item => ({
+            product_id: item.matchId || null,
             provider_id: providerId,
             cost_price: item.cost,
             product_name: item.name,
@@ -149,36 +157,16 @@ export async function integrateProviderCosts(items: ParsedItem[], providerId: st
             updated_at: new Date().toISOString()
         }));
 
-        const newToUpsert = allItems.filter(i => !i.matchId).map(item => ({
-            product_id: null,
-            provider_id: providerId,
-            cost_price: item.cost,
-            product_name: item.name,
-            category_name: item.categoryName || "Sin Asignar",
-            updated_at: new Date().toISOString()
-        }));
-
-        let finalError = null;
-
-        if (matchedToUpsert.length > 0) {
-            const { error } = await supabaseAdmin
+        if (toInsert.length > 0) {
+            const { error: insError } = await supabaseAdmin
                 .from('provider_costs')
-                .upsert(matchedToUpsert, { onConflict: 'product_id,provider_id' });
-            if (error) finalError = error;
+                .insert(toInsert);
+            if (insError) throw insError;
         }
-
-        if (newToUpsert.length > 0) {
-            const { error } = await supabaseAdmin
-                .from('provider_costs')
-                .upsert(newToUpsert, { onConflict: 'provider_id,product_name' });
-            if (error) finalError = error;
-        }
-
-        if (finalError) throw finalError;
 
         return { 
             success: true, 
-            message: `Sincronización histórica lista: se procesaron ${matchedToUpsert.length + newToUpsert.length} productos.` 
+            message: `Sincronización histórica lista: se procesaron ${toInsert.length} productos.` 
         };
     } catch (err: any) {
         console.error("Error integrating provider costs:", err);
@@ -413,7 +401,8 @@ export async function searchMatches(items: ParsedItem[], providerId?: string) {
             similarity: Math.round(highestScore * 100),
             currentPrice,
             currentCost: prevCost,
-            status: isMatched ? 'matched' : 'new'
+            status: isMatched ? 'matched' : 'new',
+            isActive: isMatched ? bestMatch.active : undefined
         });
     }
 
@@ -447,10 +436,23 @@ export async function getMissingProducts(matchedIds: string[], providerId?: stri
  * Procesa la sincronización final.
  */
 export async function processSync(items: ParsedItem[], providerId: string | null = null) {
-    console.log(`Starting sync for ${items.length} items. Provider: ${providerId || 'Mixed'}`);
+    console.log(`🚀 Sincronización: ${items.length} items. Proveedor: ${providerId || 'Catálogo'}`);
+    
     const results = { success: true, created: 0, updated: 0, deactivated: 0, errors: [] as string[] };
-    const createdIds: string[] = [];
+    let itemsToProcess = [...items];
 
+    // 1. AUTO-MATCHING: Si los items están 'pending', buscamos coincidencias ahora mismo
+    if (items.some(i => i.status === 'pending')) {
+        console.log("🔍 Detectados items pendientes. Buscando coincidencias...");
+        const matchRes = await searchMatches(items, providerId || undefined);
+        if (matchRes.success) {
+            itemsToProcess = matchRes.items;
+        } else {
+            results.errors.push(`Error de matching: ${matchRes.message}`);
+        }
+    }
+
+    const createdIds: string[] = [];
     const DEFAULT_CAT_NAME = "Sin Asignar";
     const DEFAULT_BRAND_NAME = "Sin Asignar";
 
@@ -461,14 +463,12 @@ export async function processSync(items: ParsedItem[], providerId: string | null
         const safeCategoryId = defCat?.id;
         const safeBrandId = defBrand?.id;
 
-        // Preparar arrays para operaciones en lote
         const providerCostsToUpsert: any[] = [];
         const pricesToUpsert: any[] = [];
         const productsToUpdate: any[] = [];
         const matchedIds = new Set<string>();
 
-        // Optimización: Obtener TODAS las variantes de los productos matcheados de una vez
-        const matchedIdsToFetch = items.filter(i => i.status === 'matched' && i.matchId).map(i => i.matchId as string);
+        const matchedIdsToFetch = itemsToProcess.filter(i => i.status === 'matched' && i.matchId).map(i => i.matchId as string);
         let variantsMap: Record<string, string[]> = {};
         
         if (matchedIdsToFetch.length > 0) {
@@ -481,7 +481,9 @@ export async function processSync(items: ParsedItem[], providerId: string | null
             }
         }
 
-        for (const item of items) {
+        console.log(`📦 Procesando ${itemsToProcess.length} items...`);
+
+        for (const item of itemsToProcess) {
             try {
                 if (item.status === 'matched' && item.matchId) {
                     matchedIds.add(item.matchId);
@@ -518,7 +520,7 @@ export async function processSync(items: ParsedItem[], providerId: string | null
                     productsToUpdate.push({
                         id: item.matchId,
                         provider_id: providerId || null,
-                        active: true,
+                        active: true, // Forzar activación
                         cost_price: item.cost,
                         price_usd: recalculatedFinalPrice,
                         descripcion_original: item.originalDescription
@@ -604,11 +606,22 @@ export async function processSync(items: ParsedItem[], providerId: string | null
         });
         const finalPrices = Array.from(uniquePrices.values());
 
-        // 1. Upsert provider_costs
-        if (finalProviderCosts.length > 0) {
-            console.log(`Upserting ${finalProviderCosts.length} provider costs...`);
-            const { error } = await supabaseAdmin.from('provider_costs').upsert(finalProviderCosts, { onConflict: 'product_id,provider_id' });
-            if (error) console.error("Error bulk upserting provider costs:", error);
+        // 1. Actualizar provider_costs: DELETE del proveedor + INSERT limpio
+        // (evita el error con el constraint "provider_costs_unique_product_vendor")
+        if (finalProviderCosts.length > 0 && providerId) {
+            console.log(`Updating ${finalProviderCosts.length} provider costs (delete+insert)...`);
+            await supabaseAdmin.from('provider_costs').delete().eq('provider_id', providerId);
+            const { error } = await supabaseAdmin.from('provider_costs').insert(
+                finalProviderCosts.map(pc => ({
+                    product_id: pc.product_id,
+                    provider_id: pc.provider_id,
+                    cost_price: pc.cost_price,
+                    product_name: pc.product_name || null,
+                    category_name: pc.category_name || null,
+                    updated_at: pc.updated_at
+                }))
+            );
+            if (error) console.error("Error actualizando provider costs:", error);
         }
 
         // 2. Upsert prices
@@ -618,14 +631,15 @@ export async function processSync(items: ParsedItem[], providerId: string | null
             if (error) console.error("Error bulk upserting prices:", error);
         }
 
-        // 3. Update products (Supabase no tiene bulk update con diferentes valores, así que usamos Promise.all en trozos)
+        // 3. Actualizar productos: SOLO campos de precio/proveedor.
+        // short_description, long_description, tags, is_featured e imágenes (product_images)
+        // NUNCA se tocan aquí — quedan intactos aunque se actualicen los precios.
         if (productsToUpdate.length > 0) {
-            console.log(`Updating ${productsToUpdate.length} products...`);
-            // Procesamos en trozos de 20 para no saturar
+            console.log(`Updating ${productsToUpdate.length} products (preserving descriptions & images)...`);
             const CHUNK_SIZE = 20;
             for (let i = 0; i < productsToUpdate.length; i += CHUNK_SIZE) {
                 const chunk = productsToUpdate.slice(i, i + CHUNK_SIZE);
-                await Promise.all(chunk.map(p => 
+                const results_batch = await Promise.all(chunk.map(p => 
                     supabaseAdmin.from('products').update({
                         provider_id: p.provider_id,
                         active: p.active,
@@ -634,6 +648,9 @@ export async function processSync(items: ParsedItem[], providerId: string | null
                         descripcion_original: p.descripcion_original
                     }).eq('id', p.id)
                 ));
+                results_batch.forEach((r, idx) => {
+                    if (r.error) results.errors.push(`Error en producto ${chunk[idx].id}: ${r.error.message}`);
+                });
             }
         }
 

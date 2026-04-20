@@ -485,11 +485,25 @@ export default function AdminPrecios() {
                         </button>
                         <button
                             onClick={handleIntegrateToDB}
-                            className="btn btn-primary"
-                            style={{ gap: 8, padding: '0 24px' }}
+                            className="btn btn-ghost"
+                            style={{ gap: 8, padding: '0 16px', border: '1px solid var(--border)' }}
                         >
                             {isSyncing ? <Loader2 className="animate-spin" size={16} /> : <Database size={16} />}
-                            Integrar a DB ({selectedIndices.size})
+                            Integrar Costos ({selectedIndices.size})
+                        </button>
+                        <button
+                            onClick={handleFinalSync}
+                            className="btn btn-primary"
+                            style={{ 
+                                gap: 8, 
+                                padding: '0 24px', 
+                                background: 'var(--green)', 
+                                borderColor: 'var(--green)',
+                                boxShadow: '0 10px 20px rgba(52, 199, 89, 0.2)' 
+                            }}
+                        >
+                            {isSyncing ? <Loader2 className="animate-spin" size={16} /> : <Zap size={16} />}
+                            PUBLICAR EN WEB ({selectedIndices.size})
                         </button>
                     </div>
                 </div>
@@ -564,11 +578,12 @@ export default function AdminPrecios() {
                                 }}>
                                     <td><input type="checkbox" checked={selectedIndices.has(idx)} onChange={() => toggleItem(idx)} /></td>
                                     <td>
-                                        <div style={{ fontWeight: 600, color: item.status === 'deactivate' ? 'var(--red)' : 'inherit', display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <div style={{ fontWeight: 600, color: item.status === 'deactivate' ? 'var(--red)' : 'inherit', display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                                             {item.name}
-                                            {item.status === 'new' && <span style={{ fontSize: '0.65rem', background: 'rgba(52, 199, 89, 0.15)', color: 'var(--green)', padding: '1px 6px', borderRadius: 4, fontWeight: 800 }}>NUEVO PRODUCTO</span>}
+                                            {item.status === 'new' && <span style={{ fontSize: '0.65rem', background: 'rgba(52, 199, 89, 0.15)', color: 'var(--green)', padding: '1px 6px', borderRadius: 4, fontWeight: 800 }}>NUEVO</span>}
                                             {item.status === 'matched' && <span style={{ fontSize: '0.65rem', background: 'rgba(0, 122, 255, 0.15)', color: 'var(--blue)', padding: '1px 6px', borderRadius: 4, fontWeight: 800 }}>ACTUALIZACIÓN</span>}
                                             {item.status === 'deactivate' && <span style={{ fontSize: '0.65rem', background: 'rgba(255, 59, 48, 0.15)', color: 'var(--red)', padding: '1px 6px', borderRadius: 4, fontWeight: 800 }}>ELIMINAR</span>}
+                                            {item.isActive === false && item.status !== 'deactivate' && <span style={{ fontSize: '0.65rem', background: 'rgba(255, 59, 48, 0.15)', color: 'var(--red)', padding: '1px 6px', borderRadius: 4, fontWeight: 800 }}>SE ACTIVARÁ</span>}
                                         </div>
                                         {item.matchName && (
                                             <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
