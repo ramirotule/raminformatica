@@ -25,6 +25,7 @@ interface ProductCardProps {
 }
 
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function ProductCard({ product }: ProductCardProps) {
     const { dolar } = useDolarBlue()
@@ -55,11 +56,13 @@ export default function ProductCard({ product }: ProductCardProps) {
             {/* Imagen */}
             <div className="product-image-wrap">
                 {image?.public_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Image
                         src={image.public_url}
                         alt={image.alt || product.name}
-                        loading="lazy"
+                        width={400}
+                        height={400}
+                        style={{ objectFit: 'contain' }}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                 ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>

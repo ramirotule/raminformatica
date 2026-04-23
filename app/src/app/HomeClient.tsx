@@ -12,6 +12,7 @@ interface HomeClientProps {
     products: ProductWithDetails[]
     slides: HomeSlide[]
     brandLogos: BrandLogo[]
+    news: WeeklyNews[]
 }
 
 // ─── Hero Carousel (from DB slides) ──────────────────────────────
@@ -265,7 +266,7 @@ function ProductRow({
     )
 }
 
-export default function HomeClient({ products, slides, brandLogos }: HomeClientProps) {
+export default function HomeClient({ products, slides, brandLogos, news }: HomeClientProps) {
     console.log('DEBUG [HomeClient] Total products:', products?.length)
     console.log('DEBUG [HomeClient] Featured products:', products?.filter(p => !!p.is_featured).length)
     if (products?.length > 0) {
@@ -333,7 +334,7 @@ export default function HomeClient({ products, slides, brandLogos }: HomeClientP
 
                     {/* Right Column: WeeklyNews Component */}
                     <div className="hero-slide-right">
-                        <WeeklyNews isHero />
+                        <WeeklyNews isHero initialNews={news} />
                     </div>
                 </div>
             </section>

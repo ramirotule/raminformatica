@@ -9,8 +9,8 @@ export const metadata: Metadata = {
   description: dict.marca.descripcion,
 }
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+// export const dynamic = 'force-dynamic'
+export const revalidate = 60 // Revalidar cada minuto
 
 async function getFeaturedProducts(): Promise<ProductWithDetails[]> {
   const { data, error } = await (supabase as any)

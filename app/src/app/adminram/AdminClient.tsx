@@ -600,6 +600,7 @@ function AdminProductos() {
     const [modalOpen, setModalOpen] = useState(false)
     const [editProduct, setEditProduct] = useState<ProductWithDetails | null>(null)
     const [showMoreDetails, setShowMoreDetails] = useState(false)
+    const [showOriginalDesc, setShowOriginalDesc] = useState(false)
 
     // Formulario nuevo/editar producto
     const [form, setForm] = useState({
@@ -609,6 +610,7 @@ function AdminProductos() {
         priceUSD: '', cost_price: '', sku: '', color: '', storage: '', connectivity: '',
         tags: '',
         long_description: '',
+        descripcion_original: '',
     })
     const [images, setImages] = useState<{ id: string, file?: File, url: string, isExisting: boolean, storagePath?: string }[]>([])
     const [draggedIdx, setDraggedIdx] = useState<number | null>(null)
@@ -950,10 +952,12 @@ function AdminProductos() {
             storage: '',
             connectivity: '',
             tags: '',
-            long_description: ''
+            long_description: '',
+            descripcion_original: '',
         })
         setImages([])
         setShowMoreDetails(false)
+        setShowOriginalDesc(false)
         setModalOpen(true)
     }
 
@@ -978,9 +982,11 @@ function AdminProductos() {
             storage: variant?.storage ?? '',
             connectivity: variant?.connectivity ?? '',
             tags: p.tags ? p.tags.join(', ') : '',
-            long_description: p.long_description || ''
+            long_description: p.long_description || '',
+            descripcion_original: (p as any).descripcion_original || '',
         })
         setShowMoreDetails(false)
+        setShowOriginalDesc(false)
         const sortedImages = [...(p.product_images || [])].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
         setImages(sortedImages.map(img => ({
             id: img.id,
@@ -1063,6 +1069,7 @@ function AdminProductos() {
                         price_usd: form.priceUSD ? parseFloat(form.priceUSD) : null,
                         condition: form.condition as 'new', short_description: form.short_description || null,
                         long_description: form.long_description || null,
+                        descripcion_original: form.descripcion_original || null,
                         active: form.active, is_featured: form.is_featured,
                     })
                     .eq('id', editProduct.id)
@@ -1650,6 +1657,60 @@ function AdminProductos() {
                                     Palabras clave que ayudarán a encontrar el producto más fácil (ej: "PS5" por "Playstation").
                                 </p>
                             </div>
+
+                            {/* ─── Descripción del Proveedor (solo lectura / expandible) ─── */}
+                            {form.descripcion_original && (
+                                <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                                        <label className="form-label" style={{ margin: 0 }}>
+                                            📦 Descripción del Proveedor
+                                            <span style={{ marginLeft: 8, fontSize: '0.72rem', fontWeight: 400, color: 'var(--text-muted)', letterSpacing: '0.02em' }}>como llega en la lista</span>
+                                        </label>
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowOriginalDesc(!showOriginalDesc)}
+                                            style={{
+                                                display: 'flex', alignItems: 'center', gap: 5,
+                                                padding: '4px 10px', borderRadius: 8, fontSize: '0.78rem', fontWeight: 600,
+                                                border: '1px solid var(--border)', background: showOriginalDesc ? 'var(--primary-light)' : 'var(--bg-secondary)',
+                                                color: showOriginalDesc ? 'var(--primary)' : 'var(--text-muted)', cursor: 'pointer',
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                        >
+                                            {showOriginalDesc ? <>👁️ Ocultar</> : <>👁️ Ver / Editar</>}
+                                        </button>
+                                    </div>
+                                    {showOriginalDesc ? (
+                                        <textarea
+                                            id="form-desc-original"
+                                            className="form-textarea"
+                                            rows={2}
+                                            value={form.descripcion_original}
+                                            onChange={(e) => setForm((f) => ({ ...f, descripcion_original: e.target.value }))}
+                                            style={{
+                                                fontFamily: 'monospace', fontSize: '0.82rem',
+                                                background: 'rgba(255,159,10,0.04)',
+                                                border: '1px solid rgba(255,159,10,0.3)',
+                                                color: 'var(--text)',
+                                                resize: 'vertical'
+                                            }}
+                                        />
+                                    ) : (
+                                        <div style={{
+                                            padding: '8px 12px', borderRadius: 8,
+                                            background: 'var(--bg-secondary)', border: '1px solid var(--border)',
+                                            fontSize: '0.85rem', color: 'var(--text-muted)',
+                                            fontFamily: 'monospace', whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+                                            maxHeight: 48, overflow: 'hidden',
+                                            position: 'relative',
+                                            cursor: 'pointer'
+                                        }} onClick={() => setShowOriginalDesc(true)}>
+                                            {form.descripcion_original}
+                                            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 20, background: 'linear-gradient(transparent, var(--bg-secondary))' }} />
+                                        </div>
+                                    )}
+                                </div>
+                            )}
 
                             {/* ─── Accordion: Más Detalles ─── */}
                             <div className="form-group" style={{ gridColumn: '1 / -1', marginTop: 8 }}>

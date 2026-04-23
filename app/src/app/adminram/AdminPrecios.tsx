@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { DollarSign, Upload, Zap, AlertCircle, CheckCircle2, FileJson, FileText, Loader2, ShieldCheck, ArrowLeft, Search, PlusCircle, Database, Pencil, Trash2 } from 'lucide-react'
-import { parseImportData, searchMatches, processSync, getMissingProducts, triggerEnrichment, recalculateAllPrices, getRecalculatePreview, type ParsedItem } from './precios/actions'
+import { DollarSign, Upload, Zap, AlertCircle, CheckCircle2, FileJson, FileText, Loader2, ShieldCheck, ArrowLeft, Search, PlusCircle, Database, Pencil, Trash2, Tag, Box } from 'lucide-react'
+import { parseImportData, searchMatches, processSync, getMissingProducts, triggerEnrichment, recalculateAllPrices, getRecalculatePreview, saveMapping, type ParsedItem } from './precios/actions'
 import { SearchableSelect } from '@/components/SearchableSelect'
 import { supabase } from '@/lib/supabase'
 
@@ -20,7 +20,7 @@ export default function AdminPrecios() {
     const [enrichStatus, setEnrichStatus] = useState<string | null>(null)
     const [providers, setProviders] = useState<any[]>([])
     const [categories, setCategories] = useState<any[]>([])
-    const [editingItem, setEditingItem] = useState<{ idx: number; name: string; cost: number; sale: number; category: string } | null>(null)
+    const [editingItem, setEditingItem] = useState<{ idx: number; name: string; cost: number; sale: number; category: string; stock: number } | null>(null)
     const [bulkPreview, setBulkPreview] = useState<any[] | null>(null)
     const [searchTerm, setSearchTerm] = useState('')
 
@@ -311,7 +311,8 @@ export default function AdminPrecios() {
             name: item.name,
             cost: item.cost,
             sale: item.finalPrice,
-            category: item.categoryName || ''
+            category: item.categoryName || '',
+            stock: item.stock !== undefined ? item.stock : 10
         })
     }
 
@@ -324,7 +325,8 @@ export default function AdminPrecios() {
                     name: editingItem.name, 
                     cost: editingItem.cost, 
                     categoryName: editingItem.category, 
-                    finalPrice: editingItem.sale 
+                    finalPrice: editingItem.sale,
+                    stock: editingItem.stock
                 }
                 : item
         ))
@@ -543,9 +545,10 @@ export default function AdminPrecios() {
                                 <th style={{ width: 40 }}><input type="checkbox" checked={selectedIndices.size === parsedItems.length && parsedItems.length > 0} onChange={toggleSelectAll} /></th>
                                 <th>Producto / Coincidencia</th>
                                 <th style={{ width: 150 }}>Categoría</th>
+                                <th style={{ width: 80 }}>Stock</th>
                                 <th style={{ width: 120 }}>P. Costo (USD)</th>
                                 <th style={{ width: 120 }}>P. Venta (USD)</th>
-                                <th style={{ width: 100 }}>Acciones</th>
+                                <th style={{ width: 130 }}>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -597,6 +600,12 @@ export default function AdminPrecios() {
                                             {item.categoryName || '—'}
                                         </div>
                                     </td>
+                                     <td style={{ textAlign: 'center' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                                            <Box size={14} color="var(--text-muted)" />
+                                            <span style={{ fontWeight: 800 }}>{item.stock !== undefined ? item.stock : '—'}</span>
+                                        </div>
+                                    </td>
                                     <td style={{ fontSize: '0.9rem', fontWeight: 700, fontFamily: 'monospace' }}>
                                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                                             {item.currentCost !== undefined && item.currentCost !== item.cost && (
@@ -614,7 +623,20 @@ export default function AdminPrecios() {
                                         </div>
                                     </td>
                                     <td>
-                                        <div style={{ display: 'flex', gap: 8 }}>
+                                        <div style={{ display: 'flex', gap: 6 }}>
+                                            {item.status === 'matched' && (
+                                                <button 
+                                                    onClick={async () => {
+                                                        const res = await saveMapping(item.originalDescription, item.matchId!, databaseProviderId || undefined)
+                                                        if (res.success) alert("Mapeo guardado")
+                                                    }}
+                                                    className="btn btn-ghost btn-sm"
+                                                    title="Mapear Permanentemente"
+                                                    style={{ width: 32, height: 32, padding: 0, color: 'var(--blue)', border: '1px solid rgba(0, 122, 255, 0.2)' }}
+                                                >
+                                                    <Tag size={14} />
+                                                </button>
+                                            )}
                                             <button 
                                                 onClick={() => openEditModal(idx, item)} 
                                                 className="btn btn-ghost btn-sm" 
@@ -681,6 +703,15 @@ export default function AdminPrecios() {
                                             value={editingItem.sale} 
                                             onChange={(e) => setEditingItem({ ...editingItem, sale: parseFloat(e.target.value) || 0 })}
                                             style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', padding: '12px 16px', borderRadius: 12, color: 'var(--green)', fontWeight: 800 }}
+                                        />
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                        <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>STOCK DISPONIBLE</label>
+                                        <input 
+                                            type="number" 
+                                            value={editingItem.stock} 
+                                            onChange={(e) => setEditingItem({ ...editingItem, stock: parseInt(e.target.value) || 0 })}
+                                            style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', padding: '12px 16px', borderRadius: 12, color: 'white', fontWeight: 800 }}
                                         />
                                     </div>
                                 </div>

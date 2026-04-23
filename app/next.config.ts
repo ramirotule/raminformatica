@@ -13,6 +13,15 @@ const nextConfig: NextConfig = {
         hostname: '*.supabase.in',
         pathname: '/storage/v1/object/public/**',
       },
+      // Permite cualquier dominio externo HTTPS (imágenes enriquecidas de terceros)
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+      {
+        protocol: 'http',
+        hostname: '**',
+      },
     ],
   },
   async headers() {

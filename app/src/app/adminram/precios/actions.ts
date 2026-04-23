@@ -18,14 +18,15 @@ export interface ParsedItem {
     categoryName?: string;
     cost: number;
     finalPrice: number;
+    status: 'pending' | 'matched' | 'new' | 'deactivate';
     matchId?: string;
     matchName?: string;
-    status: 'pending' | 'matched' | 'new' | 'deactivate';
     similarity?: number;
     currentPrice?: number;
     currentCost?: number;
     providerId?: string;
     isActive?: boolean;
+    stock?: number;
 }
 
 function calculateFinalPrice(cost: number, isGcGroup = false, originalJsonPrice?: number) {
@@ -325,11 +326,14 @@ function getSimilarity(s1: string, s2: string): number {
 
 /**
  * Busca coincidencias para una lista de productos.
+ * 1. Mapeos manuales (tabla supplier_mappings)
+ * 2. Exacto por descripción original (columna descripcion_original en products)
+ * 3. Fuzzy por nombre
  */
 export async function searchMatches(items: ParsedItem[], providerId?: string) {
     const results: ParsedItem[] = [];
 
-    // 1. Cargamos productos de la tienda para detectar actualizaciones en la web
+    // 1. Cargamos productos de la tienda
     const { data: dbProducts } = await supabaseAdmin.from("products").select(`
         id, 
         name,
@@ -338,11 +342,17 @@ export async function searchMatches(items: ParsedItem[], providerId?: string) {
         active,
         product_variants (
             id,
-            prices (amount)
+            prices (amount),
+            inventory (qty_available)
         )
     `);
 
-    // 2. Cargamos costos históricos de este proveedor para ver cuánto cambió respecto a la última vez que lo subimos
+    // 2. Cargamos mapeos manuales
+    let mappingQuery = supabaseAdmin.from('supplier_mappings').select('variant_id, original_name, provider_id');
+    if (providerId) mappingQuery = mappingQuery.eq('provider_id', providerId);
+    const { data: mappings } = await mappingQuery;
+
+    // 3. Cargamos costos históricos
     let historyMap: Record<string, number> = {};
     if (providerId) {
         const { data: history } = await supabaseAdmin
@@ -362,23 +372,49 @@ export async function searchMatches(items: ParsedItem[], providerId?: string) {
     for (const item of items) {
         let bestMatch: any = null;
         let highestScore = 0;
+        let matchBy = '';
 
-        // 1. Exacto por descripción original (Máxima prioridad)
-        const exactMatch = dbProducts.find(dbP => 
-            dbP.descripcion_original && 
-            dbP.descripcion_original.trim().toLowerCase() === item.originalDescription.trim().toLowerCase()
+        // --- ESTRATEGIA DE MATCHING ---
+
+        // A. Mapeo Manual (Mayor prioridad)
+        const manualMap = mappings?.find(m => 
+            m.original_name.trim().toLowerCase() === item.originalDescription.trim().toLowerCase()
         );
 
-        if (exactMatch) {
-            bestMatch = exactMatch;
-            highestScore = 1;
-        } else {
-            // 2. Fuzzy por nombre
+        if (manualMap) {
+            // Buscamos el producto que tiene esta variante
+            const mappedProduct = dbProducts.find(p => 
+                p.product_variants.some((v: any) => v.id === manualMap.variant_id)
+            );
+            if (mappedProduct) {
+                bestMatch = mappedProduct;
+                highestScore = 1;
+                matchBy = 'manual';
+            }
+        }
+
+        if (!bestMatch) {
+            // B. Exacto por descripción original en producto
+            const exactMatch = dbProducts.find(dbP => 
+                dbP.descripcion_original && 
+                dbP.descripcion_original.trim().toLowerCase() === item.originalDescription.trim().toLowerCase()
+            );
+
+            if (exactMatch) {
+                bestMatch = exactMatch;
+                highestScore = 1;
+                matchBy = 'exact';
+            }
+        }
+
+        if (!bestMatch) {
+            // C. Fuzzy por nombre
             for (const dbP of dbProducts) {
                 const score = getSimilarity(item.name.toLowerCase(), dbP.name.toLowerCase());
                 if (score > highestScore) {
                     highestScore = score;
                     bestMatch = dbP;
+                    matchBy = 'fuzzy';
                 }
             }
         }
@@ -390,8 +426,6 @@ export async function searchMatches(items: ParsedItem[], providerId?: string) {
             currentPrice = bestMatch.product_variants[0].prices[0].amount;
         }
 
-        // El costo anterior lo sacamos prioritariamente de la tabla provider_costs (histórico real)
-        // y si no existe ahí, del producto matcheado en la tienda.
         const prevCost = historyMap[item.name.toLowerCase()] || (isMatched ? bestMatch.cost_price : undefined);
 
         results.push({
@@ -511,6 +545,17 @@ export async function processSync(items: ParsedItem[], providerId: string | null
                                 amount: recalculatedFinalPrice,
                                 updated_at: new Date().toISOString()
                             });
+
+                            // --- ACTUALIZAR STOCK ---
+                            // Si viene stock en el item (o por defecto si es matched y queremos resetear/setear)
+                            if (item.stock !== undefined) {
+                                await supabaseAdmin.from('inventory')
+                                    .upsert({ 
+                                        variant_id: variantId, 
+                                        qty_available: item.stock,
+                                        updated_at: new Date().toISOString()
+                                    }, { onConflict: 'variant_id' });
+                            }
                         }
                     } else {
                         // Si no hay variantes, el producto no se puede actualizar correctamente en precios
@@ -528,8 +573,7 @@ export async function processSync(items: ParsedItem[], providerId: string | null
 
                     results.updated++;
                 } else if (item.status === 'new') {
-                    // La creación de nuevos sigue siendo individual por ahora para obtener el ID, 
-                    // pero podemos mejorarla si son muchos. Normalmente son menos que las actualizaciones.
+                    // La creación de nuevos sigue siendo individual
                     let categoryId = safeCategoryId;
                     if (item.categoryName) {
                         const { data: cat } = await supabaseAdmin.from('categories').select('id').eq('name', item.categoryName).maybeSingle();
@@ -568,7 +612,7 @@ export async function processSync(items: ParsedItem[], providerId: string | null
                     const { data: v } = await supabaseAdmin.from('product_variants').insert({ product_id: (newP as any).id, active: true }).select().single();
                     if (v) {
                         await supabaseAdmin.from('prices').insert({ variant_id: (v as any).id, currency: 'USD', amount: item.finalPrice });
-                        await supabaseAdmin.from('inventory').insert({ variant_id: (v as any).id, qty_available: 10 });
+                        await supabaseAdmin.from('inventory').insert({ variant_id: (v as any).id, qty_available: item.stock !== undefined ? item.stock : 10 });
                     }
 
                     createdIds.push((newP as any).id);
@@ -944,5 +988,36 @@ export async function bulkEnrichProducts(ids: string[], mode: 'all' | 'descripti
     } catch (err: any) {
         console.error("Error in bulkEnrichProducts:", err);
         return { success: false, message: `Error general: ${err.message}` };
+    }
+}
+
+/**
+ * Crea un mapeo permanente entre una descripción original y un producto/variante.
+ */
+export async function saveMapping(originalName: string, productId: string, providerId?: string) {
+    try {
+        // Obtenemos la primera variante del producto
+        const { data: variant } = await supabaseAdmin
+            .from('product_variants')
+            .select('id')
+            .eq('product_id', productId)
+            .maybeSingle();
+
+        if (!variant) throw new Error("El producto seleccionado no tiene variantes.");
+
+        const { error } = await supabaseAdmin
+            .from('supplier_mappings')
+            .upsert({
+                variant_id: variant.id,
+                original_name: originalName,
+                provider_id: providerId || null
+            }, { onConflict: 'original_name,provider_id' });
+
+        if (error) throw error;
+
+        return { success: true, message: "Mapeo guardado correctamente." };
+    } catch (err: any) {
+        console.error("Error saving mapping:", err);
+        return { success: false, message: err.message };
     }
 }

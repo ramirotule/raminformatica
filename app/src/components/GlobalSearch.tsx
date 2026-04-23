@@ -62,28 +62,53 @@ export default function GlobalSearch() {
                 const { data, error } = await queryBuilder.limit(50)
                 if (error) throw error
 
-                // Scoring Local para relevancia
+                // Scoring Local para relevancia y Filtrado Estricto
                 const scored = (data as ProductWithDetails[]).map(p => {
                     let score = 0
                     const name = p.name.toLowerCase()
                     const brand = (p as any).brands?.name?.toLowerCase() || ''
+                    const catName = (p.categories?.name || '').toLowerCase()
                     const shortDesc = (p.short_description || '').toLowerCase()
                     const longDesc = (p.long_description || '').toLowerCase()
-                    const tags = (p as any).tags_index?.toLowerCase() || '' // Assuming tags_index is still available in the data
+                    const tags = (p as any).tags_index?.toLowerCase() || ''
+                    const variantSpecs = [
+                        p.product_variants?.[0]?.storage,
+                        p.product_variants?.[0]?.color,
+                        p.product_variants?.[0]?.connectivity
+                    ].filter(Boolean).join(' ').toLowerCase()
+
+                    const allText = [name, brand, catName, shortDesc, longDesc, tags, variantSpecs].join(' ')
+
+                    // Todos los términos deben estar presentes como palabras completas
+                    const allTermsPresent = terms.every(term => {
+                        const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        const regex = new RegExp(`(^|[^a-zA-Z0-9])${escapedTerm}([^a-zA-Z0-9]|$)`, 'i');
+                        return regex.test(allText);
+                    })
+
+                    if (!allTermsPresent) return { product: p, score: -1 }
 
                     terms.forEach(term => {
-                        if (name.includes(term)) score += 50
-                        if (brand.includes(term)) score += 30
-                        if (tags.includes(term)) score += 15 // Added tags scoring
-                        if (shortDesc.includes(term)) score += 5
-                        if (longDesc.includes(term)) score += 1
+                        const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        const regex = new RegExp(`(^|[^a-zA-Z0-9])${escapedTerm}([^a-zA-Z0-9]|$)`, 'i');
+
+                        if (regex.test(name)) score += 50
+                        if (regex.test(brand)) score += 30
+                        if (regex.test(tags)) score += 15
+                        if (regex.test(shortDesc)) score += 5
+                        if (regex.test(longDesc)) score += 1
                     })
                     return { product: p, score }
                 })
 
-                // Ordenar por score y tomar los 8 mejores
-                scored.sort((a, b) => b.score - a.score)
-                setResults(scored.slice(0, 8).map(s => s.product))
+                // Filtrar los que no pasaron el filtro estricto, ordenar por score y tomar los 8 mejores
+                const filteredResults = scored
+                    .filter(s => s.score >= 0)
+                    .sort((a, b) => b.score - a.score)
+                    .slice(0, 8)
+                    .map(s => s.product)
+
+                setResults(filteredResults)
             } catch (err) {
                 console.error('Fatal search error:', err)
             } finally {

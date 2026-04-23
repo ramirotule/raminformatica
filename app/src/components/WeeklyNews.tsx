@@ -4,12 +4,13 @@ import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
 import type { WeeklyNews as NewsType } from '@/lib/database.types'
 
-export default function WeeklyNews({ isHero = false }: { isHero?: boolean }) {
-    const [news, setNews] = useState<NewsType[]>([])
-    const [loading, setLoading] = useState(true)
+export default function WeeklyNews({ isHero = false, initialNews = [] }: { isHero?: boolean, initialNews?: NewsType[] }) {
+    const [news, setNews] = useState<NewsType[]>(initialNews)
+    const [loading, setLoading] = useState(initialNews.length === 0)
     const [index, setIndex] = useState(0)
     const [direction, setDirection] = useState(0)
 
@@ -158,17 +159,23 @@ export default function WeeklyNews({ isHero = false }: { isHero?: boolean }) {
                                                         whileHover={{ opacity: 0.95, scale: 1.01 }}
                                                         transition={{ duration: 0.2 }}
                                                     >
-                                                        <img 
+                                                        <Image 
                                                             src={currentItem.image_url!} 
                                                             alt={currentItem.title || ''} 
+                                                            width={1200}
+                                                            height={500}
+                                                            priority={isHero && index === 0}
                                                             style={{ width: '100%', height: 'auto', display: 'block', objectFit: 'cover' }} 
                                                         />
                                                     </motion.div>
                                                 </Link>
                                             ) : (
-                                                <img 
+                                                <Image 
                                                     src={currentItem.image_url!} 
                                                     alt={currentItem.title || ''} 
+                                                    width={1200}
+                                                    height={500}
+                                                    priority={isHero && index === 0}
                                                     style={{ width: '100%', height: 'auto', display: 'block', objectFit: 'cover' }} 
                                                 />
                                             )}

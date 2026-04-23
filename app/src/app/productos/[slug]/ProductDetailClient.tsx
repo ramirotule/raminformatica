@@ -8,6 +8,7 @@ import { formatUSD, formatARS, getPriceUSD, getPriceARS, conditionLabel } from '
 import type { ProductWithDetails, ProductImage } from '@/lib/database.types'
 import { ShoppingCart, ChevronLeft, Minus, Plus, ShieldCheck, Truck, X, ChevronRight, House, ChevronDown, CreditCard } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import AddedToCartModal from '@/components/AddedToCartModal'
 
 // Tabla de intereses por cuotas
@@ -118,8 +119,16 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     onClick={() => openLightbox(mainImage)}
                 >
                     {mainImage ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={mainImage} alt={product.name} className="main-image" />
+                        <Image 
+                            src={mainImage} 
+                            alt={product.name} 
+                            width={800} 
+                            height={800} 
+                            priority 
+                            className="main-image"
+                            style={{ objectFit: 'contain', width: '100%', height: 'auto' }}
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                        />
                     ) : (
                         <div className="main-image-placeholder">📦</div>
                     )}
@@ -132,8 +141,13 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                                 className={`thumb-btn ${mainImage === img.public_url ? 'active' : ''}`}
                                 onClick={() => setMainImage(img.public_url || '')}
                             >
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={img.public_url || ''} alt={product.name} />
+                                <Image 
+                                    src={img.public_url || ''} 
+                                    alt={product.name} 
+                                    width={100} 
+                                    height={100}
+                                    style={{ objectFit: 'contain', width: '100%', height: 'auto' }}
+                                />
                             </button>
                         ))}
                     </div>

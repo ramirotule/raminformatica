@@ -3,6 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { dict } from '@/lib/dict'
+import Image from 'next/image'
 import type { Category } from '@/lib/database.types'
 
 interface CategoriasClientProps {
@@ -35,10 +36,12 @@ export default function CategoriasClient({ categories }: CategoriasClientProps) 
                             >
                                 <span className="cat-emoji" role="img" aria-label={cat.name}>
                                     {cat.icon_url && cat.icon_url.startsWith('http') ? (
-                                        <img
+                                        <Image
                                             src={cat.icon_url}
                                             alt={cat.name}
-                                            style={{ width: 64, height: 64, objectFit: 'contain' }}
+                                            width={64}
+                                            height={64}
+                                            style={{ objectFit: 'contain' }}
                                         />
                                     ) : (
                                         cat.icon_url || '📁'

@@ -82,27 +82,25 @@ export default function ProductosClient({
 
                 const allText = [name, brand, catName, shortDesc, longDesc, tagsRaw, variantSpecs].join(' ')
 
-                // Todos los términos deben estar presentes
+                // Todos los términos deben estar presentes como palabras completas o delimitadas
                 const allTermsPresent = terms.every(term => {
-                    if (/^\d+$/.test(term)) {
-                        const regex = new RegExp(`(^|[^0-9])${term}([^0-9]|$)`, 'i')
-                        return regex.test(allText)
-                    }
-                    return allText.includes(term)
+                    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    // Buscamos el término rodeado de límites de palabra o caracteres no alfanuméricos
+                    const regex = new RegExp(`(^|[^a-zA-Z0-9])${escapedTerm}([^a-zA-Z0-9]|$)`, 'i');
+                    return regex.test(allText);
                 })
 
                 if (!allTermsPresent) return { product: p, score: -1 }
 
                 // Calcular peso
                 terms.forEach(term => {
-                    const isNum = /^\d+$/.test(term)
+                    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const regex = new RegExp(`(^|[^a-zA-Z0-9])${escapedTerm}([^a-zA-Z0-9]|$)`, 'i');
+
                     const check = (text: string, weight: number) => {
-                         if (isNum) {
-                             const regex = new RegExp(`(^|[^0-9])${term}([^0-9]|$)`, 'i')
-                             if (regex.test(text)) score += weight
-                         } else if (text.includes(term)) {
-                             score += weight
-                         }
+                        if (regex.test(text)) {
+                            score += weight
+                        }
                     }
 
                     check(name, 50)        // El nombre es lo más importante
