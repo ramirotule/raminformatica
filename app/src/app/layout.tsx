@@ -124,6 +124,12 @@ export default function RootLayout({
             });
           `}
         </Script>
+        {/* Umami Analytics */}
+        <Script
+          src="https://cloud.umami.is/script.js"
+          data-website-id="8ffc12e3-6de5-4857-95b4-b6fc333e5040"
+          strategy="afterInteractive"
+        />
         <AnalyticsInit />
         <LayoutShell>
           {children}
