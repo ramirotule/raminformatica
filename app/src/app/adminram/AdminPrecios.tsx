@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { DollarSign, Upload, Zap, AlertCircle, CheckCircle2, FileJson, FileText, Loader2, ShieldCheck, ArrowLeft, Search, PlusCircle, Database, Pencil, Trash2, Tag, Box } from 'lucide-react'
-import { parseImportData, searchMatches, processSync, getMissingProducts, triggerEnrichment, recalculateAllPrices, getRecalculatePreview, saveMapping, type ParsedItem } from './precios/actions'
+import { parseImportData, searchMatches, processSync, getMissingProducts, triggerEnrichment, recalculateAllPrices, getRecalculatePreview, saveMapping, getMappings, deleteMapping, reactivateProviderProducts, type ParsedItem } from './precios/actions'
 import { SearchableSelect } from '@/components/SearchableSelect'
 import { supabase } from '@/lib/supabase'
 
@@ -23,6 +23,13 @@ export default function AdminPrecios() {
     const [editingItem, setEditingItem] = useState<{ idx: number; name: string; cost: number; sale: number; category: string; stock: number } | null>(null)
     const [bulkPreview, setBulkPreview] = useState<any[] | null>(null)
     const [searchTerm, setSearchTerm] = useState('')
+    const [isReactivating, setIsReactivating] = useState(false)
+    // ─── Mapeos ───
+    const [mappings, setMappings] = useState<any[]>([])
+    const [mappingsLoading, setMappingsLoading] = useState(false)
+    const [mappingsOpen, setMappingsOpen] = useState(false)
+    const [editingMapping, setEditingMapping] = useState<{ id: string; original_name: string; product_name: string } | null>(null)
+    const [editingMappingName, setEditingMappingName] = useState('')
 
     useEffect(() => {
         async function fetchProviders() {
@@ -165,6 +172,23 @@ export default function AdminPrecios() {
         }
     }
 
+    const handleReactivateProvider = async () => {
+        if (!databaseProviderId) return
+        if (!window.confirm(`¿Reactivar TODOS los productos inactivos de este proveedor?`)) return
+        setIsReactivating(true)
+        setResult(null)
+        try {
+            const { reactivateProviderProducts: fn } = await import('./precios/actions')
+            const res = await reactivateProviderProducts(databaseProviderId)
+            setResult({ success: res.success, message: res.message })
+        } catch (err: any) {
+            setResult({ success: false, message: 'Error al reactivar: ' + err.message })
+        } finally {
+            setIsReactivating(false)
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+        }
+    }
+
     const handleSearchMatches = async () => {
         setIsLoading(true)
         try {
@@ -228,7 +252,11 @@ export default function AdminPrecios() {
 
         try {
             const itemsToSync = parsedItems.filter((_, i) => selectedIndices.has(i))
-            const res = await processSync(itemsToSync, isCatalogSync ? undefined : databaseProviderId)
+            // Desactivación masiva SOLO si el usuario hizo detección inteligente completa
+            // y hay explícitamente items 'deactivate' en la selección (productos que ya no están en el catálogo)
+            const hasDeactivations = itemsToSync.some(i => i.status === 'deactivate')
+            const doMassDeactivation = isCatalogSync || hasDeactivations
+            const res = await processSync(itemsToSync, isCatalogSync ? undefined : databaseProviderId, doMassDeactivation)
 
             setResult(res)
             if (res.success && res.createdIds && res.createdIds.length > 0) {
@@ -507,6 +535,24 @@ export default function AdminPrecios() {
                             {isSyncing ? <Loader2 className="animate-spin" size={16} /> : <Zap size={16} />}
                             PUBLICAR EN WEB ({selectedIndices.size})
                         </button>
+                        {databaseProviderId && (
+                            <button
+                                onClick={handleReactivateProvider}
+                                disabled={isReactivating}
+                                className="btn btn-ghost"
+                                title="Reactivar todos los productos inactivos de este proveedor"
+                                style={{ 
+                                    gap: 8, 
+                                    padding: '0 14px',
+                                    color: '#FF9500',
+                                    border: '1px solid rgba(255, 149, 0, 0.3)',
+                                    background: 'rgba(255, 149, 0, 0.05)'
+                                }}
+                            >
+                                {isReactivating ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle2 size={16} />}
+                                Reactivar Todos
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -763,6 +809,13 @@ export default function AdminPrecios() {
                         </h4>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                             <button 
+                                onClick={() => handleAutoLoad('productos_gcgroup.json')}
+                                className="btn btn-ghost btn-sm"
+                                style={{ background: 'rgba(52,199,89,0.07)', border: '1px solid var(--green)', fontSize: '0.75rem', height: 'auto', padding: '8px', fontWeight: 700, color: 'var(--green-dark)' }}
+                            >
+                                🟢 GCGroup
+                            </button>
+                            <button 
                                 onClick={() => handleAutoLoad('productos_zentek.json')}
                                 className="btn btn-ghost btn-sm"
                                 style={{ background: 'white', border: '1px solid var(--border)', fontSize: '0.75rem', height: 'auto', padding: '8px' }}
@@ -786,7 +839,7 @@ export default function AdminPrecios() {
                             <button 
                                 onClick={() => handleAutoLoad('productos_ram.json')}
                                 className="btn btn-ghost btn-sm"
-                                style={{ background: 'white', border: '1px solid var(--border)', fontSize: '0.75rem', height: 'auto', padding: '8px' }}
+                                style={{ background: 'white', border: '1px solid var(--border)', fontSize: '0.75rem', height: 'auto', padding: '8px', gridColumn: 'span 2' }}
                             >
                                 💎 Todos (Mejor Precio)
                             </button>
@@ -896,8 +949,167 @@ export default function AdminPrecios() {
                     </button>
                 </div>
 
-                {bulkPreviewModal}
+                {/* ─── Panel Lateral ─── */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+                    {/* Sección de Mapeos */}
+                    <div className="card" style={{ padding: 0, overflow: 'hidden', border: '1px solid var(--border)' }}>
+                        <button
+                            type="button"
+                            onClick={async () => {
+                                const next = !mappingsOpen
+                                setMappingsOpen(next)
+                                if (next && mappings.length === 0) {
+                                    setMappingsLoading(true)
+                                    const res = await getMappings(databaseProviderId || undefined)
+                                    setMappings(res.mappings)
+                                    setMappingsLoading(false)
+                                }
+                            }}
+                            style={{
+                                width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                padding: '14px 16px', background: 'var(--bg-card)', border: 'none', cursor: 'pointer',
+                                color: 'var(--text)', fontWeight: 700, fontSize: '0.88rem'
+                            }}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <Tag size={15} color="var(--blue)" />
+                                Mapeos de Proveedor
+                                {mappings.length > 0 && (
+                                    <span style={{ fontSize: '0.7rem', background: 'rgba(0,122,255,0.12)', color: 'var(--blue)', padding: '2px 7px', borderRadius: 6, fontWeight: 800 }}>
+                                        {mappings.length}
+                                    </span>
+                                )}
+                            </div>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{mappingsOpen ? '▲' : '▼'}</span>
+                        </button>
+
+                        {mappingsOpen && (
+                            <div style={{ borderTop: '1px solid var(--border)' }}>
+                                {/* Botón recargar */}
+                                <div style={{ display: 'flex', gap: 8, padding: '10px 12px', borderBottom: '1px solid var(--border)' }}>
+                                    <button
+                                        className="btn btn-ghost btn-sm"
+                                        style={{ flex: 1, fontSize: '0.75rem' }}
+                                        onClick={async () => {
+                                            setMappingsLoading(true)
+                                            const res = await getMappings(databaseProviderId || undefined)
+                                            setMappings(res.mappings)
+                                            setMappingsLoading(false)
+                                        }}
+                                        disabled={mappingsLoading}
+                                    >
+                                        {mappingsLoading ? <Loader2 size={12} className="animate-spin" /> : '↺'} Recargar
+                                    </button>
+                                </div>
+
+                                {/* Lista de mapeos */}
+                                <div style={{ maxHeight: 380, overflowY: 'auto' }}>
+                                    {mappingsLoading && (
+                                        <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                                            <Loader2 size={20} className="animate-spin" />
+                                        </div>
+                                    )}
+                                    {!mappingsLoading && mappings.length === 0 && (
+                                        <div style={{ padding: '20px 16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
+                                            Sin mapeos para este proveedor.
+                                        </div>
+                                    )}
+                                    {!mappingsLoading && mappings.map((m) => (
+                                        <div key={m.id} style={{
+                                            padding: '10px 14px', borderBottom: '1px solid rgba(255,255,255,0.04)',
+                                            display: 'flex', flexDirection: 'column', gap: 4
+                                        }}>
+                                            {editingMapping?.id === m.id ? (
+                                                // ─── Modo edición inline ───
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                                    <label style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Nombre proveedor</label>
+                                                    <input
+                                                        autoFocus
+                                                        value={editingMappingName}
+                                                        onChange={(e) => setEditingMappingName(e.target.value)}
+                                                        style={{
+                                                            background: 'var(--bg-secondary)', border: '1px solid var(--blue)',
+                                                            padding: '6px 10px', borderRadius: 8, color: 'var(--text)',
+                                                            fontSize: '0.8rem', fontFamily: 'monospace'
+                                                        }}
+                                                    />
+                                                    <div style={{ display: 'flex', gap: 6, marginTop: 2 }}>
+                                                        <button
+                                                            className="btn btn-ghost btn-sm"
+                                                            style={{ flex: 1, fontSize: '0.72rem' }}
+                                                            onClick={() => setEditingMapping(null)}
+                                                        >Cancelar</button>
+                                                        <button
+                                                            className="btn btn-primary btn-sm"
+                                                            style={{ flex: 1, fontSize: '0.72rem' }}
+                                                            onClick={async () => {
+                                                                // saveMapping hace upsert con onConflict 'original_name,provider_id'
+                                                                // → primero borramos el viejo y luego guardamos el nuevo nombre
+                                                                await deleteMapping(m.id)
+                                                                const res = await saveMapping(
+                                                                    editingMappingName.trim(),
+                                                                    m.product_id,
+                                                                    m.provider_id || undefined
+                                                                )
+                                                                if (res.success) {
+                                                                    const updated = await getMappings(databaseProviderId || undefined)
+                                                                    setMappings(updated.mappings)
+                                                                    setEditingMapping(null)
+                                                                } else {
+                                                                    alert('Error: ' + (res as any).message)
+                                                                }
+                                                            }}
+                                                        >Guardar</button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                // ─── Modo lectura ───
+                                                <>
+                                                    <div style={{ fontSize: '0.78rem', fontFamily: 'monospace', color: 'var(--text-secondary)', wordBreak: 'break-word' }}>
+                                                        {m.original_name}
+                                                    </div>
+                                                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
+                                                        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                                            <Database size={10} />
+                                                            {m.product_name}
+                                                        </span>
+                                                        <div style={{ display: 'flex', gap: 4 }}>
+                                                            <button
+                                                                className="btn btn-ghost btn-sm"
+                                                                style={{ width: 26, height: 26, padding: 0, border: '1px solid var(--border)' }}
+                                                                title="Editar nombre original"
+                                                                onClick={() => {
+                                                                    setEditingMapping(m)
+                                                                    setEditingMappingName(m.original_name)
+                                                                }}
+                                                            ><Pencil size={11} /></button>
+                                                            <button
+                                                                className="btn btn-ghost btn-sm"
+                                                                style={{ width: 26, height: 26, padding: 0, color: 'var(--red)', border: '1px solid rgba(255,59,48,0.2)' }}
+                                                                title="Eliminar mapeo"
+                                                                onClick={async () => {
+                                                                    if (!confirm(`¿Eliminar mapeo "${m.original_name}"?`)) return
+                                                                    await deleteMapping(m.id)
+                                                                    setMappings(prev => prev.filter(x => x.id !== m.id))
+                                                                }}
+                                                            ><Trash2 size={11} /></button>
+                                                        </div>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                </div>
+
             </div>
+
+            {bulkPreviewModal}
         </div>
     )
 }

@@ -82,34 +82,52 @@ export default function ProductosClient({
 
                 const allText = [name, brand, catName, shortDesc, longDesc, tagsRaw, variantSpecs].join(' ')
 
-                // Todos los términos deben estar presentes como palabras completas o delimitadas
-                const allTermsPresent = terms.every(term => {
-                    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                    // Buscamos el término rodeado de límites de palabra o caracteres no alfanuméricos
-                    const regex = new RegExp(`(^|[^a-zA-Z0-9])${escapedTerm}([^a-zA-Z0-9]|$)`, 'i');
-                    return regex.test(allText);
-                })
+                // Estrategia de matching por tipo de término:
+                // - Número puro ("17", "256"): word-boundary numérico
+                // - Alfanumérico mixto ("04s", "g04s", "s26"): substring simple
+                // - Letra pura ("pro", "iphone"): word-boundary alfanumérico
+                const matchTerm = (term: string, text: string, isLast: boolean): boolean => {
+                    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+                    const isNumeric = /^\d+$/.test(term)
+                    const isAlpha = /^[a-zA-Z]+$/.test(term)
+                    const isMixed = !isNumeric && !isAlpha
+
+                    if (isMixed) return text.includes(term)
+
+                    if (isNumeric) {
+                        const regex = isLast
+                            ? new RegExp(`(^|[^0-9])${escapedTerm}`, 'i')
+                            : new RegExp(`(^|[^0-9])${escapedTerm}([^0-9]|$)`, 'i')
+                        return regex.test(text)
+                    }
+
+                    const regex = isLast
+                        ? new RegExp(`(^|[^a-zA-Z0-9])${escapedTerm}`, 'i')
+                        : new RegExp(`(^|[^a-zA-Z0-9])${escapedTerm}([^a-zA-Z0-9]|$)`, 'i')
+                    return regex.test(text)
+                }
+
+                // Todos los términos deben estar presentes en el texto combinado
+                const allTermsPresent = terms.every((term, i) =>
+                    matchTerm(term, allText, i === terms.length - 1)
+                )
 
                 if (!allTermsPresent) return { product: p, score: -1 }
 
                 // Calcular peso
-                terms.forEach(term => {
-                    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                    const regex = new RegExp(`(^|[^a-zA-Z0-9])${escapedTerm}([^a-zA-Z0-9]|$)`, 'i');
-
+                terms.forEach((term, i) => {
+                    const isLast = i === terms.length - 1
                     const check = (text: string, weight: number) => {
-                        if (regex.test(text)) {
-                            score += weight
-                        }
+                        if (matchTerm(term, text, isLast)) score += weight
                     }
 
-                    check(name, 50)        // El nombre es lo más importante
-                    check(brand, 30)       // La marca es muy importante
-                    check(catName, 20)     // La categoría
-                    check(tagsRaw, 15)     // Los tags
-                    check(variantSpecs, 10) // Specs de variante
-                    check(shortDesc, 5)    // Descripciones valen menos
-                    check(longDesc, 1)     // Descripciones técnicas valen menos
+                    check(name, 50)
+                    check(brand, 30)
+                    check(catName, 20)
+                    check(tagsRaw, 15)
+                    check(variantSpecs, 10)
+                    check(shortDesc, 5)
+                    check(longDesc, 1)
                 })
 
                 return { product: p, score }

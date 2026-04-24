@@ -701,46 +701,95 @@ function AdminProductos() {
 
     useEffect(() => { load() }, [load])
 
-    const filteredProducts = products.filter(p => {
+    const filteredProducts = (() => {
         const terms = searchQuery.toLowerCase().trim().split(/\s+/).filter(t => t !== '')
-        
-        let matchesSearch = true;
-        if (terms.length > 0) {
-            // Concatenamos todos los campos buscables para este producto
-            const searchableText = [
-                p.name.toLowerCase(),
-                p.brands?.name?.toLowerCase() || '',
-                p.categories?.name?.toLowerCase() || '',
-                p.providers?.name?.toLowerCase() || '',
-                p.short_description?.toLowerCase() || '',
-                p.long_description?.toLowerCase() || '',
-                ...(p.tags || []).map(t => t.toLowerCase()),
-                p.product_variants?.[0]?.sku?.toLowerCase() || '',
-                p.product_variants?.[0]?.storage?.toLowerCase() || '',
-                p.product_variants?.[0]?.color?.toLowerCase() || '',
-                p.product_variants?.[0]?.connectivity?.toLowerCase() || ''
-            ].join(' ')
 
-            // Cada término de la búsqueda debe estar presente en el texto buscable
-            matchesSearch = terms.every(term => {
-                // Si el término es puramente numérico (ej: "8"), queremos evitar que coincida con "128"
-                if (/^\d+$/.test(term)) {
-                    const regex = new RegExp(`(^|[^0-9])${term}([^0-9]|$)`, 'i')
-                    return regex.test(searchableText)
+        let list = [...products]
+
+        if (terms.length > 0) {
+            const listWithScores = list.map(p => {
+                const name = p.name.toLowerCase()
+                const brand = (p.brands?.name || '').toLowerCase()
+                const catName = (p.categories?.name || '').toLowerCase()
+                const provName = (p.providers?.name || '').toLowerCase()
+                const shortDesc = (p.short_description || '').toLowerCase()
+                const longDesc = (p.long_description || '').toLowerCase()
+                const tagsRaw = (p.tags || []).join(' ').toLowerCase()
+                const variantSpecs = [
+                    p.product_variants?.[0]?.sku,
+                    p.product_variants?.[0]?.storage,
+                    p.product_variants?.[0]?.color,
+                    p.product_variants?.[0]?.connectivity
+                ].filter(Boolean).join(' ').toLowerCase()
+
+                const allText = [name, brand, catName, provName, shortDesc, longDesc, tagsRaw, variantSpecs].join(' ')
+
+                // Estrategia de matching por tipo de término:
+                // - Número puro ("17", "256"): word-boundary numérico (evita "iOS17" → "17")
+                // - Alfanumérico mixto ("04s", "g04s", "s26"): substring simple (son suficientemente específicos)
+                // - Letra pura ("pro", "iphone"): word-boundary alfanumérico (evita "pro" → "proveedor")
+                // Para el último término se usa prefijo en lugar de match exacto (usuario aún tipea)
+                const matchTerm = (term: string, text: string, isLast: boolean): boolean => {
+                    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+                    const isNumeric = /^\d+$/.test(term)
+                    const isAlpha = /^[a-zA-Z]+$/.test(term)
+                    const isMixed = !isNumeric && !isAlpha // 04s, g04s, s26, iphone17
+
+                    if (isMixed) {
+                        // Substring directo — suficientemente específico para no tener falsos positivos
+                        return text.includes(term)
+                    }
+                    if (isNumeric) {
+                        // Solo acepta el número aislado de dígitos (evita "17" en "170")
+                        const regex = isLast
+                            ? new RegExp(`(^|[^0-9])${escaped}`, 'i')
+                            : new RegExp(`(^|[^0-9])${escaped}([^0-9]|$)`, 'i')
+                        return regex.test(text)
+                    }
+                    // Letra pura: word-boundary alfanumérico
+                    const regex = isLast
+                        ? new RegExp(`(^|[^a-zA-Z0-9])${escaped}`, 'i')
+                        : new RegExp(`(^|[^a-zA-Z0-9])${escaped}([^a-zA-Z0-9]|$)`, 'i')
+                    return regex.test(text)
                 }
-                return searchableText.includes(term)
-            })
+
+                const allTermsPresent = terms.every((term, i) =>
+                    matchTerm(term, allText, i === terms.length - 1)
+                )
+
+                if (!allTermsPresent) return { product: p, score: -1 }
+
+                // Pesos por campo
+                let score = 0
+                terms.forEach((term, i) => {
+                    const isLast = i === terms.length - 1
+                    if (matchTerm(term, name, isLast)) score += 50
+                    if (matchTerm(term, brand, isLast)) score += 30
+                    if (matchTerm(term, catName, isLast)) score += 20
+                    if (matchTerm(term, provName, isLast)) score += 15
+                    if (matchTerm(term, tagsRaw, isLast)) score += 15
+                    if (matchTerm(term, variantSpecs, isLast)) score += 10
+                    if (matchTerm(term, shortDesc, isLast)) score += 5
+                    if (matchTerm(term, longDesc, isLast)) score += 1
+                })
+
+                return { product: p, score }
+            }).filter(item => item.score >= 0)
+
+            listWithScores.sort((a, b) => b.score - a.score)
+            list = listWithScores.map(item => item.product)
         }
 
-        const matchesProvider = !providerFilter || p.provider_id === providerFilter
-        const matchesCategory = !categoryFilter || p.category_id === categoryFilter
-        const matchesBrand = !brandFilter || p.brand_id === brandFilter
-        const matchesStatus = statusFilter === 'all' || 
-                             (statusFilter === 'active' && p.active) || 
-                             (statusFilter === 'inactive' && !p.active)
-
-        return matchesSearch && matchesProvider && matchesCategory && matchesBrand && matchesStatus
-    })
+        return list.filter(p => {
+            const matchesProvider = !providerFilter || p.provider_id === providerFilter
+            const matchesCategory = !categoryFilter || p.category_id === categoryFilter
+            const matchesBrand = !brandFilter || p.brand_id === brandFilter
+            const matchesStatus = statusFilter === 'all' ||
+                                 (statusFilter === 'active' && p.active) ||
+                                 (statusFilter === 'inactive' && !p.active)
+            return matchesProvider && matchesCategory && matchesBrand && matchesStatus
+        })
+    })()
 
     const sortedProducts = [...filteredProducts].sort((a, b) => {
         let valA: any = ''

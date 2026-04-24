@@ -1,9 +1,9 @@
 {
   "metadatos": {
-    "ultima_actualizacion": "14/04/2026 10:29",
-    "total_productos": 4038,
+    "ultima_actualizacion": "23/04/2026 09:17",
+    "total_productos": 4033,
     "proveedor": "GcGroup",
-    "productos_gcgroup": 191,
+    "productos_gcgroup": 186,
     "productos_kadabra": 143,
     "productos_Zentek": 137,
     "productos_quiro": 152,
@@ -30788,52 +30788,52 @@
       "fecha_actualizacion": "19/03/2026 22:26"
     },
     {
-      "nombre": "Iphone 15 128 GB Sim/esim",
-      "precio": 725,
-      "precio_costo": 630.0,
+      "nombre": "Iphone 13 128 GB Sim/esim",
+      "precio": 660,
+      "precio_costo": 570.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Iphone 15 256 GB Sim/esim",
-      "precio": 840,
-      "precio_costo": 730.0,
+      "precio": 850,
+      "precio_costo": 740.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Iphone 16 128 GB Sim/esim",
-      "precio": 855,
-      "precio_costo": 745.0,
+      "precio": 850,
+      "precio_costo": 740.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Iphone 16 256 GB Sim/esim",
-      "precio": 960,
-      "precio_costo": 840.0,
+      "precio": 950,
+      "precio_costo": 830.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
-      "nombre": "Iphone 17 256 GB Simoesim",
-      "precio": 960,
-      "precio_costo": 840.0,
+      "nombre": "Iphone 17 256 GB ESIM",
+      "precio": 970,
+      "precio_costo": 850.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Iphone 17e 256 GB ESIM",
-      "precio": 740,
-      "precio_costo": 640.0,
+      "precio": 715,
+      "precio_costo": 620.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Iphone 17 Air 256 GB ESIM",
@@ -30841,47 +30841,71 @@
       "precio_costo": 950.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Iphone 17 Pro 256 GB ESIM",
-      "precio": 1445,
-      "precio_costo": 1275.0,
+      "precio": 1465,
+      "precio_costo": 1295.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Iphone 17 Pro 256 GB ESIM",
+      "precio": 1490,
+      "precio_costo": 1315.0,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Iphone 17 Pro 512 GB ESIM",
+      "precio": 1690,
+      "precio_costo": 1495.0,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Iphone 17 Pro Max 256 GB ESIM",
-      "precio": 1610,
-      "precio_costo": 1425.0,
+      "precio": 1640,
+      "precio_costo": 1450.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Iphone 17 Pro Max 256 GB ESIM",
-      "precio": 1620,
-      "precio_costo": 1435.0,
-      "categoria": "Celulares",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Iphone 17 Pro Max 512 GB ESIM",
-      "precio": 1805,
-      "precio_costo": 1600.0,
+      "precio": 1835,
+      "precio_costo": 1625.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Iphone 17 Pro Max 512 GB ESIM",
+      "precio": 1845,
+      "precio_costo": 1635.0,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Iphone 17 Pro Max 1 TB ESIM",
+      "precio": 2055,
+      "precio_costo": 1825.0,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Samsung A06 4/64 GB",
-      "precio": 145,
-      "precio_costo": 105.0,
+      "precio": 140,
+      "precio_costo": 100.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Samsung A06 4/128 GB",
@@ -30889,15 +30913,15 @@
       "precio_costo": 130.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Samsung A07 4/64 GB",
-      "precio": 150,
-      "precio_costo": 110.0,
+      "precio": 145,
+      "precio_costo": 105.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Samsung A07 4/128 GB",
@@ -30905,7 +30929,7 @@
       "precio_costo": 125.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Samsung A16 4/128 GB",
@@ -30913,7 +30937,23 @@
       "precio_costo": 145.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Samsung A17 4/128 GB",
+      "precio": 210,
+      "precio_costo": 165.0,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Samsung A17 6/128 GB",
+      "precio": 240,
+      "precio_costo": 190.0,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Samsung A17 8/256 GB",
@@ -30921,15 +30961,7 @@
       "precio_costo": 215.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Samsung A26 5G 6/128 GB",
-      "precio": 270,
-      "precio_costo": 220.0,
-      "categoria": "Celulares",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Samsung A26 5G 8/256 GB",
@@ -30937,55 +30969,63 @@
       "precio_costo": 265.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
-      "nombre": "Samsung A37 5G 8/256 GB",
-      "precio": 495,
-      "precio_costo": 420.0,
-      "categoria": "Celulares",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Samsung A56 5G 8/128 GB",
+      "nombre": "Samsung A36 5G 8/256 GB",
       "precio": 385,
       "precio_costo": 320.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Samsung A37 5G 8/256 GB",
+      "precio": 485,
+      "precio_costo": 410.0,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Samsung A56 5G 8/128 GB",
+      "precio": 390,
+      "precio_costo": 325.0,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Samsung A56 5G 8/256 GB",
-      "precio": 470,
-      "precio_costo": 400.0,
+      "precio": 450,
+      "precio_costo": 380.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Samsung A57 5G 8/128 GB",
-      "precio": 515,
-      "precio_costo": 440.0,
+      "precio": 4695,
+      "precio_costo": 4200.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Samsung A57 5G 8/256 GB",
-      "precio": 570,
-      "precio_costo": 490.0,
+      "precio": 550,
+      "precio_costo": 470.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Samsung A57 5G 12/256 GB",
-      "precio": 635,
-      "precio_costo": 545.0,
+      "precio": 615,
+      "precio_costo": 530.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Samsung A57 5G 12/512 GB",
@@ -30993,47 +31033,39 @@
       "precio_costo": 615.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Samsung S24 Fe 8/128 GB",
-      "precio": 545,
-      "precio_costo": 465.0,
-      "categoria": "Celulares",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Samsung S25 Fe 8/256 GB",
-      "precio": 660,
-      "precio_costo": 570.0,
+      "precio": 675,
+      "precio_costo": 585.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Samsung S25 12/256 GB",
-      "precio": 805,
-      "precio_costo": 700.0,
-      "categoria": "Celulares",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Samsung S25 Ultra 12/256 GB",
-      "precio": 1055,
-      "precio_costo": 925.0,
-      "categoria": "Celulares",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Samsung S25 Ultra 12/512 GB",
-      "precio": 1135,
-      "precio_costo": 995.0,
+      "precio": 1125,
+      "precio_costo": 990.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Samsung S25 Ultra 12/1 TB",
+      "precio": 1225,
+      "precio_costo": 1080.0,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Samsung S26 12/256 GB",
+      "precio": 900,
+      "precio_costo": 785.0,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Samsung S26 12/512 GB",
@@ -31041,15 +31073,23 @@
       "precio_costo": 975.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Samsung S26 Plus 12/256 GB",
-      "precio": 1195,
-      "precio_costo": 1050.0,
+      "precio": 1185,
+      "precio_costo": 1040.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Samsung S26 Plus 12/512 GB",
+      "precio": 1320,
+      "precio_costo": 1165.0,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Samsung S26 Ultra 12/256 GB",
@@ -31057,23 +31097,23 @@
       "precio_costo": 1180.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
-      "nombre": "Samsung S26 Ultra 12/512 GB",
-      "precio": 1425,
-      "precio_costo": 1260.0,
+      "nombre": "Samsung S26 Ultra 16/1 TB",
+      "precio": 1715,
+      "precio_costo": 1520.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
-      "nombre": "Samsung S26 Ultra 16/1tb",
-      "precio": 1750,
-      "precio_costo": 1550.0,
+      "nombre": "Motorola E15 2/64 GB",
+      "precio": 140,
+      "precio_costo": 100.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Motorola G04s 4/256 GB",
@@ -31081,23 +31121,15 @@
       "precio_costo": 140.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
-      "nombre": "Motorola G06 4/64 GB",
-      "precio": 150,
-      "precio_costo": 110.0,
-      "categoria": "Celulares",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Motorola G06 4/256 GB",
+      "nombre": "Motorola G05 4/128 GB",
       "precio": 175,
       "precio_costo": 135.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Motorola G15 4/256 GB",
@@ -31105,7 +31137,7 @@
       "precio_costo": 145.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Motorola G15 4/512 GB",
@@ -31113,31 +31145,23 @@
       "precio_costo": 180.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Motorola G17 4/256 GB",
-      "precio": 290,
-      "precio_costo": 235.0,
+      "precio": 265,
+      "precio_costo": 215.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Motorola G17 Power 8/256 GB",
-      "precio": 300,
-      "precio_costo": 245.0,
+      "precio": 285,
+      "precio_costo": 230.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Motorola G35 5G 4/128 GB",
-      "precio": 200,
-      "precio_costo": 155.0,
-      "categoria": "Celulares",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Motorola G35 5G 4/256 GB",
@@ -31145,7 +31169,7 @@
       "precio_costo": 180.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Motorola G56 5G 8/256 GB",
@@ -31153,7 +31177,7 @@
       "precio_costo": 220.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Motorola G67 4/256 GB",
@@ -31161,15 +31185,15 @@
       "precio_costo": 310.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
-      "nombre": "Motorola G86 Power 5G 8/256 GB",
-      "precio": 305,
-      "precio_costo": 250.0,
+      "nombre": "Motorola G86 5G 8/256 GB",
+      "precio": 300,
+      "precio_costo": 245.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Motorola G86 Power 5G 8/512 GB",
@@ -31177,7 +31201,23 @@
       "precio_costo": 270.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Motorola Edge 40 Pro 12/256 GB",
+      "precio": 450,
+      "precio_costo": 380.0,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Motorola Edge 50 Fusion 5G 8/256 GB",
+      "precio": 300,
+      "precio_costo": 245.0,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Motorola Edge 50 5G 12/512 GB",
@@ -31185,7 +31225,7 @@
       "precio_costo": 350.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Motorola Edge 50 Pro 5G 12/512 GB",
@@ -31193,7 +31233,7 @@
       "precio_costo": 385.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Motorola Edge 60 Fusion 5G 8/256 GB",
@@ -31201,47 +31241,39 @@
       "precio_costo": 280.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Motorola Edge 60 Fusion 5G 12/256 GB",
-      "precio": 355,
-      "precio_costo": 295.0,
+      "precio": 350,
+      "precio_costo": 290.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Motorola Edge 60 Pro 5G 8/256 GB",
-      "precio": 495,
-      "precio_costo": 420.0,
-      "categoria": "Celulares",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Motorola Edge 60 Pro 5G 12/512 GB",
-      "precio": 560,
-      "precio_costo": 480.0,
+      "precio": 565,
+      "precio_costo": 485.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Motorola Edge 60 Pro 5G 16/512 GB",
-      "precio": 570,
-      "precio_costo": 490.0,
+      "precio": 575,
+      "precio_costo": 495.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Motorola Edge 70 5G 12/512 GB",
-      "precio": 705,
-      "precio_costo": 610.0,
+      "precio": 700,
+      "precio_costo": 605.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Motorola Edge 70 Fusion 5G 8/256 GB",
@@ -31249,7 +31281,7 @@
       "precio_costo": 460.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Motorola Razr 50 5G 12/512 GB",
@@ -31257,23 +31289,15 @@
       "precio_costo": 610.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Motorola Razr 50 Ultra 5G 12/512 GB",
-      "precio": 760,
-      "precio_costo": 660.0,
-      "categoria": "Celulares",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Motorola Razr 60 5G 12/512 GB",
-      "precio": 705,
-      "precio_costo": 610.0,
+      "precio": 710,
+      "precio_costo": 615.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Infinix Smart 10 3/64 GB",
@@ -31281,7 +31305,7 @@
       "precio_costo": 100.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Infinix Smart 10 4/128 GB",
@@ -31289,7 +31313,7 @@
       "precio_costo": 115.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Infinix Hot 60i 8/256 GB",
@@ -31297,7 +31321,7 @@
       "precio_costo": 175.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Infinix Hot 60 Pro 8/256 GB",
@@ -31305,7 +31329,7 @@
       "precio_costo": 215.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Infinix Hot 60 Pro+ 8/256 GB",
@@ -31313,7 +31337,7 @@
       "precio_costo": 240.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Infinix Note 50x 5G 8/256 GB",
@@ -31321,7 +31345,7 @@
       "precio_costo": 195.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Infinix Note 50 Pro Nfc 8/256 GB",
@@ -31329,7 +31353,7 @@
       "precio_costo": 265.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Infinix Gt 30 Pro 5G 12/256 GB",
@@ -31337,7 +31361,7 @@
       "precio_costo": 360.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Redmi A5 3/64 GB",
@@ -31345,7 +31369,7 @@
       "precio_costo": 100.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Redmi A5 4/128 GB",
@@ -31353,23 +31377,7 @@
       "precio_costo": 125.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Xiaomi Redmi A7 Pro 4/64 GB",
-      "precio": 150,
-      "precio_costo": 110.0,
-      "categoria": "Celulares",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Xiaomi Redmi A7 Pro 4/128 GB",
-      "precio": 160,
-      "precio_costo": 120.0,
-      "categoria": "Celulares",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Redmi 15 8/256 GB",
@@ -31377,7 +31385,7 @@
       "precio_costo": 190.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Redmi 15c 4/128 GB",
@@ -31385,7 +31393,7 @@
       "precio_costo": 125.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Redmi 15c 4/256 GB",
@@ -31393,7 +31401,7 @@
       "precio_costo": 140.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Redmi 15c 8/256 GB",
@@ -31401,7 +31409,7 @@
       "precio_costo": 160.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Note 14 8/256 GB",
@@ -31409,7 +31417,7 @@
       "precio_costo": 190.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Note 14 5G 6/128 GB",
@@ -31417,7 +31425,7 @@
       "precio_costo": 195.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Note 14 5G 8/256 GB",
@@ -31425,7 +31433,7 @@
       "precio_costo": 225.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Note 14s 8/256 GB",
@@ -31433,7 +31441,15 @@
       "precio_costo": 220.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Xiaomi Note 14s 12/512 GB",
+      "precio": 325,
+      "precio_costo": 270.0,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Note 14 Pro 5G 8/256 GB",
@@ -31441,31 +31457,31 @@
       "precio_costo": 290.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Note 14 Pro 5G 12/512 GB",
-      "precio": 405,
-      "precio_costo": 340.0,
+      "precio": 395,
+      "precio_costo": 330.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
-      "nombre": "Xiaomi Note 14 Pro + 8/256 GB",
+      "nombre": "Xiaomi Note 14 Pro+ 8/256 GB",
       "precio": 385,
       "precio_costo": 320.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
-      "nombre": "Xiaomi Note 14 Pro + 12/512 GB",
+      "nombre": "Xiaomi Note 14 Pro+ 12/512 GB",
       "precio": 460,
       "precio_costo": 390.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Note 15 6/128 GB",
@@ -31473,7 +31489,7 @@
       "precio_costo": 190.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Note 15 8/256 GB",
@@ -31481,31 +31497,31 @@
       "precio_costo": 210.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Note 15 8/512 GB",
-      "precio": 305,
-      "precio_costo": 250.0,
+      "precio": 300,
+      "precio_costo": 245.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Note 15 5G 8/256 GB",
-      "precio": 315,
-      "precio_costo": 260.0,
+      "precio": 310,
+      "precio_costo": 255.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
-      "nombre": "Xiaomi Note 15 Pro 8/256 GB",
-      "precio": 315,
-      "precio_costo": 260.0,
+      "nombre": "Xiaomi Note 15 5G 8/512 GB",
+      "precio": 355,
+      "precio_costo": 295.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Note 15 Pro 12/512 GB",
@@ -31513,23 +31529,23 @@
       "precio_costo": 330.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Note 15 Pro 5G 8/256 GB",
-      "precio": 390,
-      "precio_costo": 325.0,
+      "precio": 385,
+      "precio_costo": 320.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Note 15 Pro 5G 8/512 GB",
-      "precio": 410,
-      "precio_costo": 345.0,
+      "precio": 405,
+      "precio_costo": 340.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Note 15 Pro 5G 12/512 GB",
@@ -31537,23 +31553,7 @@
       "precio_costo": 390.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Xiaomi Note 15 Pro + 8/256 GB",
-      "precio": 460,
-      "precio_costo": 390.0,
-      "categoria": "Celulares",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Xiaomi Note 15 Pro + 12/512 GB",
-      "precio": 520,
-      "precio_costo": 445.0,
-      "categoria": "Celulares",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Poco C71 3/64 GB",
@@ -31561,7 +31561,7 @@
       "precio_costo": 100.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Poco C71 4/128 GB",
@@ -31569,7 +31569,7 @@
       "precio_costo": 115.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Poco C85 6/128 GB",
@@ -31577,7 +31577,7 @@
       "precio_costo": 130.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Poco C85 8/256 GB",
@@ -31585,7 +31585,7 @@
       "precio_costo": 160.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Poco M7 6/128 GB",
@@ -31593,7 +31593,7 @@
       "precio_costo": 140.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Poco M7 Pro 5G 8/256 GB",
@@ -31601,15 +31601,15 @@
       "precio_costo": 255.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Poco M8 5G 8/256 GB",
-      "precio": 290,
-      "precio_costo": 235.0,
+      "precio": 285,
+      "precio_costo": 230.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Poco M8 5G 8/512 GB",
@@ -31617,7 +31617,15 @@
       "precio_costo": 265.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Xiaomi Poco M8 Pro 5G 12/512 GB",
+      "precio": 425,
+      "precio_costo": 360.0,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Poco X7 Pro 5G 8/256 GB",
@@ -31625,23 +31633,15 @@
       "precio_costo": 350.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Poco X7 Pro 5G 12/512 GB",
-      "precio": 505,
-      "precio_costo": 430.0,
+      "precio": 495,
+      "precio_costo": 420.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Xiaomi Poco X8 Pro 5G 8/256 GB",
-      "precio": 415,
-      "precio_costo": 350.0,
-      "categoria": "Celulares",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Poco X8 Pro 5G 8/512 GB",
@@ -31649,15 +31649,7 @@
       "precio_costo": 385.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Xiaomi Poco X8 Pro 5G 12/512 GB",
-      "precio": 510,
-      "precio_costo": 435.0,
-      "categoria": "Celulares",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Poco X8 Pro Max 5G 12/256 GB",
@@ -31665,15 +31657,15 @@
       "precio_costo": 485.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
-      "nombre": "Xiaomi Poco F7 5G 12/512 GB",
-      "precio": 620,
-      "precio_costo": 535.0,
+      "nombre": "Xiaomi Poco X8 Pro Max 5G 12/512 GB",
+      "precio": 655,
+      "precio_costo": 565.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Poco F7 Pro 5G 12/512 GB",
@@ -31681,7 +31673,7 @@
       "precio_costo": 590.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Poco F8 Pro 5G 12/256 GB",
@@ -31689,7 +31681,7 @@
       "precio_costo": 645.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Poco F8 Pro 5G 12/512 GB",
@@ -31697,7 +31689,7 @@
       "precio_costo": 695.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi Poco F8 Ultra 5G 16/512 GB",
@@ -31705,7 +31697,7 @@
       "precio_costo": 945.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi 15 5G 12/256 GB",
@@ -31713,7 +31705,7 @@
       "precio_costo": 720.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi 15 5G 12/512 GB",
@@ -31721,7 +31713,7 @@
       "precio_costo": 805.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi 15t 5G 12/256 GB",
@@ -31729,7 +31721,7 @@
       "precio_costo": 525.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi 15t Pro 5G 12/256 GB",
@@ -31737,15 +31729,55 @@
       "precio_costo": 725.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Xiaomi 15t Pro 5G 12/512 GB",
-      "precio": 990,
-      "precio_costo": 865.0,
+      "precio": 955,
+      "precio_costo": 835.0,
       "categoria": "Celulares",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Xiaomi 17 5G 12/512 GB",
+      "precio": 1135,
+      "precio_costo": 995.0,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Xiaomi 17 Ultra 5G 16/512 GB",
+      "precio": 1640,
+      "precio_costo": 1450.0,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Xiaomi 17 Ultra 5G 16/1 TB",
+      "precio": 1825,
+      "precio_costo": 1620.0,
+      "categoria": "Celulares",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Tablet Xiaomi Redmi Pad Se 8,7\" 4/128 GB LTE Gris",
+      "precio": 220,
+      "precio_costo": 175.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Tablet Xiaomi Redmi Pad 2 8/256 Wifi Gris",
+      "precio": 305,
+      "precio_costo": 250.0,
+      "categoria": "Tablets & Ipads",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Tablet Samsung X230 A11+ 11.0\" 6/128gb Wifi Grey/silver",
@@ -31753,7 +31785,7 @@
       "precio_costo": 240.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Jbl Go 4 Bluetooth 4.2 Watts Black/white/blue/red/camuflado/pink",
@@ -31761,7 +31793,7 @@
       "precio_costo": 40.0,
       "categoria": "Audio JBL",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Jbl Clip 5 Bluetooth 7 Watts Black/blue/red",
@@ -31769,31 +31801,7 @@
       "precio_costo": 50.0,
       "categoria": "Audio JBL",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Jbl Flip 7 35 Watts Black/blue/red/white/pink/camuflado",
-      "precio": 145,
-      "precio_costo": 105.0,
-      "categoria": "Audio JBL",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Jbl Charge 6 45 Watts Black/blue/red/pink/white",
-      "precio": 190,
-      "precio_costo": 145.0,
-      "categoria": "Audio JBL",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Jbl Xtreme 4 100 Watts 24 Horas Negro",
-      "precio": 320,
-      "precio_costo": 265.0,
-      "categoria": "Audio JBL",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Jbl Boombox 4 210 Watts 2v Camuflado",
@@ -31801,7 +31809,7 @@
       "precio_costo": 470.0,
       "categoria": "Audio JBL",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Jbl Barra De Sonido Cine Sb580 3,1 Soundbar Usb Bluetooth 440watts",
@@ -31809,7 +31817,39 @@
       "precio_costo": 290.0,
       "categoria": "Audio JBL",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Joystick Ps5 Black",
+      "precio": 110,
+      "precio_costo": 75.0,
+      "categoria": "Video Juegos",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Joystick Ps5 White",
+      "precio": 110,
+      "precio_costo": 75.0,
+      "categoria": "Video Juegos",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Joystick Ps5 Gray Camo",
+      "precio": 110,
+      "precio_costo": 75.0,
+      "categoria": "Video Juegos",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "Joystick Ps5 Red",
+      "precio": 110,
+      "precio_costo": 75.0,
+      "categoria": "Video Juegos",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Joystick Ps5 Starlight Blue",
@@ -31817,15 +31857,7 @@
       "precio_costo": 75.0,
       "categoria": "Video Juegos",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Joystick Ps5 Sterling Silver",
-      "precio": 110,
-      "precio_costo": 75.0,
-      "categoria": "Video Juegos",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Sony Ps5 Digital 825 GB",
@@ -31833,15 +31865,7 @@
       "precio_costo": 590.0,
       "categoria": "Video Juegos",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Sony Ps5 Digital 825gb Fortnite",
-      "precio": 695,
-      "precio_costo": 600.0,
-      "categoria": "Video Juegos",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Sony Ps5 Digital 1tb Rachet + Returnal",
@@ -31849,7 +31873,7 @@
       "precio_costo": 605.0,
       "categoria": "Video Juegos",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Sony Ps5 C/lectora 1tb",
@@ -31857,31 +31881,23 @@
       "precio_costo": 670.0,
       "categoria": "Video Juegos",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Volante Logitech G29 Ps5 / Ps4 / Pc",
-      "precio": 360,
-      "precio_costo": 300.0,
-      "categoria": "Video Juegos",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Sony Vr2 Horizon Bundle",
-      "precio": 570,
-      "precio_costo": 490.0,
+      "precio": 560,
+      "precio_costo": 480.0,
       "categoria": "Video Juegos",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Apple Pencil Usbc",
-      "precio": 150,
-      "precio_costo": 110.0,
+      "precio": 145,
+      "precio_costo": 105.0,
       "categoria": "Accesorios",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Apple Pencil Pro",
@@ -31889,15 +31905,15 @@
       "precio_costo": 140.0,
       "categoria": "Accesorios",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Airpods 4",
-      "precio": 190,
-      "precio_costo": 145.0,
+      "precio": 185,
+      "precio_costo": 140.0,
       "categoria": "AirPods",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Airpods 4 Noise Cancelling",
@@ -31905,7 +31921,7 @@
       "precio_costo": 175.0,
       "categoria": "AirPods",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Airpods Pro 3ra Usbc",
@@ -31913,7 +31929,7 @@
       "precio_costo": 250.0,
       "categoria": "AirPods",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Watch Se 2 44mm",
@@ -31921,7 +31937,7 @@
       "precio_costo": 200.0,
       "categoria": "Smartwatch",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Watch Se 3 Gps 40mm",
@@ -31929,7 +31945,7 @@
       "precio_costo": 295.0,
       "categoria": "Smartwatch",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Watch S9 41mm Gps",
@@ -31937,7 +31953,7 @@
       "precio_costo": 310.0,
       "categoria": "Smartwatch",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Watch S9 45mm Gps",
@@ -31945,7 +31961,7 @@
       "precio_costo": 340.0,
       "categoria": "Smartwatch",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Watch S10 42mm Gps",
@@ -31953,7 +31969,7 @@
       "precio_costo": 370.0,
       "categoria": "Smartwatch",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Watch S10 46mm Gps",
@@ -31961,7 +31977,7 @@
       "precio_costo": 400.0,
       "categoria": "Smartwatch",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Watch 11 42mm Gps",
@@ -31969,7 +31985,7 @@
       "precio_costo": 390.0,
       "categoria": "Smartwatch",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Watch 11 46mm Gps",
@@ -31977,23 +31993,7 @@
       "precio_costo": 420.0,
       "categoria": "Smartwatch",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Watch Ultra 3 Gps Cell 49mm",
-      "precio": 925,
-      "precio_costo": 810.0,
-      "categoria": "Smartwatch",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Ipad A16 11 128 GB",
-      "precio": 485,
-      "precio_costo": 410.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Ipad A16 11 256 GB",
@@ -32001,7 +32001,7 @@
       "precio_costo": 520.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Ipad Air 11 M3 128 GB",
@@ -32009,7 +32009,7 @@
       "precio_costo": 600.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Ipad Air 11 M3 256 GB",
@@ -32017,23 +32017,23 @@
       "precio_costo": 710.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Ipad Air 11 M4 128 GB",
-      "precio": 770,
-      "precio_costo": 670.0,
+      "precio": 760,
+      "precio_costo": 660.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Ipad Air 11 M4 256 GB",
-      "precio": 905,
-      "precio_costo": 790.0,
+      "precio": 895,
+      "precio_costo": 780.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Ipad Air 13 M4 128 GB",
@@ -32041,47 +32041,7 @@
       "precio_costo": 940.0,
       "categoria": "Tablets & Ipads",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Ipad Pro 11 M5 256 GB",
-      "precio": 1150,
-      "precio_costo": 1010.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Ipad Pro 13 M5 256 GB",
-      "precio": 1460,
-      "precio_costo": 1290.0,
-      "categoria": "Tablets & Ipads",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Macbook Neo A18 13 8/256 GB",
-      "precio": 870,
-      "precio_costo": 760.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Macbook Neo A18 13 8/512 GB",
-      "precio": 985,
-      "precio_costo": 860.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "Macbook Air M4 13 16/256 GB",
-      "precio": 1215,
-      "precio_costo": 1070.0,
-      "categoria": "Notebooks & Macbooks",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Macbook Air M4 15 16/256 GB",
@@ -32089,63 +32049,47 @@
       "precio_costo": 1270.0,
       "categoria": "Notebooks & Macbooks",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Macbook Air M5 13 16/512 GB",
-      "precio": 1405,
-      "precio_costo": 1240.0,
+      "precio": 1385,
+      "precio_costo": 1220.0,
       "categoria": "Notebooks & Macbooks",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Macbook Air M5 13 16/1tb",
-      "precio": 1685,
-      "precio_costo": 1490.0,
+      "precio": 1605,
+      "precio_costo": 1420.0,
       "categoria": "Notebooks & Macbooks",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Macbook Air M5 15 16/512 GB",
-      "precio": 1705,
-      "precio_costo": 1510.0,
+      "precio": 1640,
+      "precio_costo": 1450.0,
       "categoria": "Notebooks & Macbooks",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "Macbook Pro M5 14 16/512 GB",
-      "precio": 1925,
-      "precio_costo": 1710.0,
+      "precio": 2015,
+      "precio_costo": 1790.0,
       "categoria": "Notebooks & Macbooks",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
-      "nombre": "85 Smart Tv Samsung Qled 4k Q70d 2026",
-      "precio": 2360,
-      "precio_costo": 2100.0,
-      "categoria": "Televisores",
+      "nombre": "Macbook Pro M5 14 16/1tb",
+      "precio": 2140,
+      "precio_costo": 1900.0,
+      "categoria": "Notebooks & Macbooks",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "85 Smart Tv Samsung Qled 4k Q7 Tizen Os",
-      "precio": 2250,
-      "precio_costo": 2000.0,
-      "categoria": "Televisores",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "75 Samsung Qled Smart Tv Uhd 4k Q7",
-      "precio": 1415,
-      "precio_costo": 1250.0,
-      "categoria": "Televisores",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "75 Smart Tv Uhd 4k Samsung U8000f",
@@ -32153,23 +32097,23 @@
       "precio_costo": 1150.0,
       "categoria": "Televisores",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "75 Smart Tv Uhd 4k Samsung Du7000",
-      "precio": 1195,
-      "precio_costo": 1050.0,
+      "precio": 1210,
+      "precio_costo": 1065.0,
       "categoria": "Televisores",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "75 Smart Tv Lg Uhd Ai Uhd 4k Procesador Alpha 7 8va Gen Con Inteligencia Artificial 75ua8550psa",
-      "precio": 1205,
-      "precio_costo": 1060.0,
+      "precio": 1215,
+      "precio_costo": 1070.0,
       "categoria": "Televisores",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "65 Smart Tv Samsung Qled 4k Q7 Tizen Os Ia",
@@ -32177,15 +32121,23 @@
       "precio_costo": 990.0,
       "categoria": "Televisores",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "65 Smart Tv Samsung Led 4k Crystal Uhd U8000",
-      "precio": 1025,
-      "precio_costo": 900.0,
+      "precio": 1015,
+      "precio_costo": 890.0,
       "categoria": "Televisores",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "65 Smart Tv Samsung Led 4k Crystal Uhd U7000",
+      "precio": 840,
+      "precio_costo": 730.0,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "65 Smart Tv Lg Uhd Ai Uhd 4k Procesador Alpha 7 8va Gen Con Inteligencia Artificial 65ua8050psa",
@@ -32193,15 +32145,15 @@
       "precio_costo": 690.0,
       "categoria": "Televisores",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "65 Smart Tv Philips Led 4k Uhd 65pud8100/77 Ambilight",
-      "precio": 725,
-      "precio_costo": 630.0,
+      "precio": 805,
+      "precio_costo": 700.0,
       "categoria": "Televisores",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "65 Smart Tv Qled Admiral Ad65g4fn",
@@ -32209,55 +32161,63 @@
       "precio_costo": 620.0,
       "categoria": "Televisores",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "60 Smart Tv 4k Uhd Admiral Ad60g3fn",
-      "precio": 525,
-      "precio_costo": 450.0,
+      "precio": 540,
+      "precio_costo": 460.0,
       "categoria": "Televisores",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
-    },
-    {
-      "nombre": "58 Smart Tv Led 58\" 4k Noblex Db58x7550",
-      "precio": 505,
-      "precio_costo": 430.0,
-      "categoria": "Televisores",
-      "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "55 Smart Tv Samsung Qled 4k Q7 Tizen Os",
-      "precio": 770,
-      "precio_costo": 670.0,
+      "precio": 785,
+      "precio_costo": 680.0,
       "categoria": "Televisores",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "55 Smart Tv Samsung 4k Qled Q65d",
-      "precio": 640,
-      "precio_costo": 550.0,
+      "precio": 670,
+      "precio_costo": 580.0,
       "categoria": "Televisores",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "55 Smart Tv Samsung Led 4k U8000 Crystal Uhd",
-      "precio": 520,
-      "precio_costo": 445.0,
+      "precio": 540,
+      "precio_costo": 460.0,
       "categoria": "Televisores",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
-      "nombre": "50 Smart Tv Uhd 4k Samsung Un50du7000gczb",
-      "precio": 460,
-      "precio_costo": 390.0,
+      "nombre": "55 Smart Tv Aoc 4k Uhd 55u7345/77i",
+      "precio": 410,
+      "precio_costo": 345.0,
       "categoria": "Televisores",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "50 Smart Tv Uhd 4k Samsung U8000",
+      "precio": 515,
+      "precio_costo": 440.0,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
+    },
+    {
+      "nombre": "50 Smart Tv Uhd 4k Samsung Du7000 Crystal",
+      "precio": 455,
+      "precio_costo": 385.0,
+      "categoria": "Televisores",
+      "proveedor": "GcGroup",
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "50 Smart Tv Admiral Qled 4k Uhd New Model",
@@ -32265,7 +32225,7 @@
       "precio_costo": 330.0,
       "categoria": "Televisores",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "50 Smart Tv 4k Uhd Aoc 50u7345/77i",
@@ -32273,7 +32233,7 @@
       "precio_costo": 310.0,
       "categoria": "Televisores",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "43 Smart Tv Tcl Qled Fhd 43s5 Google",
@@ -32281,15 +32241,15 @@
       "precio_costo": 270.0,
       "categoria": "Televisores",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
-      "nombre": "40 Smart Tv Admiral Led Fhd Ad40e3e",
-      "precio": 265,
-      "precio_costo": 215.0,
+      "nombre": "43 Smart Tv Full Hd Aoc 43s5355/77i",
+      "precio": 295,
+      "precio_costo": 240.0,
       "categoria": "Televisores",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "32 Smart Tv Samsung Hd Un32t4300a",
@@ -32297,7 +32257,7 @@
       "precio_costo": 195.0,
       "categoria": "Televisores",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "32 Smart Tv Tcl Qled Fhd 32s5k Google Tv",
@@ -32305,7 +32265,7 @@
       "precio_costo": 200.0,
       "categoria": "Televisores",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     },
     {
       "nombre": "32 Smart Tv Aoc 32s5355/77i",
@@ -32313,7 +32273,7 @@
       "precio_costo": 160.0,
       "categoria": "Televisores",
       "proveedor": "GcGroup",
-      "fecha_actualizacion": "14/04/2026 10:29"
+      "fecha_actualizacion": "23/04/2026 09:17"
     }
   ]
 }

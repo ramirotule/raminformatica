@@ -362,7 +362,9 @@ export async function searchMatches(items: ParsedItem[], providerId?: string) {
         
         if (history) {
             history.forEach(h => {
-                historyMap[h.product_name.toLowerCase()] = h.cost_price;
+                if (h.product_name) {
+                    historyMap[h.product_name.toLowerCase()] = h.cost_price;
+                }
             });
         }
     }
@@ -467,9 +469,41 @@ export async function getMissingProducts(matchedIds: string[], providerId?: stri
 }
 
 /**
+ * Reactiva TODOS los productos inactivos de un proveedor.
+ * Útil para recuperarse de una desactivación masiva accidental.
+ */
+export async function reactivateProviderProducts(providerId: string) {
+    if (!providerId) return { success: false, message: 'Falta providerId', count: 0 };
+    try {
+        const { data: inactive, error: fetchErr } = await supabaseAdmin
+            .from('products')
+            .select('id')
+            .eq('provider_id', providerId)
+            .eq('active', false);
+
+        if (fetchErr) throw fetchErr;
+        if (!inactive || inactive.length === 0) {
+            return { success: true, message: 'No hay productos inactivos para reactivar.', count: 0 };
+        }
+
+        const ids = inactive.map(p => p.id);
+        const { error: updateErr } = await supabaseAdmin
+            .from('products')
+            .update({ active: true })
+            .in('id', ids);
+
+        if (updateErr) throw updateErr;
+
+        return { success: true, message: `✅ ${ids.length} productos reactivados.`, count: ids.length };
+    } catch (err: any) {
+        return { success: false, message: `Error: ${err.message}`, count: 0 };
+    }
+}
+
+/**
  * Procesa la sincronización final.
  */
-export async function processSync(items: ParsedItem[], providerId: string | null = null) {
+export async function processSync(items: ParsedItem[], providerId: string | null = null, doMassDeactivation: boolean = false) {
     console.log(`🚀 Sincronización: ${items.length} items. Proveedor: ${providerId || 'Catálogo'}`);
     
     const results = { success: true, created: 0, updated: 0, deactivated: 0, errors: [] as string[] };
@@ -520,7 +554,7 @@ export async function processSync(items: ParsedItem[], providerId: string | null
         for (const item of itemsToProcess) {
             try {
                 if (item.status === 'matched' && item.matchId) {
-                    matchedIds.add(item.matchId);
+                    matchedIds.add(String(item.matchId));
                     
                     if (providerId) {
                         providerCostsToUpsert.push({
@@ -615,7 +649,9 @@ export async function processSync(items: ParsedItem[], providerId: string | null
                         await supabaseAdmin.from('inventory').insert({ variant_id: (v as any).id, qty_available: item.stock !== undefined ? item.stock : 10 });
                     }
 
-                    createdIds.push((newP as any).id);
+                    const newProductId = (newP as any).id;
+                    createdIds.push(newProductId);
+                    matchedIds.add(String(newProductId)); // evita que el Paso 4 lo desactive
                     results.created++;
                 } else if (item.status === 'deactivate' && item.matchId) {
                     await supabaseAdmin.from('products').update({ active: false }).eq('id', item.matchId);
@@ -699,19 +735,25 @@ export async function processSync(items: ParsedItem[], providerId: string | null
         }
 
         // 4. Deactivaciones masivas (productos que NO están en la lista actual)
-        // - Con providerId: solo desactiva productos de ese proveedor
-        // - Sin providerId (catálogo consolidado): desactiva TODOS los activos no matcheados
-        if (matchedIds.size > 0 && items.some(i => i.status !== 'deactivate')) {
+        // SOLO corre si doMassDeactivation=true (sync completo del proveedor)
+        // Para syncs parciales/selectivos, los items con status 'deactivate' ya se procesaron arriba
+        if (doMassDeactivation && matchedIds.size > 0 && items.some(i => i.status !== 'deactivate')) {
             console.log("Checking for products to deactivate...");
+            console.log(`🔒 Protected IDs (matched + new): ${matchedIds.size}`);
             let activeQuery = supabaseAdmin.from('products').select('id').eq('active', true);
             if (providerId) activeQuery = (activeQuery as any).eq('provider_id', providerId);
             const { data: actives } = await activeQuery;
             if (actives) {
-                const idsToDeactivate = actives.filter(p => !matchedIds.has(p.id)).map(p => p.id);
+                // Usar String() para garantizar comparación correcta de UUIDs
+                const idsToDeactivate = actives
+                    .filter(p => !matchedIds.has(String(p.id)))
+                    .map(p => p.id);
                 if (idsToDeactivate.length > 0) {
                     console.log(`Deactivating ${idsToDeactivate.length} missing products...`);
                     await supabaseAdmin.from('products').update({ active: false }).in('id', idsToDeactivate);
                     results.deactivated += idsToDeactivate.length;
+                } else {
+                    console.log('✅ No products to deactivate.');
                 }
             }
         }
@@ -1018,6 +1060,53 @@ export async function saveMapping(originalName: string, productId: string, provi
         return { success: true, message: "Mapeo guardado correctamente." };
     } catch (err: any) {
         console.error("Error saving mapping:", err);
+        return { success: false, message: err.message };
+    }
+}
+
+/**
+ * Lista todos los mapeos de un proveedor, enriquecidos con el nombre del producto.
+ */
+export async function getMappings(providerId?: string) {
+    try {
+        let query = supabaseAdmin
+            .from('supplier_mappings')
+            .select('id, original_name, provider_id, variant_id, product_variants(product_id, products(id, name))')
+            .order('original_name', { ascending: true });
+
+        if (providerId) query = (query as any).eq('provider_id', providerId);
+
+        const { data, error } = await query;
+        if (error) throw error;
+
+        const mappings = (data || []).map((m: any) => ({
+            id: m.id,
+            original_name: m.original_name,
+            provider_id: m.provider_id,
+            variant_id: m.variant_id,
+            product_id: m.product_variants?.products?.id || null,
+            product_name: m.product_variants?.products?.name || '—',
+        }));
+
+        return { success: true, mappings };
+    } catch (err: any) {
+        return { success: false, mappings: [] as any[], message: err.message };
+    }
+}
+
+/**
+ * Elimina un mapeo por su ID.
+ */
+export async function deleteMapping(id: string) {
+    try {
+        const { error } = await supabaseAdmin
+            .from('supplier_mappings')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+        return { success: true };
+    } catch (err: any) {
         return { success: false, message: err.message };
     }
 }
