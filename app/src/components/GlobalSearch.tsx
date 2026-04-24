@@ -54,9 +54,10 @@ export default function GlobalSearch() {
                     .eq('active', true)
                     // .limit(8) // Initial limit removed as it's applied later
 
-                // Aplicamos un .or() por cada término para que todos deban estar presentes en algún campo
+                // El query trae candidatos buscando solo en name (campos de alta relevancia)
+                // El filtrado fino por descripciones lo hace el scoring local con primaryText
                 terms.forEach(term => {
-                    queryBuilder = queryBuilder.or(`name.ilike.%${term}%,short_description.ilike.%${term}%,long_description.ilike.%${term}%`)
+                    queryBuilder = queryBuilder.or(`name.ilike.%${term}%`)
                 })
 
                 const { data, error } = await queryBuilder.limit(50)
@@ -70,33 +71,52 @@ export default function GlobalSearch() {
                     const catName = (p.categories?.name || '').toLowerCase()
                     const shortDesc = (p.short_description || '').toLowerCase()
                     const longDesc = (p.long_description || '').toLowerCase()
-                    const tags = (p as any).tags_index?.toLowerCase() || ''
+                    const tags = ((p as any).tags || []).join(' ').toLowerCase()
                     const variantSpecs = [
                         p.product_variants?.[0]?.storage,
                         p.product_variants?.[0]?.color,
                         p.product_variants?.[0]?.connectivity
                     ].filter(Boolean).join(' ').toLowerCase()
 
-                    const allText = [name, brand, catName, shortDesc, longDesc, tags, variantSpecs].join(' ')
+                    // primaryText: FILTRAR (incluir/excluir) sin descripciones
+                    // allText: PUNTUAR (ordenar relevancia) con todos los campos
+                    const primaryText = [name, brand, catName, tags, variantSpecs].join(' ')
+                    const allText = [primaryText, shortDesc].join(' ')
 
-                    // Todos los términos deben estar presentes como palabras completas
-                    const allTermsPresent = terms.every(term => {
-                        const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                        const regex = new RegExp(`(^|[^a-zA-Z0-9])${escapedTerm}([^a-zA-Z0-9]|$)`, 'i');
-                        return regex.test(allText);
-                    })
+                    const matchTerm = (term: string, text: string, isLast: boolean): boolean => {
+                        const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+                        const isNumeric = /^\d+$/.test(term)
+                        const isAlpha = /^[a-zA-Z]+$/.test(term)
+                        const isMixed = !isNumeric && !isAlpha
+
+                        if (isMixed) return text.includes(term)
+                        if (isNumeric) {
+                            const regex = isLast
+                                ? new RegExp(`(^|[^0-9])${escaped}`, 'i')
+                                : new RegExp(`(^|[^0-9])${escaped}([^0-9]|$)`, 'i')
+                            return regex.test(text)
+                        }
+                        const regex = isLast
+                            ? new RegExp(`(^|[^a-zA-Z0-9])${escaped}`, 'i')
+                            : new RegExp(`(^|[^a-zA-Z0-9])${escaped}([^a-zA-Z0-9]|$)`, 'i')
+                        return regex.test(text)
+                    }
+
+                    // El término DEBE estar en campos primarios (no basta con estar en descripciones)
+                    const allTermsPresent = terms.every((term, i) =>
+                        matchTerm(term, primaryText, i === terms.length - 1)
+                    )
 
                     if (!allTermsPresent) return { product: p, score: -1 }
 
-                    terms.forEach(term => {
-                        const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                        const regex = new RegExp(`(^|[^a-zA-Z0-9])${escapedTerm}([^a-zA-Z0-9]|$)`, 'i');
-
-                        if (regex.test(name)) score += 50
-                        if (regex.test(brand)) score += 30
-                        if (regex.test(tags)) score += 15
-                        if (regex.test(shortDesc)) score += 5
-                        if (regex.test(longDesc)) score += 1
+                    terms.forEach((term, i) => {
+                        const isLast = i === terms.length - 1
+                        if (matchTerm(term, name, isLast)) score += 50
+                        if (matchTerm(term, brand, isLast)) score += 30
+                        if (matchTerm(term, catName, isLast)) score += 20
+                        if (matchTerm(term, tags, isLast)) score += 15
+                        if (matchTerm(term, variantSpecs, isLast)) score += 10
+                        if (matchTerm(term, shortDesc, isLast)) score += 5
                     })
                     return { product: p, score }
                 })

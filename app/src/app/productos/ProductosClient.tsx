@@ -80,7 +80,8 @@ export default function ProductosClient({
                     p.product_variants?.[0]?.connectivity
                 ].filter(Boolean).join(' ').toLowerCase()
 
-                const allText = [name, brand, catName, shortDesc, longDesc, tagsRaw, variantSpecs].join(' ')
+                const primaryText = [name, brand, catName, tagsRaw, variantSpecs].join(' ')
+                const allText = [primaryText, shortDesc].join(' ')
 
                 // Estrategia de matching por tipo de término:
                 // - Número puro ("17", "256"): word-boundary numérico
@@ -109,7 +110,7 @@ export default function ProductosClient({
 
                 // Todos los términos deben estar presentes en el texto combinado
                 const allTermsPresent = terms.every((term, i) =>
-                    matchTerm(term, allText, i === terms.length - 1)
+                    matchTerm(term, primaryText, i === terms.length - 1)
                 )
 
                 if (!allTermsPresent) return { product: p, score: -1 }

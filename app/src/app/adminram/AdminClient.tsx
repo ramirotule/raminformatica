@@ -722,7 +722,8 @@ function AdminProductos() {
                     p.product_variants?.[0]?.connectivity
                 ].filter(Boolean).join(' ').toLowerCase()
 
-                const allText = [name, brand, catName, provName, shortDesc, longDesc, tagsRaw, variantSpecs].join(' ')
+                const primaryText = [name, brand, catName, provName, tagsRaw, variantSpecs].join(' ')
+                const allText = [primaryText, shortDesc].join(' ')
 
                 // Estrategia de matching por tipo de término:
                 // - Número puro ("17", "256"): word-boundary numérico (evita "iOS17" → "17")
@@ -754,7 +755,7 @@ function AdminProductos() {
                 }
 
                 const allTermsPresent = terms.every((term, i) =>
-                    matchTerm(term, allText, i === terms.length - 1)
+                    matchTerm(term, primaryText, i === terms.length - 1)
                 )
 
                 if (!allTermsPresent) return { product: p, score: -1 }
@@ -770,7 +771,6 @@ function AdminProductos() {
                     if (matchTerm(term, tagsRaw, isLast)) score += 15
                     if (matchTerm(term, variantSpecs, isLast)) score += 10
                     if (matchTerm(term, shortDesc, isLast)) score += 5
-                    if (matchTerm(term, longDesc, isLast)) score += 1
                 })
 
                 return { product: p, score }
@@ -1405,10 +1405,17 @@ function AdminProductos() {
             </div>
 
             {selectedIds.size > 0 && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'var(--primary-light)', borderRadius: 8, marginBottom: 16, border: '1px solid var(--primary)' }}>
-                    <span style={{ fontWeight: 600, color: 'var(--primary-dark)', fontSize: '0.9rem' }}>{selectedIds.size} seleccionado(s)</span>
-                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <div style={{ padding: '10px 16px', background: 'var(--primary-light)', borderRadius: 8, marginBottom: 16, border: '1px solid var(--primary)' }}>
+                    {/* Fila 1: acciones primarias + contador a la derecha */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                         <button className="btn btn-sm btn-primary" onClick={() => bulkStatus(true)}>Activar</button>
+                        <button className="btn btn-danger btn-sm" onClick={bulkDelete}>Eliminar</button>
+                        <span style={{ marginLeft: 'auto', fontWeight: 700, color: 'var(--primary-dark)', fontSize: '0.85rem', background: 'var(--primary)', color: 'white', borderRadius: 20, padding: '2px 12px' }}>
+                            {selectedIds.size} seleccionado(s)
+                        </span>
+                    </div>
+                    {/* Fila 2: acciones secundarias */}
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                         <button className="btn btn-sm btn-ghost" style={{ background: 'rgba(0,0,0,0.05)', border: '1px solid var(--border)' }} onClick={() => bulkStatus(false)}>Pausar</button>
                         <button className="btn btn-sm btn-ghost" style={{ background: 'rgba(0,0,0,0.05)', border: '1px solid var(--border)' }} onClick={() => { setBulkCategoryForm(''); setBulkCategoryOpen(true); }}>Categoría</button>
                         <button className="btn btn-sm btn-ghost" style={{ background: 'rgba(0,0,0,0.05)', border: '1px solid var(--border)' }} onClick={() => { setBulkBrandForm(''); setBulkBrandOpen(true); }}>Marca</button>
@@ -1433,7 +1440,6 @@ function AdminProductos() {
                             {isSaving ? <Loader2 size={14} className="animate-spin" style={{ marginRight: 4 }} /> : <Image size={14} style={{ marginRight: 4 }} />}
                             Buscar Imágenes (Web)
                         </button>
-                        <button className="btn btn-danger btn-sm" onClick={bulkDelete}>Eliminar</button>
                     </div>
                 </div>
             )}
