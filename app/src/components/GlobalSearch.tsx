@@ -10,6 +10,7 @@ import { dict } from '@/lib/dict'
 import { getPriceUSD, formatUSD, getPriceARS, formatARS } from '@/lib/utils'
 import { trackSearch } from '@/lib/analytics'
 import { useDolar } from '@/context/DolarContext'
+import { productUrl } from '@/lib/productUrl'
 
 export default function GlobalSearch() {
     const { searchQuery, setSearchQuery } = useSearch()
@@ -140,10 +141,10 @@ export default function GlobalSearch() {
         return () => clearTimeout(timer)
     }, [searchQuery, isProductsPage])
 
-    const handleSelect = (slug: string) => {
+    const handleSelect = (product: ProductWithDetails) => {
         setSearchQuery('')
         setShowDropdown(false)
-        router.push(`/productos/${slug}`)
+        router.push(productUrl(product.slug, (product.categories as any)?.slug))
     }
 
     return (
@@ -195,7 +196,7 @@ export default function GlobalSearch() {
                                     <button
                                         key={product.id}
                                         className="dropdown-item"
-                                        onClick={() => handleSelect(product.slug)}
+                                        onClick={() => handleSelect(product)}
                                         style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px' }}
                                     >
                                         <div style={{ width: 40, height: 40, borderRadius: 6, background: 'var(--bg-secondary)', overflow: 'hidden', flexShrink: 0, border: '1px solid var(--border)' }}>

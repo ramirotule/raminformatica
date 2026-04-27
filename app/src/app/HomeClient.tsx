@@ -6,6 +6,7 @@ import { ChevronRight, ChevronLeft, Zap, TrendingUp, Star } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import WeeklyNews from "@/components/WeeklyNews";
 import { dict } from "@/lib/dict";
+import { productUrl } from "@/lib/productUrl";
 import type {
   ProductWithDetails,
   HomeSlide,
@@ -44,7 +45,7 @@ function HeroCarousel({
       )[0].public_url,
       storage_path: null,
       product_id: p.id,
-      link_url: `/productos/${p.slug}`,
+      link_url: productUrl(p.slug, (p.categories as any)?.slug),
       sort_order: 0,
       active: true,
       created_at: p.created_at,
@@ -84,7 +85,7 @@ function HeroCarousel({
           const href =
             slide.link_url ||
             (slide.product_id
-              ? `/productos/${slide.products?.slug || slide.product_id}`
+              ? productUrl(slide.products?.slug || String(slide.product_id), (slide.products as any)?.categories?.slug)
               : "#");
           return (
             <Link

@@ -1,13 +1,14 @@
 import { MetadataRoute } from 'next'
 import { supabase } from '@/lib/supabase'
+import { productUrl } from '@/lib/productUrl'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = 'https://raminformatica.com.ar'
 
-    // Fetch all products
+    // Fetch all products with their category slug
     const { data: products } = await (supabase as any)
         .from('products')
-        .select('slug, updated_at')
+        .select('slug, updated_at, categories(slug)')
         .eq('active', true)
 
     // Fetch all categories
@@ -16,7 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .select('slug')
 
     const productUrls = (products || []).map((product: any) => ({
-        url: `${baseUrl}/productos/${product.slug}`,
+        url: `${baseUrl}${productUrl(product.slug, product.categories?.slug)}`,
         lastModified: product.updated_at ? new Date(product.updated_at) : new Date(),
         changeFrequency: 'weekly' as const,
         priority: 0.8,

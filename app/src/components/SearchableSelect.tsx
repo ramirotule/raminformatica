@@ -6,6 +6,7 @@ import { ChevronDown, Check, Search } from 'lucide-react'
 export interface Option {
     value: string;
     label: string;
+    icon?: React.ReactNode;
 }
 
 interface Props {
@@ -168,7 +169,10 @@ export function SearchableSelect({ options, value, onChange, placeholder = 'Sele
                                     }}
                                     onMouseEnter={() => setHighlightedIdx(idx)}
                                 >
-                                    {option.label}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                        {option.icon && <span style={{ display: 'flex', alignItems: 'center', opacity: 0.8 }}>{option.icon}</span>}
+                                        {option.label}
+                                    </div>
                                     {option.value === value && <Check size={14} />}
                                 </div>
                             ))

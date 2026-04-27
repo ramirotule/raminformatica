@@ -5,11 +5,11 @@ import ProductDetailClient from './ProductDetailClient'
 import { Metadata } from 'next'
 
 interface ProductPageProps {
-    params: Promise<{ slug: string }>
+    params: Promise<{ categoria: string; slug: string }>
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
-    const { slug } = await params
+    const { slug, categoria } = await params
     const { data: product } = await (supabase as any)
         .from('products')
         .select('name, short_description, product_images(public_url)')
@@ -19,15 +19,20 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     if (!product) return { title: 'Producto no encontrado' }
 
     const imageUrl = (product as any).product_images?.[0]?.public_url
+    const canonicalUrl = `https://raminformatica.com.ar/productos/${categoria}/${slug}`
 
     return {
         title: `${(product as any).name} | RAM Informática`,
         description: (product as any).short_description || `Comprar ${(product as any).name} al mejor precio en RAM Informática Argentina.`,
+        alternates: {
+            canonical: canonicalUrl,
+        },
         openGraph: {
             title: (product as any).name,
             description: (product as any).short_description,
             images: imageUrl ? [{ url: imageUrl }] : [],
             type: 'article',
+            url: canonicalUrl,
         },
         twitter: {
             card: 'summary_large_image',
@@ -39,7 +44,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-    const { slug } = await params
+    const { slug, categoria } = await params
 
     const { data: product } = await (supabase as any)
         .from('products')
@@ -63,7 +68,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
     }
 
     const typedProduct = product as unknown as ProductWithDetails
-    const mainImage = typedProduct.product_images?.[0]?.public_url
     const variant = typedProduct.product_variants?.[0]
     const price = variant?.prices?.[0]?.amount
 
@@ -85,7 +89,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             availability: (variant?.inventory?.[0]?.qty_available ?? 0) > 0
                 ? 'https://schema.org/InStock'
                 : 'https://schema.org/OutOfStock',
-            url: `https://raminformatica.com.ar/productos/${slug}`,
+            url: `https://raminformatica.com.ar/productos/${categoria}/${slug}`,
         }
     }
 
@@ -103,4 +107,3 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </>
     )
 }
-

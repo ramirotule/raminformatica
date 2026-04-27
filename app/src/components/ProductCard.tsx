@@ -3,6 +3,7 @@
 import { useDolarBlue } from '@/hooks/useDolarBlue'
 import { formatUSD, formatARS, getPriceUSD, getPriceARS, conditionLabel } from '@/lib/utils'
 import type { ProductWithDetails } from '@/lib/database.types'
+import { productUrl } from '@/lib/productUrl'
 
 const CATEGORY_EMOJI: Record<string, string> = {
     'celulares-iphone': '📱',
@@ -10,11 +11,11 @@ const CATEGORY_EMOJI: Record<string, string> = {
     'celulares-motorola': '📱',
     'celulares-infinix': '📱',
     'celulares-xiaomi': '📱',
-    'jbl-parlantes-auriculares': '🎵',
+    'jbl-parlantes-auriculares': '🔊',
     'video-juegos': '🎮',
     'airpods': '🎧',
     'apple-watch': '⌚',
-    'ipad': '📲',
+    'ipad': '📟',
     'macbook': '💻',
     'televisores': '📺',
 }
@@ -49,7 +50,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
     return (
         <Link
-            href={`/productos/${product.slug}`}
+            href={productUrl(product.slug, (product.categories as any)?.slug)}
             className="product-card animate-fade-in"
             aria-label={`Ver detalles de ${product.name}`}
         >

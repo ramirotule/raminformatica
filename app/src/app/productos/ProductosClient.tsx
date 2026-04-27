@@ -2,12 +2,30 @@
 
 import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Search, SlidersHorizontal, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { 
+    Search, 
+    SlidersHorizontal, 
+    X, 
+    ChevronLeft, 
+    ChevronRight,
+    Smartphone,
+    Headphones,
+    Gamepad2,
+    Watch,
+    Tablet,
+    Laptop,
+    Tv,
+    Speaker,
+    LayoutGrid,
+    Package
+} from 'lucide-react'
 import ProductCard from '@/components/ProductCard'
 import { dict } from '@/lib/dict'
 import { getPriceUSD } from '@/lib/utils'
 import type { ProductWithDetails, Category, Brand } from '@/lib/database.types'
 import { SearchableSelect } from '@/components/SearchableSelect'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 interface ProductosClientProps {
     products: ProductWithDetails[]
@@ -30,6 +48,7 @@ export default function ProductosClient({
     description 
 }: ProductosClientProps) {
     const searchParams = useSearchParams()
+    const pathname = usePathname()
     const {
         searchQuery: search,
         setSearchQuery: setSearch,
@@ -227,6 +246,113 @@ export default function ProductosClient({
                 )}
             </div>
 
+            {/* ─── Pills de Categorías ─────────────────────── */}
+            <div style={{
+                display: 'flex',
+                gap: 8,
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                marginBottom: 28,
+            }}>
+                <Link
+                    href="/productos"
+                    className="category-pill"
+                    style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        padding: '10px 22px',
+                        borderRadius: 999,
+                        fontSize: '0.9rem',
+                        fontWeight: 600,
+                        border: '1px solid',
+                        textDecoration: 'none',
+                        transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                        whiteSpace: 'nowrap',
+                        borderColor: pathname === '/productos' && !selectedCategory ? 'var(--accent)' : 'var(--border)',
+                        background: pathname === '/productos' && !selectedCategory ? 'var(--accent)' : 'var(--bg-card)',
+                        color: pathname === '/productos' && !selectedCategory ? '#fff' : 'var(--text-secondary)',
+                        boxShadow: pathname === '/productos' && !selectedCategory ? '0 4px 12px var(--accent-glow)' : 'none',
+                    }}
+                >
+                    <LayoutGrid size={16} />
+                    Todos
+                </Link>
+                {categories.map(cat => {
+                    const isActive = pathname === `/productos/${cat.slug}` || selectedCategory === cat.slug
+                    
+                    const getIcon = () => {
+                        // Priority 1: Custom icon_url from DB
+                        if (cat.icon_url) {
+                            if (cat.icon_url.startsWith('http')) {
+                                return <img src={cat.icon_url} alt="" style={{ width: 18, height: 18, objectFit: 'contain' }} />
+                            }
+                            return <span style={{ fontSize: '1.1rem' }}>{cat.icon_url}</span>
+                        }
+
+                        // Priority 2: Lucide icons mapping
+                        const iconMap: Record<string, any> = {
+                            'celulares-iphone': Smartphone,
+                            'celulares-samsung': Smartphone,
+                            'celulares-motorola': Smartphone,
+                            'celulares-infinix': Smartphone,
+                            'celulares-xiaomi': Smartphone,
+                            'jbl-parlantes-auriculares': Speaker,
+                            'video-juegos': Gamepad2,
+                            'airpods': Headphones,
+                            'apple-watch': Watch,
+                            'ipad': Tablet,
+                            'macbook': Laptop,
+                            'televisores': Tv,
+                        }
+
+                        const IconComp = iconMap[cat.slug] || Package
+                        return <IconComp size={16} />
+                    }
+
+                    return (
+                        <Link
+                            key={cat.id}
+                            href={`/productos/${cat.slug}`}
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 8,
+                                padding: '10px 22px',
+                                borderRadius: 999,
+                                fontSize: '0.9rem',
+                                fontWeight: 600,
+                                border: '1px solid',
+                                textDecoration: 'none',
+                                transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                                whiteSpace: 'nowrap',
+                                borderColor: isActive ? 'var(--accent)' : 'var(--border)',
+                                background: isActive ? 'var(--accent)' : 'var(--bg-card)',
+                                color: isActive ? '#fff' : 'var(--text-secondary)',
+                                boxShadow: isActive ? '0 4px 12px var(--accent-glow)' : 'none',
+                            }}
+                            onMouseEnter={(e) => {
+                                if (!isActive) {
+                                    e.currentTarget.style.borderColor = 'var(--accent)'
+                                    e.currentTarget.style.background = 'rgba(52, 199, 89, 0.05)'
+                                    e.currentTarget.style.color = 'var(--text-primary)'
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                if (!isActive) {
+                                    e.currentTarget.style.borderColor = 'var(--border)'
+                                    e.currentTarget.style.background = 'var(--bg-card)'
+                                    e.currentTarget.style.color = 'var(--text-secondary)'
+                                }
+                            }}
+                        >
+                            {getIcon()}
+                            {cat.name}
+                        </Link>
+                    )
+                })}
+            </div>
+
             {/* ─── Filtros expandidos ─────────────────────────── */}
             {showFilters && (
                 <div
@@ -252,8 +378,39 @@ export default function ProductosClient({
                             value={selectedCategory}
                             onChange={(v) => { setSelectedCategory(v); if (v) trackFilterApply('categoria', v) }}
                             options={[
-                                { value: '', label: 'Todas las categorías' },
-                                ...categories.map(cat => ({ value: cat.slug, label: cat.name }))
+                                { value: '', label: 'Todas las categorías', icon: <LayoutGrid size={14} /> },
+                                ...categories.map(cat => {
+                                    const iconMap: Record<string, any> = {
+                                        'celulares-iphone': Smartphone,
+                                        'celulares-samsung': Smartphone,
+                                        'celulares-motorola': Smartphone,
+                                        'celulares-infinix': Smartphone,
+                                        'celulares-xiaomi': Smartphone,
+                                        'jbl-parlantes-auriculares': Speaker,
+                                        'video-juegos': Gamepad2,
+                                        'airpods': Headphones,
+                                        'apple-watch': Watch,
+                                        'ipad': Tablet,
+                                        'macbook': Laptop,
+                                        'televisores': Tv,
+                                    }
+                                    const IconComp = iconMap[cat.slug] || Package
+                                    
+                                    let iconNode = <IconComp size={14} />
+                                    if (cat.icon_url) {
+                                        if (cat.icon_url.startsWith('http')) {
+                                            iconNode = <img src={cat.icon_url} alt="" style={{ width: 14, height: 14, objectFit: 'contain' }} />
+                                        } else {
+                                            iconNode = <span style={{ fontSize: '0.9rem' }}>{cat.icon_url}</span>
+                                        }
+                                    }
+
+                                    return { 
+                                        value: cat.slug, 
+                                        label: cat.name,
+                                        icon: iconNode
+                                    }
+                                })
                             ]}
                             placeholder="Todas las categorías"
                         />
