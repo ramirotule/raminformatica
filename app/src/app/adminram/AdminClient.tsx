@@ -1410,7 +1410,7 @@ function AdminProductos() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                         <button className="btn btn-sm btn-primary" onClick={() => bulkStatus(true)}>Activar</button>
                         <button className="btn btn-danger btn-sm" onClick={bulkDelete}>Eliminar</button>
-                        <span style={{ marginLeft: 'auto', fontWeight: 700, color: 'var(--primary-dark)', fontSize: '0.85rem', background: 'var(--primary)', color: 'white', borderRadius: 20, padding: '2px 12px' }}>
+                        <span style={{ marginLeft: 'auto', fontWeight: 700, fontSize: '0.85rem', background: 'var(--primary)', color: 'white', borderRadius: 20, padding: '2px 12px' }}>
                             {selectedIds.size} seleccionado(s)
                         </span>
                     </div>
