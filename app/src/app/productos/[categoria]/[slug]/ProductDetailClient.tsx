@@ -11,13 +11,14 @@ import Link from 'next/link'
 import Image from 'next/image'
 import AddedToCartModal from '@/components/AddedToCartModal'
 
-// Tabla de intereses por cuotas
 const CUOTAS_CONFIG = [
-    { cuotas: 3,  recargo: 0.1167 },
-    { cuotas: 6,  recargo: 0.1945 },
-    { cuotas: 9,  recargo: 0.2754 },
-    { cuotas: 12, recargo: 0.3377 },
+    { cuotas: 3,  recargo: 0.147499 }, // 12.19% + IVA
+    { cuotas: 6,  recargo: 0.230989 }, // 19.09% + IVA
+    { cuotas: 9,  recargo: 0.330209 }, // 27.29% + IVA
+    { cuotas: 12, recargo: 0.390709 }, // 32.29% + IVA
 ]
+
+const FEE_COBRO_INSTANTE = 0.0761 // 6.29% + IVA (MP usa 7.61% exacto)
 
 interface ProductDetailClientProps {
     product: ProductWithDetails
@@ -282,7 +283,9 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                                     </div>
                                     {/* Filas */}
                                     {CUOTAS_CONFIG.map(({ cuotas, recargo }) => {
-                                        const totalConRecargo = Math.round(priceARS * (1 + recargo))
+                                        // Fórmula financiera de Mercado Pago: Monto = Neto / (1 - Suma de comisiones)
+                                        const totalComisiones = FEE_COBRO_INSTANTE + recargo
+                                        const totalConRecargo = Math.round(priceARS / (1 - totalComisiones))
                                         const valorCuota = Math.round(totalConRecargo / cuotas)
                                         return (
                                             <div
