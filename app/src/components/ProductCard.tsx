@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import { useDolarBlue } from '@/hooks/useDolarBlue'
 import { formatUSD, formatARS, getPriceUSD, getPriceARS, conditionLabel } from '@/lib/utils'
 import type { ProductWithDetails } from '@/lib/database.types'
@@ -31,14 +32,17 @@ import Image from 'next/image'
 export default function ProductCard({ product }: ProductCardProps) {
     const { dolar } = useDolarBlue()
 
-    const images = [...(product.product_images || [])].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+    // Optimizamos la selección de imagen y agregamos un fallback más robusto
+    const image = useMemo(() => {
+        if (!product.product_images || product.product_images.length === 0) return null;
+        return [...product.product_images].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))[0];
+    }, [product.product_images]);
+
     const variant = product.product_variants?.[0]
     const priceUSD = getPriceUSD(variant?.prices, product.price_usd)
     const priceARS = priceUSD && dolar ? getPriceARS(priceUSD, dolar.venta) : null
     const stock = (variant?.inventory as any)?.[0]?.qty_available ?? null
-    const image = product.product_images && product.product_images.length > 0
-        ? [...product.product_images].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))[0]
-        : null
+
     const emoji = CATEGORY_EMOJI[(product.categories as any)?.slug] ?? '📦'
 
     const conditionClass: Record<string, string> = {
@@ -64,6 +68,8 @@ export default function ProductCard({ product }: ProductCardProps) {
                         height={400}
                         style={{ objectFit: 'contain' }}
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        unoptimized // Bypass Next.js optimization to avoid 404/500 failures in grid
+                        priority={product.is_featured} // Prioritize featured products
                     />
                 ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
