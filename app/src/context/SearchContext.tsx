@@ -5,6 +5,8 @@ import React, { createContext, useContext, useState, ReactNode } from 'react'
 interface SearchContextType {
     searchQuery: string
     setSearchQuery: (query: string) => void
+    category: string
+    setCategory: (category: string) => void
     showFilters: boolean
     setShowFilters: (show: boolean) => void
     sortBy: string
@@ -16,11 +18,13 @@ const SearchContext = createContext<SearchContextType | undefined>(undefined)
 
 export function SearchProvider({ children }: { children: ReactNode }) {
     const [searchQuery, setSearchQuery] = useState('')
+    const [category, setCategory] = useState('')
     const [showFilters, setShowFilters] = useState(false)
     const [sortBy, setSortBy] = useState('reciente')
 
     const resetSearch = () => {
         setSearchQuery('')
+        setCategory('')
         setShowFilters(false)
         setSortBy('reciente')
     }
@@ -29,6 +33,8 @@ export function SearchProvider({ children }: { children: ReactNode }) {
         <SearchContext.Provider value={{
             searchQuery,
             setSearchQuery,
+            category,
+            setCategory,
             showFilters,
             setShowFilters,
             sortBy,

@@ -15,16 +15,35 @@ import { useTheme } from '@/context/ThemeContext'
 import { SearchableSelect } from './SearchableSelect'
 import { phone } from '@/const/phone'
 import { messagewsp } from '@/const/messagewsp'
+import { supabase } from '@/lib/supabase'
+import type { Category } from '@/lib/database.types'
 
 export default function Header() {
     const pathname = usePathname()
     const { dolar, loading } = useDolarBlue()
     const { totalItems, isDrawerOpen, setDrawerOpen } = useCart()
-    const { showFilters, setShowFilters, sortBy, setSortBy, resetSearch } = useSearch()
+    const { 
+        showFilters, 
+        setShowFilters, 
+        sortBy, 
+        setSortBy, 
+        resetSearch,
+        category,
+        setCategory
+    } = useSearch()
     const { theme, toggleTheme } = useTheme()
     const [menuOpen, setMenuOpen] = useState(false)
+    const [categories, setCategories] = useState<Category[]>([])
     const router = useRouter()
     const prevPathname = useRef(pathname)
+
+    useEffect(() => {
+        async function fetchCategories() {
+            const { data } = await supabase.from('categories').select('*').order('name')
+            if (data) setCategories(data)
+        }
+        fetchCategories()
+    }, [])
 
     useEffect(() => {
         if (prevPathname.current !== pathname) {
@@ -43,6 +62,11 @@ export default function Header() {
         { href: '/productos', label: dict.nav.productos },
         { href: '/nosotros', label: dict.nav.nosotros },
         { href: '/como-comprar', label: dict.nav.comoComprar },
+    ]
+
+    const categoryOptions = [
+        { value: '', label: 'Todas las categorías' },
+        ...categories.map(c => ({ value: c.slug, label: c.name }))
     ]
 
     return (
@@ -167,22 +191,38 @@ export default function Header() {
                         <div className="global-search-wrapper">
                             <GlobalSearch />
 
+                            <div className="md-show" style={{ width: 220 }}>
+                                <SearchableSelect
+                                    id="header-category"
+                                    value={category}
+                                    onChange={(v) => {
+                                        setCategory(v)
+                                        if (!isProductsPage) {
+                                            router.push(`/productos?categoria=${v}`)
+                                        }
+                                    }}
+                                    options={categoryOptions}
+                                    placeholder="Todas las categorías"
+                                />
+                            </div>
+
                             <button
                                 className="btn"
                                 style={{
                                     height: '46px',
-                                    padding: '0 24px',
+                                    padding: '0 20px',
                                     borderRadius: '12px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '10px',
-                                    background: showFilters ? 'rgba(52, 199, 89, 0.15)' : 'var(--bg-card)',
-                                    border: showFilters ? '1px solid var(--accent)' : '1px solid var(--border-light)',
-                                    color: 'var(--text-primary)',
+                                    background: showFilters ? 'rgba(52, 199, 89, 0.1)' : 'var(--bg-card)',
+                                    border: showFilters ? '2px solid var(--accent)' : '1px solid var(--border-light)',
+                                    color: showFilters ? 'var(--accent)' : 'var(--text-primary)',
                                     fontSize: '0.95rem',
-                                    fontWeight: 500,
+                                    fontWeight: 700,
                                     cursor: 'pointer',
-                                    transition: 'all 0.2s ease'
+                                    transition: 'all 0.2s ease',
+                                    boxShadow: showFilters ? '0 0 15px rgba(52, 199, 89, 0.2)' : 'none'
                                 }}
                                 onClick={() => {
                                     if (!isProductsPage) {
@@ -211,7 +251,8 @@ export default function Header() {
                                         { value: 'reciente', label: 'Más recientes' },
                                         { value: 'precio-asc', label: 'Precio: menor a mayor' },
                                         { value: 'precio-desc', label: 'Precio: mayor a menor' },
-                                        { value: 'nombre', label: 'Nombre A-Z' },
+                                        { value: 'nombre-asc', label: 'Nombre A-Z' },
+                                        { value: 'nombre-desc', label: 'Nombre Z-A' },
                                     ]}
                                 />
                             </div>

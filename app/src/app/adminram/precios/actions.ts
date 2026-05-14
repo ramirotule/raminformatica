@@ -278,46 +278,87 @@ function getCriticalTokens(model: string): Set<string> {
 
 function getSpecsSimilarity(a: ProductSpecs, b: ProductSpecs): number {
     let score = 0;
+    let applicableWeight = 0;
 
     // Marca (10%) — marcas distintas = 0 inmediato
     if (a.brand && b.brand) {
-        if (a.brand === b.brand) score += 0.10;
-        else return 0;
+        if (a.brand !== b.brand) return 0;
+        score += 0.10;
+        applicableWeight += 0.10;
+    } else if (a.brand || b.brand) {
+        // Solo uno tiene marca → medio crédito
+        score += 0.05;
+        applicableWeight += 0.10;
     }
+    // Ambos sin marca: no aplica (no penaliza ni suma)
 
-    // Modelo (40%) via critical tokens
-    let modelScore = 0;
+    // Modelo (40%)
     if (a.model && b.model) {
         const ca = getCriticalTokens(a.model);
         const cb = getCriticalTokens(b.model);
-        if (ca.size > 0 && cb.size > 0) {
+        const allPureNumbers = (tokens: Set<string>) =>
+            tokens.size > 0 && [...tokens].every(t => /^\d+$/.test(t));
+
+        let modelScore = 0;
+        if (ca.size > 0 && cb.size > 0 && !allPureNumbers(ca) && !allPureNumbers(cb)) {
+            // Critical tokens alfanuméricos (S25, Note14, A55…): usar solo critical tokens
             const inter = [...ca].filter(t => cb.has(t)).length;
             const union = new Set([...ca, ...cb]).size;
             modelScore = inter / union;
         } else {
-            // Fallback: token overlap de todo el modelo
+            // Critical tokens son solo números puros (ej: "4", "65") o no hay critical tokens:
+            // mezclar overlap de critical tokens con overlap de todos los tokens
             const ta = new Set(a.model.split(' '));
             const tb = new Set(b.model.split(' '));
-            const inter = [...ta].filter(t => tb.has(t)).length;
-            const union = new Set([...ta, ...tb]).size;
-            modelScore = union > 0 ? inter / union : 0;
+            const allInter = [...ta].filter(t => tb.has(t)).length;
+            const allUnion = new Set([...ta, ...tb]).size;
+            const allScore = allUnion > 0 ? allInter / allUnion : 0;
+
+            if (ca.size > 0 && cb.size > 0) {
+                const critInter = [...ca].filter(t => cb.has(t)).length;
+                const critUnion = new Set([...ca, ...cb]).size;
+                const critScore = critInter / critUnion;
+                modelScore = 0.4 * critScore + 0.6 * allScore;
+            } else {
+                modelScore = allScore;
+            }
         }
+        score += modelScore * 0.40;
+        applicableWeight += 0.40;
     }
-    score += modelScore * 0.40;
 
     // Storage (25%)
-    if (a.storage && b.storage) { if (a.storage === b.storage) score += 0.25; }
-    else if (!a.storage || !b.storage) score += 0.125;
+    if (a.storage && b.storage) {
+        if (a.storage === b.storage) score += 0.25;
+        applicableWeight += 0.25;
+    } else if (a.storage || b.storage) {
+        score += 0.125;
+        applicableWeight += 0.25;
+    }
+    // Ambos sin storage: no aplica
 
     // RAM (15%)
-    if (a.ram && b.ram) { if (a.ram === b.ram) score += 0.15; }
-    else if (!a.ram || !b.ram) score += 0.075;
+    if (a.ram && b.ram) {
+        if (a.ram === b.ram) score += 0.15;
+        applicableWeight += 0.15;
+    } else if (a.ram || b.ram) {
+        score += 0.075;
+        applicableWeight += 0.15;
+    }
+    // Ambos sin RAM: no aplica
 
     // Pantalla (10%)
-    if (a.screen && b.screen) { if (a.screen === b.screen) score += 0.10; }
-    else if (!a.screen || !b.screen) score += 0.05;
+    if (a.screen && b.screen) {
+        if (a.screen === b.screen) score += 0.10;
+        applicableWeight += 0.10;
+    } else if (a.screen || b.screen) {
+        score += 0.05;
+        applicableWeight += 0.10;
+    }
+    // Ambos sin pantalla: no aplica
 
-    return Math.min(score, 1);
+    if (applicableWeight === 0) return 0;
+    return Math.min(score / applicableWeight, 1);
 }
 
 function getSimilarity(s1: string, s2: string): number {

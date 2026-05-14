@@ -36,6 +36,7 @@ import {
     Zap,
     Cpu,
     Sparkles,
+    Copy,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { dict } from '@/lib/dict'
@@ -78,6 +79,22 @@ function Sidebar({ active, onChange }: { active: AdminSection; onChange: (s: Adm
                     {dict.admin.titulo}
                 </div>
             </div>
+
+            <button
+                className="admin-nav-item"
+                onClick={() => window.open('/', '_blank')}
+                style={{ 
+                    marginBottom: 20, 
+                    color: 'var(--accent)', 
+                    background: 'rgba(52, 199, 89, 0.1)', 
+                    border: '1px solid rgba(52, 199, 89, 0.2)',
+                    fontWeight: 700 
+                }}
+            >
+                <ExternalLink size={16} />
+                Ver mi web
+            </button>
+
             {items.map((item) => (
                 <button
                     key={item.id}
@@ -643,7 +660,7 @@ function AdminProductos() {
     const [providerFilter, setProviderFilter] = useState('')
     const [categoryFilter, setCategoryFilter] = useState('')
     const [brandFilter, setBrandFilter] = useState('')
-    const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
+    const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('active')
 
     const handleSort = (field: SortField) => {
         if (sortField === field) {
@@ -1041,6 +1058,42 @@ function AdminProductos() {
             id: img.id,
             url: img.public_url || '',
             isExisting: true,
+            storagePath: img.storage_path
+        })))
+        setModalOpen(true)
+    }
+
+    function handleDuplicate(p: ProductWithDetails) {
+        const variant = p.product_variants?.[0]
+        const price = variant?.prices?.find((pr: any) => pr.currency === 'USD')
+        setEditProduct(null)
+        setForm({
+            name: `${p.name} (Copia)`,
+            slug: slugify(`${p.name} copia ${Math.floor(Math.random() * 1000)}`),
+            category_id: p.category_id || '',
+            brand_id: p.brand_id || '',
+            provider_id: p.provider_id || '',
+            condition: p.condition || 'new',
+            short_description: p.short_description ?? '',
+            active: true,
+            is_featured: false,
+            priceUSD: p.price_usd ? String(p.price_usd) : (price ? String(price.amount) : ''),
+            cost_price: p.cost_price ? String(p.cost_price) : '',
+            sku: variant?.sku ? `${variant.sku}-COPY` : '',
+            color: variant?.color ?? '',
+            storage: variant?.storage ?? '',
+            connectivity: variant?.connectivity ?? '',
+            tags: p.tags ? p.tags.join(', ') : '',
+            long_description: p.long_description || '',
+            descripcion_original: (p as any).descripcion_original || '',
+        })
+        setShowMoreDetails(true)
+        setShowOriginalDesc(false)
+        const sortedImages = [...(p.product_images || [])].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+        setImages(sortedImages.map(img => ({
+            id: Math.random().toString(36).substr(2, 9),
+            url: img.public_url || '',
+            isExisting: false,
             storagePath: img.storage_path
         })))
         setModalOpen(true)
@@ -1608,6 +1661,14 @@ function AdminProductos() {
                                                     title="Editar"
                                                 >
                                                     <Pencil size={14} />
+                                                </button>
+                                                <button
+                                                    id={`duplicate-product-${p.id}`}
+                                                    className="btn btn-ghost btn-sm"
+                                                    onClick={() => handleDuplicate(p)}
+                                                    title="Duplicar"
+                                                >
+                                                    <Copy size={14} />
                                                 </button>
                                                 <button
                                                     id={`delete-product-${p.id}`}
@@ -2403,6 +2464,7 @@ function AdminProductos() {
 // ─── Admin Categorías ─────────────────────────────────────────────────────────
 function AdminCategorias() {
     const [items, setItems] = useState<Category[]>([])
+    const [searchQuery, setSearchQuery] = useState('')
     const [loading, setLoading] = useState(true)
     const [isSaving, setIsSaving] = useState(false)
     const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
@@ -2450,7 +2512,13 @@ function AdminCategorias() {
         }
     }
 
-    const sortedItems = [...items].sort((a, b) => {
+    const filteredItems = items.filter(item => {
+        if (!searchQuery) return true
+        const query = searchQuery.toLowerCase().trim()
+        return item.name.toLowerCase().includes(query) || (item.slug || '').toLowerCase().includes(query)
+    })
+
+    const sortedItems = [...filteredItems].sort((a, b) => {
         const valA = (a[sortField] || '').toLowerCase()
         const valB = (b[sortField] || '').toLowerCase()
         if (valA < valB) return sortOrder === 'asc' ? -1 : 1
@@ -2560,6 +2628,23 @@ function AdminCategorias() {
                 <button id="admin-new-category" className="btn btn-primary btn-sm" onClick={openNew}>
                     <Plus size={15} /> {dict.admin.nuevo}
                 </button>
+            </div>
+
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 20 }}>
+                <div style={{ position: 'relative', flex: 1, maxWidth: 400, display: 'flex', alignItems: 'center', gap: 8, padding: '0 12px', background: 'var(--bg-secondary)', borderRadius: 8, border: '1px solid var(--border-color)', height: 40 }}>
+                    <Search size={16} style={{ color: 'var(--text-muted)' }} />
+                    <input
+                        placeholder="Buscar categorías..."
+                        style={{ background: 'none', border: 'none', color: 'var(--text)', flex: 1, height: '100%', outline: 'none', fontSize: '0.9rem' }}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    {searchQuery && (
+                        <button onClick={() => setSearchQuery('')} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+                            <X size={14} />
+                        </button>
+                    )}
+                </div>
             </div>
 
             {selectedIds.size > 0 && (
@@ -2745,6 +2830,7 @@ function AdminCategorias() {
 // ─── Admin Marcas ─────────────────────────────────────────────────────────────
 function AdminMarcas() {
     const [items, setItems] = useState<Brand[]>([])
+    const [searchQuery, setSearchQuery] = useState('')
     const [loading, setLoading] = useState(true)
     const [isSaving, setIsSaving] = useState(false)
     const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
@@ -2799,7 +2885,13 @@ function AdminMarcas() {
         }
     }
 
-    const sortedItems = [...items].sort((a, b) => {
+    const filteredItems = items.filter(item => {
+        if (!searchQuery) return true
+        const query = searchQuery.toLowerCase().trim()
+        return item.name.toLowerCase().includes(query) || (item.slug || '').toLowerCase().includes(query)
+    })
+
+    const sortedItems = [...filteredItems].sort((a, b) => {
         const valA = sortField === 'created_at' ? new Date(a.created_at || 0).getTime() : (a[sortField] || '').toLowerCase()
         const valB = sortField === 'created_at' ? new Date(b.created_at || 0).getTime() : (b[sortField] || '').toLowerCase()
         if (valA < valB) return sortOrder === 'asc' ? -1 : 1
@@ -2900,6 +2992,23 @@ function AdminMarcas() {
                 <button id="admin-new-brand" className="btn btn-primary btn-sm" onClick={() => { setEditId(null); setForm({ name: '', slug: '', logo_url: '' }); setLogoFile(null); setModalOpen(true) }}>
                     <Plus size={15} /> {dict.admin.nuevo}
                 </button>
+            </div>
+
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 20 }}>
+                <div style={{ position: 'relative', flex: 1, maxWidth: 400, display: 'flex', alignItems: 'center', gap: 8, padding: '0 12px', background: 'var(--bg-secondary)', borderRadius: 8, border: '1px solid var(--border-color)', height: 40 }}>
+                    <Search size={16} style={{ color: 'var(--text-muted)' }} />
+                    <input
+                        placeholder="Buscar marcas..."
+                        style={{ background: 'none', border: 'none', color: 'var(--text)', flex: 1, height: '100%', outline: 'none', fontSize: '0.9rem' }}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    {searchQuery && (
+                        <button onClick={() => setSearchQuery('')} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+                            <X size={14} />
+                        </button>
+                    )}
+                </div>
             </div>
 
             {selectedIds.size > 0 && (
@@ -3711,6 +3820,7 @@ function AdminHome() {
 // ─── Admin Proveedores ────────────────────────────────────────────────────────
 function AdminProveedores() {
     const [items, setItems] = useState<Provider[]>([])
+    const [searchQuery, setSearchQuery] = useState('')
     const [loading, setLoading] = useState(true)
     const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
     const [modalOpen, setModalOpen] = useState(false)
@@ -3807,7 +3917,13 @@ function AdminProveedores() {
         setSingleDeleteConfirm(null)
     }
 
-    const sortedItems = [...items].sort((a: any, b: any) => {
+    const filteredItems = items.filter(item => {
+        if (!searchQuery) return true
+        const query = searchQuery.toLowerCase().trim()
+        return item.name.toLowerCase().includes(query) || (item.email || '').toLowerCase().includes(query)
+    })
+
+    const sortedItems = [...filteredItems].sort((a: any, b: any) => {
         const valA = (a[sortField] || '').toLowerCase()
         const valB = (b[sortField] || '').toLowerCase()
         if (valA < valB) return sortOrder === 'asc' ? -1 : 1
@@ -3822,6 +3938,23 @@ function AdminProveedores() {
                 <button className="btn btn-primary btn-sm" onClick={() => { setEditId(null); setForm({ name: '', email: '', phone: '', address: '', notes: '', active: true }); setModalOpen(true) }}>
                     <Plus size={15} /> Nuevo Proveedor
                 </button>
+            </div>
+
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 20 }}>
+                <div style={{ position: 'relative', flex: 1, maxWidth: 400, display: 'flex', alignItems: 'center', gap: 8, padding: '0 12px', background: 'var(--bg-secondary)', borderRadius: 8, border: '1px solid var(--border-color)', height: 40 }}>
+                    <Search size={16} style={{ color: 'var(--text-muted)' }} />
+                    <input
+                        placeholder="Buscar proveedores..."
+                        style={{ background: 'none', border: 'none', color: 'var(--text)', flex: 1, height: '100%', outline: 'none', fontSize: '0.9rem' }}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    {searchQuery && (
+                        <button onClick={() => setSearchQuery('')} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+                            <X size={14} />
+                        </button>
+                    )}
+                </div>
             </div>
 
             {selectedIds.size > 0 && (
