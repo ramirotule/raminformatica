@@ -127,7 +127,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                             height={800} 
                             priority 
                             className="main-image"
-                            style={{ objectFit: 'contain', width: '100%', height: 'auto' }}
+                            style={{ objectFit: 'contain', width: '100%', height: '100%' }}
                             sizes="(max-width: 768px) 100vw, 50vw"
                         />
                     ) : (
@@ -147,7 +147,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                                     alt={product.name} 
                                     width={100} 
                                     height={100}
-                                    style={{ objectFit: 'contain', width: '100%', height: 'auto' }}
+                                    style={{ objectFit: 'contain', width: '100%', height: '100%' }}
                                 />
                             </button>
                         ))}

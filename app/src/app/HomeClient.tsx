@@ -366,70 +366,72 @@ export default function HomeClient({
       <section
         className="hero"
         style={{
-          minHeight: "80vh",
-          padding: "160px 0 60px",
+          minHeight: "auto",
+          padding: "140px 0 40px",
           background: "var(--bg-primary)",
           display: "flex",
           alignItems: "center",
           overflow: "hidden",
         }}
       >
-        <div className="container hero-grid-layout">
-          {/* Left Column: Hero Text */}
-          <div className="hero-content-left">
-            <div
-              className="hero-eyebrow"
-              style={{ justifyContent: "flex-start" }}
-            >
-              <Zap size={13} />
-              <span>Toda la Tecnología que buscas</span>
-            </div>
-
-            <h1
-              className="hero-title"
-              style={{
-                fontSize: "clamp(2.2rem, 3.8vw, 4.2rem)",
-                lineHeight: 1.1,
-                marginBottom: 24,
-                textAlign: "left",
-              }}
-            >
-              <span>{dict.hero.titulo}</span>
-              <br />
-              {dict.hero.subtitulo}
-            </h1>
-
-            <p
-              className="hero-desc"
-              style={{
-                fontSize: "1.15rem",
-                maxWidth: "100%",
-                marginBottom: 44,
-                opacity: 0.92,
-                textAlign: "left",
-                marginInline: 0,
-              }}
-            >
-              {dict.hero.descripcion}
-            </p>
-
-            <div
-              className="hero-actions"
-              style={{ justifyContent: "flex-start" }}
-            >
-              <Link href="/productos" className="btn btn-primary">
-                {dict.hero.cta}
-                <ChevronRight size={16} />
-              </Link>
-              <Link href="/categorias" className="btn btn-secondary">
-                {dict.hero.ctaSecundario}
-              </Link>
-            </div>
+        <div className="hero-stack-layout" style={{ width: '100%' }}>
+          {/* Top: WeeklyNews Component (Full Width) */}
+          <div className="hero-slide-top" style={{ marginBottom: 30 }}>
+            <WeeklyNews isHero initialNews={news} />
           </div>
 
-          {/* Right Column: WeeklyNews Component */}
-          <div className="hero-slide-right">
-            <WeeklyNews isHero initialNews={news} />
+          {/* Bottom: Hero Text (In Container) */}
+          <div className="container">
+            <div className="hero-content-bottom" style={{ textAlign: 'center' }}>
+              <div
+                className="hero-eyebrow"
+                style={{ justifyContent: 'center' }}
+              >
+                <Zap size={13} />
+                <span>Toda la Tecnología que buscas</span>
+              </div>
+
+              <h1
+                className="hero-title"
+                style={{
+                  fontSize: "clamp(2.5rem, 5vw, 4.5rem)",
+                  lineHeight: 1.1,
+                  marginBottom: 24,
+                  textAlign: "center",
+                }}
+              >
+                <span>{dict.hero.titulo}</span>
+                <br />
+                {dict.hero.subtitulo}
+              </h1>
+
+              <p
+                className="hero-desc"
+                style={{
+                  fontSize: "1.2rem",
+                  maxWidth: "800px",
+                  marginBottom: 44,
+                  opacity: 0.92,
+                  textAlign: "center",
+                  marginInline: "auto",
+                }}
+              >
+                {dict.hero.descripcion}
+              </p>
+
+              <div
+                className="hero-actions"
+                style={{ justifyContent: "center" }}
+              >
+                <Link href="/productos" className="btn btn-primary">
+                  {dict.hero.cta}
+                  <ChevronRight size={16} />
+                </Link>
+                <Link href="/categorias" className="btn btn-secondary">
+                  {dict.hero.ctaSecundario}
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>

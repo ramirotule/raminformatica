@@ -3,7 +3,7 @@
 import { ListFilter, ChevronDown } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 
-export type SortOption = 'reciente' | 'precio-asc' | 'precio-desc' | 'nombre-asc' | 'nombre-desc'
+export type SortOption = 'mas-vendidos' | 'reciente' | 'precio-asc' | 'precio-desc' | 'nombre-asc' | 'nombre-desc'
 
 interface SortControlsProps {
     sortBy: SortOption;
@@ -16,6 +16,7 @@ export function SortControls({ sortBy, onSortChange, onToggleFilters }: SortCont
     const ref = useRef<HTMLDivElement>(null)
 
     const options: { value: SortOption; label: string }[] = [
+        { value: 'mas-vendidos', label: 'Más vendidos' },
         { value: 'reciente', label: 'Más recientes' },
         { value: 'precio-asc', label: 'Menor precio' },
         { value: 'precio-desc', label: 'Mayor precio' },

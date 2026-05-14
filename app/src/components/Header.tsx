@@ -29,7 +29,8 @@ export default function Header() {
         setSortBy, 
         resetSearch,
         category,
-        setCategory
+        setCategory,
+        searchQuery
     } = useSearch()
     const { theme, toggleTheme } = useTheme()
     const [menuOpen, setMenuOpen] = useState(false)
@@ -47,10 +48,23 @@ export default function Header() {
 
     useEffect(() => {
         if (prevPathname.current !== pathname) {
-            resetSearch()
+            // Resetear búsqueda solo si salimos de la sección de productos
+            if (!pathname.startsWith('/productos')) {
+                resetSearch()
+            }
         }
+        
+        // Sincronizar el combo de categorías con la URL (para rutas dinámicas /productos/[slug])
+        const parts = pathname.split('/')
+        if (parts[1] === 'productos' && parts[2]) {
+            setCategory(parts[2])
+        } else if (pathname === '/productos') {
+            const catParam = new URLSearchParams(window.location.search).get('categoria')
+            if (!catParam) setCategory('')
+        }
+
         prevPathname.current = pathname
-    }, [pathname, resetSearch])
+    }, [pathname, resetSearch, setCategory])
 
     const isProductsPage = pathname === '/productos'
     const isHome = pathname === '/'
@@ -197,8 +211,10 @@ export default function Header() {
                                     value={category}
                                     onChange={(v) => {
                                         setCategory(v)
-                                        if (!isProductsPage) {
-                                            router.push(`/productos?categoria=${v}`)
+                                        if (v) {
+                                            router.push(`/productos/${v}`)
+                                        } else {
+                                            router.push('/productos')
                                         }
                                     }}
                                     options={categoryOptions}
@@ -227,7 +243,11 @@ export default function Header() {
                                 onClick={() => {
                                     if (!isProductsPage) {
                                         setShowFilters(true)
-                                        router.push('/productos')
+                                        const params = new URLSearchParams()
+                                        if (category) params.set('categoria', category)
+                                        if (searchQuery) params.set('q', searchQuery)
+                                        const queryStr = params.toString()
+                                        router.push(`/productos${queryStr ? `?${queryStr}` : ''}`)
                                     } else {
                                         setShowFilters(!showFilters)
                                     }
@@ -244,7 +264,11 @@ export default function Header() {
                                     onChange={(v) => {
                                         setSortBy(v)
                                         if (!isProductsPage) {
-                                            router.push('/productos')
+                                            const params = new URLSearchParams()
+                                            if (category) params.set('categoria', category)
+                                            if (searchQuery) params.set('q', searchQuery)
+                                            const queryStr = params.toString()
+                                            router.push(`/productos${queryStr ? `?${queryStr}` : ''}`)
                                         }
                                     }}
                                     options={[

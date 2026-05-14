@@ -58,11 +58,14 @@ export default function ProductosClient({
     const [visibleItems, setVisibleItems] = useState(20)
     const ITEMS_PER_STEP = 20
 
-    // Sync URL params for Category
+    // Sync URL params for Category and Search Query
     useEffect(() => {
         const cat = searchParams.get('categoria')
+        const q = searchParams.get('q')
+        
         if (cat) setSelectedCategory(cat)
-    }, [searchParams, setSelectedCategory])
+        if (q) setSearch(q)
+    }, [searchParams, setSelectedCategory, setSearch])
 
     const handleBrandToggle = (slug: string) => {
         if (!slug) {
@@ -85,7 +88,7 @@ export default function ProductosClient({
         setMinPrice('')
         setMaxPrice('')
         setPriceCurrency('ARS')
-        setSortBy('reciente')
+        setSortBy('mas-vendidos')
         setVisibleItems(20)
         router.push(pathname, { scroll: false })
     }
@@ -174,7 +177,11 @@ export default function ProductosClient({
                 case 'precio-desc': return pb - pa
                 case 'nombre-asc': return a.name.localeCompare(b.name, 'es')
                 case 'nombre-desc': return b.name.localeCompare(a.name, 'es')
-                default: return 0 // reciente (default from DB)
+                case 'mas-vendidos':
+                    if (a.is_featured && !b.is_featured) return -1
+                    if (!a.is_featured && b.is_featured) return 1
+                    return (b.created_at || '').localeCompare(a.created_at || '')
+                default: return (b.created_at || '').localeCompare(a.created_at || '')
             }
         })
 

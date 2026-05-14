@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Loader2, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -13,6 +13,7 @@ export default function WeeklyNews({ isHero = false, initialNews = [] }: { isHer
     const [loading, setLoading] = useState(initialNews.length === 0)
     const [index, setIndex] = useState(0)
     const [direction, setDirection] = useState(0)
+    const [selectedItem, setSelectedItem] = useState<NewsType | null>(null)
 
     useEffect(() => {
         async function fetchNews() {
@@ -25,7 +26,7 @@ export default function WeeklyNews({ isHero = false, initialNews = [] }: { isHer
                     .order('sort_order', { ascending: true })
                 
                 if (data) {
-                    // Solo mostramos los que tienen imagen
+                    console.log("WeeklyNews: Datos recibidos de Supabase:", data.map(d => ({ id: d.id, sort: d.sort_order })))
                     const onlyWithImages = (data as NewsType[]).filter(item => item.image_url)
                     setNews(onlyWithImages)
                 }
@@ -97,7 +98,7 @@ export default function WeeklyNews({ isHero = false, initialNews = [] }: { isHer
             position: 'relative',
             background: isHero ? 'transparent' : 'var(--bg-primary)'
         }}>
-            <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+            <div className={isHero ? "" : "container"} style={{ position: 'relative', zIndex: 1 }}>
                 {!isHero && (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 32, textAlign: 'center' }}>
                         <h2 style={{ 
@@ -116,7 +117,7 @@ export default function WeeklyNews({ isHero = false, initialNews = [] }: { isHer
                         <Loader2 className="animate-spin" size={48} color="var(--green)" />
                     </div>
                 ) : (
-                    <div style={{ position: 'relative', maxWidth: '1400px', margin: '0 auto' }}>
+                    <div style={{ position: 'relative', maxWidth: isHero ? '100%' : '1400px', margin: '0 auto' }}>
                         <div style={{ position: 'relative', height: 'auto', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', perspective: '2000px' }}>
                             <AnimatePresence initial={false} custom={direction} mode="popLayout">
                                 <motion.div
@@ -143,42 +144,62 @@ export default function WeeklyNews({ isHero = false, initialNews = [] }: { isHer
                                         cursor: 'grab'
                                     }}
                                 >
-                                    <div style={{
-                                        width: '100%',
-                                        background: 'var(--bg-card)',
-                                        borderRadius: 24,
-                                        border: '1px solid var(--border)',
-                                        overflow: 'hidden',
-                                        boxShadow: 'var(--shadow-lg)',
-                                        position: 'relative'
-                                    }}>
-                                        <div style={{ width: '100%', position: 'relative', background: '#000', overflow: 'hidden', cursor: (currentItem as any).link_url ? 'pointer' : 'grab' }}>
-                                            {(currentItem as any).link_url ? (
-                                                <Link href={(currentItem as any).link_url}>
-                                                    <motion.div 
-                                                        whileHover={{ opacity: 0.95, scale: 1.01 }}
-                                                        transition={{ duration: 0.2 }}
-                                                    >
-                                                        <Image 
-                                                            src={currentItem.image_url!} 
-                                                            alt={currentItem.title || ''} 
-                                                            width={1200}
-                                                            height={500}
-                                                            priority={isHero && index === 0}
-                                                            style={{ width: '100%', height: 'auto', display: 'block', objectFit: 'cover' }} 
-                                                        />
-                                                    </motion.div>
-                                                </Link>
-                                            ) : (
+                                        <div 
+                                            onClick={() => setSelectedItem(currentItem)}
+                                            style={{
+                                                width: '100%',
+                                                height: isHero ? 'clamp(200px, 40vh, 400px)' : 'auto',
+                                                background: '#000',
+                                                borderRadius: isHero ? 0 : 24,
+                                                border: isHero ? 'none' : '1px solid var(--border)',
+                                                overflow: 'hidden',
+                                                boxShadow: isHero ? 'none' : 'var(--shadow-lg)',
+                                                position: 'relative',
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                        {/* Blurred Backdrop for Hero */}
+                                        {isHero && (
+                                            <div style={{ 
+                                                position: 'absolute', 
+                                                inset: 0, 
+                                                zIndex: 0,
+                                                overflow: 'hidden'
+                                            }}>
+                                                <Image 
+                                                    src={currentItem.image_url!} 
+                                                    alt=""
+                                                    fill
+                                                    className="opacity-70 scale-110"
+                                                    style={{ objectFit: 'cover', filter: 'blur(12px) brightness(0.8)' }}
+                                                />
+                                            </div>
+                                        )}
+
+                                        <div style={{ 
+                                            width: '100%', 
+                                            height: '100%',
+                                            position: 'relative', 
+                                            zIndex: 1,
+                                            background: 'transparent', 
+                                            overflow: 'hidden'
+                                        }}>
+                                            <motion.div 
+                                                whileHover={{ scale: 1.005 }}
+                                                transition={{ duration: 0.2 }}
+                                                style={{ width: '100%', height: '100%' }}
+                                            >
                                                 <Image 
                                                     src={currentItem.image_url!} 
                                                     alt={currentItem.title || ''} 
-                                                    width={1200}
-                                                    height={500}
+                                                    fill
                                                     priority={isHero && index === 0}
-                                                    style={{ width: '100%', height: 'auto', display: 'block', objectFit: 'cover' }} 
+                                                    style={{ 
+                                                        objectFit: isHero ? 'contain' : 'cover',
+                                                        objectPosition: 'center',
+                                                    }} 
                                                 />
-                                            )}
+                                            </motion.div>
                                         </div>
                                     </div>
                                 </motion.div>
@@ -192,7 +213,7 @@ export default function WeeklyNews({ isHero = false, initialNews = [] }: { isHer
                                 justifyContent: 'center', 
                                 alignItems: 'center',
                                 gap: 24, 
-                                marginTop: 40 
+                                marginTop: isHero ? 20 : 40 
                             }}>
                                 <button 
                                     onClick={prevStep}
@@ -269,6 +290,71 @@ export default function WeeklyNews({ isHero = false, initialNews = [] }: { isHer
                 )}
             </div>
 
+            {/* Immersive Modal */}
+            <AnimatePresence>
+                {selectedItem && (
+                    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setSelectedItem(null)}
+                            style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(20px)' }}
+                        />
+                        
+                        <motion.div 
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                            style={{ position: 'relative', zIndex: 10, width: '90%', maxWidth: '1200px', display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'center' }}
+                        >
+                            <button 
+                                onClick={() => setSelectedItem(null)}
+                                style={{ position: 'absolute', top: -60, right: 0, background: 'rgba(255,255,255,0.1)', color: 'white', border: 'none', borderRadius: '50%', width: 44, height: 44, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                            >
+                                <X size={24} />
+                            </button>
+
+                            <div style={{ 
+                                width: '100%', 
+                                maxHeight: '70vh',
+                                borderRadius: 24, 
+                                overflow: 'hidden', 
+                                boxShadow: '0 30px 60px rgba(0,0,0,0.5)', 
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                background: '#000',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                            }}>
+                                <img 
+                                    src={selectedItem.image_url!} 
+                                    alt={selectedItem.title || ''} 
+                                    style={{ 
+                                        maxWidth: '100%', 
+                                        maxHeight: '70vh', 
+                                        objectFit: 'contain',
+                                        display: 'block' 
+                                    }}
+                                />
+                            </div>
+
+                            {(selectedItem as any).link_url && (
+                                <Link 
+                                    href={(selectedItem as any).link_url} 
+                                    className="btn btn-primary" 
+                                    style={{ padding: '16px 48px', fontSize: '1.1rem', borderRadius: 100, boxShadow: '0 0 30px var(--accent-glow)' }}
+                                    onClick={() => setSelectedItem(null)}
+                                >
+                                    Ver Oferta Ahora <ChevronRight size={20} />
+                                </Link>
+                            )}
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
             <style jsx>{`
                 .carousel-nav-btn:hover {
                     transform: scale(1.15) translateY(-2px);
@@ -284,3 +370,4 @@ export default function WeeklyNews({ isHero = false, initialNews = [] }: { isHer
         </section>
     )
 }
+

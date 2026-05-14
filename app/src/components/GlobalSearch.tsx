@@ -13,7 +13,7 @@ import { useDolar } from '@/context/DolarContext'
 import { productUrl } from '@/lib/productUrl'
 
 export default function GlobalSearch() {
-    const { searchQuery, setSearchQuery } = useSearch()
+    const { searchQuery, setSearchQuery, category } = useSearch()
     const { dolar } = useDolar()
     const [results, setResults] = useState<ProductWithDetails[]>([])
     const [loading, setLoading] = useState(false)
@@ -163,6 +163,15 @@ export default function GlobalSearch() {
                     onFocus={() => {
                         if (searchQuery && !isProductsPage) setShowDropdown(true)
                     }}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            setShowDropdown(false)
+                            const params = new URLSearchParams()
+                            if (searchQuery) params.set('q', searchQuery)
+                            if (category) params.set('categoria', category)
+                            router.push(`/productos?${params.toString()}`)
+                        }
+                    }}
                 />
                 {searchQuery && (
                     <button
@@ -227,7 +236,10 @@ export default function GlobalSearch() {
                                 className="dropdown-footer"
                                 onClick={() => {
                                     setShowDropdown(false)
-                                    router.push(`/productos?q=${searchQuery}`)
+                                    const params = new URLSearchParams()
+                                    if (searchQuery) params.set('q', searchQuery)
+                                    if (category) params.set('categoria', category)
+                                    router.push(`/productos?${params.toString()}`)
                                 }}
                             >
                                 Ver todos los resultados

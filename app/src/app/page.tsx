@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 }
 
 // export const dynamic = 'force-dynamic'
-export const revalidate = 60 // Revalidar cada minuto
+export const revalidate = 0 // Siempre fresco para pruebas
 
 async function getFeaturedProducts(): Promise<ProductWithDetails[]> {
   const { data, error } = await (supabase as any)

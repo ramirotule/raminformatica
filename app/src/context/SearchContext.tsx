@@ -20,13 +20,13 @@ export function SearchProvider({ children }: { children: ReactNode }) {
     const [searchQuery, setSearchQuery] = useState('')
     const [category, setCategory] = useState('')
     const [showFilters, setShowFilters] = useState(false)
-    const [sortBy, setSortBy] = useState('reciente')
+    const [sortBy, setSortBy] = useState('mas-vendidos')
 
     const resetSearch = () => {
         setSearchQuery('')
         setCategory('')
         setShowFilters(false)
-        setSortBy('reciente')
+        setSortBy('mas-vendidos')
     }
 
     return (
