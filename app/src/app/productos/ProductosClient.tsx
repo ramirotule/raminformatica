@@ -9,9 +9,8 @@ import { calculatePriceRanges, type PriceBracket } from '@/lib/price-utils'
 import type { ProductWithDetails, Category, Brand } from '@/lib/database.types'
 
 // New Components
-import { FilterSidebar } from './components/FilterSidebar'
 import { SortControls, type SortOption } from './components/SortControls'
-import { MobileFilters } from './components/MobileFilters'
+import { FilterModal } from './components/FilterModal'
 
 import { useSearch } from '@/context/SearchContext'
 import { useDolarBlue } from '@/hooks/useDolarBlue'
@@ -43,8 +42,7 @@ export default function ProductosClient({
         category: selectedCategory,
         setCategory: setSelectedCategory,
         sortBy,
-        setSortBy,
-        showFilters
+        setSortBy
     } = useSearch()
 
     // Filter State
@@ -54,7 +52,7 @@ export default function ProductosClient({
     const [minPrice, setMinPrice] = useState('')
     const [maxPrice, setMaxPrice] = useState('')
     const [priceCurrency, setPriceCurrency] = useState<'ARS' | 'USD'>('ARS')
-    const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+    const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
     const [visibleItems, setVisibleItems] = useState(20)
     const ITEMS_PER_STEP = 20
 
@@ -200,31 +198,14 @@ export default function ProductosClient({
                 gap: 32,
                 marginTop: 20
             }}>
-                {/* Desktop Sidebar */}
-                {showFilters && (
-                    <div className="hide-on-mobile" style={{ gridColumn: 'span 3' }}>
-                        <FilterSidebar 
-                            brands={availableBrands}
-                            selectedBrands={selectedBrands}
-                            onBrandToggle={handleBrandToggle}
-                            minPrice={minPrice}
-                            maxPrice={maxPrice}
-                            currency={priceCurrency}
-                            onCurrencyChange={setPriceCurrency}
-                            onMinPriceChange={setMinPrice}
-                            onMaxPriceChange={setMaxPrice}
-                            onReset={resetFilters}
-                            hasFilters={hasFilters}
-                        />
-                    </div>
-                )}
-
-                {/* Main Content */}
-                <main style={{ gridColumn: showFilters ? 'span 9' : 'span 12' } as any}>
+                {/* Main Content - Always Full Width */}
+                <main style={{ gridColumn: 'span 12' } as any}>
                     <SortControls 
                         sortBy={sortBy as SortOption} 
                         onSortChange={(opt) => setSortBy(opt)}
-                        onToggleFilters={() => setMobileFiltersOpen(true)}
+                        onToggleFilters={() => setIsFilterModalOpen(true)}
+                        hasFilters={hasFilters}
+                        onReset={resetFilters}
                     />
 
                     {filtered.length === 0 ? (
@@ -259,10 +240,10 @@ export default function ProductosClient({
                 </main>
             </div>
 
-            {/* Mobile Drawer */}
-            <MobileFilters 
-                isOpen={mobileFiltersOpen}
-                onClose={() => setMobileFiltersOpen(false)}
+            {/* Unified Filter Modal (Small, Prolijo, Centered) */}
+            <FilterModal 
+                isOpen={isFilterModalOpen}
+                onClose={() => setIsFilterModalOpen(false)}
                 brands={availableBrands}
                 selectedBrands={selectedBrands}
                 onBrandToggle={handleBrandToggle}

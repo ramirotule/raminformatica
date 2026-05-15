@@ -14,6 +14,7 @@ interface FilterSidebarProps {
     onMaxPriceChange: (val: string) => void;
     onReset: () => void;
     hasFilters: boolean;
+    hideTitle?: boolean;
 }
 
 export function FilterSidebar({
@@ -27,7 +28,8 @@ export function FilterSidebar({
     onMinPriceChange,
     onMaxPriceChange,
     onReset,
-    hasFilters
+    hasFilters,
+    hideTitle = false
 }: FilterSidebarProps) {
     const brandOptions = [
         { value: '', label: 'Todas las marcas' },
@@ -39,29 +41,29 @@ export function FilterSidebar({
             width: '100%', 
             display: 'flex', 
             flexDirection: 'column', 
-            gap: 32,
-            position: 'sticky',
-            top: 100
+            gap: 32
         }}>
             {/* Header / Reset */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 700 }}>Filtros</h3>
-                {hasFilters && (
-                    <button 
-                        onClick={onReset}
-                        style={{ 
-                            fontSize: '0.85rem', 
-                            color: 'var(--accent)', 
-                            background: 'none', 
-                            border: 'none', 
-                            cursor: 'pointer',
-                            padding: 4
-                        }}
-                    >
-                        Limpiar todos
-                    </button>
-                )}
-            </div>
+            {!hideTitle && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700 }}>Filtros</h3>
+                    {hasFilters && (
+                        <button 
+                            onClick={onReset}
+                            style={{ 
+                                fontSize: '0.85rem', 
+                                color: 'var(--accent)', 
+                                background: 'none', 
+                                border: 'none', 
+                                cursor: 'pointer',
+                                padding: 4
+                            }}
+                        >
+                            Limpiar todos
+                        </button>
+                    )}
+                </div>
+            )}
 
             {/* Marcas (Dropdown Searchable) */}
             <div>

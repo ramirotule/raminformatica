@@ -272,8 +272,9 @@ img {
   display: flex;
   align-items: center;
   gap: 12px;
-  width: 100%;
+  width: fit-content;
   max-width: 1000px;
+  margin-inline: auto;
 }
 
 .header-actions {
@@ -828,8 +829,8 @@ img {
 }
 
 .header-search {
+  width: 100%;
   max-width: 600px;
-  margin-inline: auto;
 }
 
 .search-input {
@@ -887,7 +888,6 @@ img {
 /* ─── Global Search Dropdown ─────────────────────────── */
 .global-search-container {
   position: relative;
-  flex: 1;
   z-index: 1000;
 }
 

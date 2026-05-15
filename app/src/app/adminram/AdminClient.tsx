@@ -3103,7 +3103,7 @@ function AdminProductos() {
                       marginTop: -1,
                     }}
                   >
-                    <div className="form-group">
+                    {/* <div className="form-group">
                       <label className="form-label" htmlFor="form-condition">
                         {dict.admin.condicion}
                       </label>
@@ -3121,7 +3121,7 @@ function AdminProductos() {
                         ]}
                         placeholder="Seleccionar..."
                       />
-                    </div>
+                    </div> */}
 
                     <div className="form-group">
                       <label className="form-label" htmlFor="form-storage">
