@@ -26,8 +26,9 @@ export default function WeeklyNews({ isHero = false, initialNews = [] }: { isHer
                     .order('sort_order', { ascending: true })
                 
                 if (data) {
-                    console.log("WeeklyNews: Datos recibidos de Supabase:", data.map(d => ({ id: d.id, sort: d.sort_order })))
-                    const onlyWithImages = (data as NewsType[]).filter(item => item.image_url)
+                    const typedData = data as NewsType[]
+                    console.log("WeeklyNews: Datos recibidos de Supabase:", typedData.map(d => ({ id: d.id, sort: d.sort_order })))
+                    const onlyWithImages = typedData.filter(item => item.image_url)
                     setNews(onlyWithImages)
                 }
             } catch (error) {
