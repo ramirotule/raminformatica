@@ -205,7 +205,7 @@ export default function Header() {
                         <div className="global-search-wrapper">
                             <GlobalSearch />
 
-                            <div className="md-show" style={{ width: 220 }}>
+                            <div className="header-category-wrap">
                                 <SearchableSelect
                                     id="header-category"
                                     value={category}

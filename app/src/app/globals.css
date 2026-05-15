@@ -900,7 +900,15 @@ img {
   border: 1px solid var(--border-light);
   border-radius: 12px;
   box-shadow: var(--shadow-lg);
-  overflow: hidden;
+  max-height: 450px;
+  overflow-y: auto;
+  z-index: 1001;
+}
+
+@media (max-width: 640px) {
+  .search-dropdown {
+    max-height: 65vh;
+  }
 }
 
 @keyframes dropdownSlide {
@@ -2419,4 +2427,20 @@ tbody td {
 
 .brand-ticker-container:hover .brand-ticker-track {
   animation-play-state: paused;
+}
+.header-category-wrap {
+  width: 220px;
+}
+@media (max-width: 768px) {
+  .global-search-wrapper {
+    flex-wrap: wrap;
+  }
+  .header-category-wrap {
+    width: 100%;
+    order: 4;
+  }
+  .global-search-container {
+    flex: 1;
+    min-width: 60%;
+  }
 }
