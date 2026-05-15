@@ -171,6 +171,7 @@ export default function WeeklyNews({ isHero = false, initialNews = [] }: { isHer
                                                     src={currentItem.image_url!} 
                                                     alt=""
                                                     fill
+                                                    unoptimized
                                                     className="opacity-70 scale-110"
                                                     style={{ objectFit: 'cover', filter: 'blur(12px) brightness(0.8)' }}
                                                 />
@@ -194,6 +195,7 @@ export default function WeeklyNews({ isHero = false, initialNews = [] }: { isHer
                                                     src={currentItem.image_url!} 
                                                     alt={currentItem.title || ''} 
                                                     fill
+                                                    unoptimized
                                                     priority={isHero && index === 0}
                                                     style={{ 
                                                         objectFit: isHero ? 'contain' : 'cover',
