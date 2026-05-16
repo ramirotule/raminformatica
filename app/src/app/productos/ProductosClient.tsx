@@ -112,8 +112,11 @@ export default function ProductosClient({
             const listWithScores = list.map(p => {
                 let score = 0
                 const name = p.name.toLowerCase()
-                const brand = (p.brands?.name || '').toLowerCase()
-                const catName = (p.categories?.name || '').toLowerCase()
+                const brand = (p.brands?.name || '').toLowerCase().trim()
+                const rawCatName = (p.categories?.name || '').toLowerCase()
+                const catName = brand === 'apple'
+                    ? rawCatName
+                    : rawCatName.replace(/\bmacbooks?\b/g, '').trim()
                 
                 const matchTerm = (term: string, text: string): boolean => text.includes(term)
 

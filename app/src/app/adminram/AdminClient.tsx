@@ -1218,8 +1218,11 @@ function AdminProductos() {
       const listWithScores = list
         .map((p) => {
           const name = p.name.toLowerCase();
-          const brand = (p.brands?.name || "").toLowerCase();
-          const catName = (p.categories?.name || "").toLowerCase();
+          const brand = (p.brands?.name || "").toLowerCase().trim();
+          const rawCatName = (p.categories?.name || "").toLowerCase();
+          const catName = brand === "apple"
+            ? rawCatName
+            : rawCatName.replace(/\bmacbooks?\b/g, "").trim();
           const provName = (p.providers?.name || "").toLowerCase();
           const shortDesc = (p.short_description || "").toLowerCase();
           const longDesc = (p.long_description || "").toLowerCase();
@@ -3103,7 +3106,7 @@ function AdminProductos() {
                       marginTop: -1,
                     }}
                   >
-                    {/* <div className="form-group">
+                    <div className="form-group">
                       <label className="form-label" htmlFor="form-condition">
                         {dict.admin.condicion}
                       </label>
@@ -3121,7 +3124,7 @@ function AdminProductos() {
                         ]}
                         placeholder="Seleccionar..."
                       />
-                    </div> */}
+                    </div>
 
                     <div className="form-group">
                       <label className="form-label" htmlFor="form-storage">

@@ -68,8 +68,11 @@ export default function GlobalSearch() {
                 const scored = (data as ProductWithDetails[]).map(p => {
                     let score = 0
                     const name = p.name.toLowerCase()
-                    const brand = (p as any).brands?.name?.toLowerCase() || ''
-                    const catName = (p.categories?.name || '').toLowerCase()
+                    const brand = ((p as any).brands?.name || '').toLowerCase().trim()
+                    const rawCatName = (p.categories?.name || '').toLowerCase()
+                    const catName = brand === 'apple'
+                        ? rawCatName
+                        : rawCatName.replace(/\bmacbooks?\b/g, '').trim()
                     const shortDesc = (p.short_description || '').toLowerCase()
                     const longDesc = (p.long_description || '').toLowerCase()
                     const tags = ((p as any).tags || []).join(' ').toLowerCase()
