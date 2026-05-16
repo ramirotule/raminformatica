@@ -889,6 +889,13 @@ img {
 .global-search-container {
   position: relative;
   z-index: 1000;
+  width: 100%;
+}
+
+@media (min-width: 769px) {
+  .global-search-container {
+    width: 480px;
+  }
 }
 
 .search-dropdown {
